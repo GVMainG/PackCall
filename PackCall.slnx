@@ -1,1 +1,8 @@
-<Solution />
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PackCall.Api/PackCall.Api.csproj" Id="bda3ba1a-3987-49a3-8bbe-7e57bbb12e56" />
+    <Project Path="src/PackCall.Core/PackCall.Core.csproj" Id="1fa951fc-6ffa-4bdf-a71f-f9e87f4e986a" />
+    <Project Path="src/PackCall.Infrastructure/PackCall.Infrastructure.csproj" Id="767aed83-0305-4501-8497-3615131bf8d0" />
+    <Project Path="src/PackCall.Worker/PackCall.Worker.csproj" Id="0bf429b1-7e29-4fcb-b476-31fef42f39dc" />
+  </Folder>
+</Solution>
