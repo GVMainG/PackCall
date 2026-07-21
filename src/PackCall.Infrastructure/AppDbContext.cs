@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PackCall.Core.Entities
+namespace PackCall.Infrastructure
 {
-    internal class DeliveryEntity
+    internal class AppDbContext
     {
-        
-
     }
 }
