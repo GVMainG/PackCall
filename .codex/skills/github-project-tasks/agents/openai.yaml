@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub задачи PackCall"
+  short_description: "Создаёт краткие задачи для PackCall"
+  default_prompt: "Use $github-project-tasks to create a concise GitHub task for PackCall."
