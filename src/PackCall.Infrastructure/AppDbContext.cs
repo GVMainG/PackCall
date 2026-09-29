@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PackCall.Infrastructure.Models;
+using PackCall.Core.Entities;
 
 namespace PackCall.Infrastructure
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace PackCall.Infrastructure.Models
+namespace PackCall.Core.Entities
 {
     public class Delivery
     {

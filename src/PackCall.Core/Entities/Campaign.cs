@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PackCall.Infrastructure.Models
+namespace PackCall.Core.Entities
 {
     public class Campaign
     {
