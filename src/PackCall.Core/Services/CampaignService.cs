@@ -45,8 +45,10 @@ public sealed class CampaignService
     public async Task StartCampaignAsync(Guid campaignId, CancellationToken ct)
     {
         var campaign = await GetRequiredCampaignAsync(campaignId, ct);
-        campaign.Start(DateTime.UtcNow);
+
+        campaign.ToInProgress();    
         ct.ThrowIfCancellationRequested();
+
         await _campaignRepository.Update(campaign, ct);
     }
 
