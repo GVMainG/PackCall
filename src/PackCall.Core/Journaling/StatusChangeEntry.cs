@@ -1,4 +1,4 @@
-using PackCall.Core.Models;
+using PackCall.Core.Entities;
 
 namespace PackCall.Core.Journaling;
 

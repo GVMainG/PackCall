@@ -1,6 +1,6 @@
 using PackCall.Core.Exceptions;
 
-namespace PackCall.Core.Models;
+namespace PackCall.Core.Entities;
 
 /// <summary>
 /// Доменная сущность: работа по отправке сообщения одному получателю
@@ -27,13 +27,13 @@ public sealed class Delivery
     public DateTime? LockExpiresAt { get; private set; }
 
     public Campaign Campaign { get; private set; } = null!;
-    public RecipientModel Recipient { get; private set; } = null!;
+    public Recipient Recipient { get; private set; } = null!;
 
     // Для восстановления сущности хранилищем.
     private Delivery() { }
 
     /// <summary>
-    /// Создаёт доставку для одного получателя кампании со статусом «Ожидает».
+    /// Создаёт доставку для одного получателя кампании со статусом "Ожидает".
     /// </summary>
     /// <param name="campaignId">Идентификатор кампании.</param>
     /// <param name="recipientId">Идентификатор получателя.</param>
@@ -56,26 +56,22 @@ public sealed class Delivery
     }
 
     /// <summary>
-    /// Переводит доставку из «Ожидает» в «Отправляется», закрепляя её за воркером
+    /// Переводит доставку из "Ожидает" в "Отправляется", закрепляя её за воркером
     /// на ограниченное время.
     /// </summary>
     /// <param name="workerId">Идентификатор воркера.</param>
     /// <param name="lockExpiresAt">Срок закрепления в UTC.</param>
-    /// <param name="now">Дата и время захвата в UTC.</param>
-    public void Capture(string workerId, DateTime lockExpiresAt, DateTime now)
+    public void Capture(string workerId, DateTime lockExpiresAt)
     {
         EnsureTransition(DeliveryStatus.InProgress);
         ArgumentException.ThrowIfNullOrWhiteSpace(workerId);
-        if (lockExpiresAt <= now)
-            throw new ArgumentException("Срок закрепления должен быть в будущем.", nameof(lockExpiresAt));
 
         DeliveryStatus = DeliveryStatus.InProgress;
         WorkerId = workerId;
         LockExpiresAt = lockExpiresAt;
-        UpdatedAt = now;
     }
 
-    /// <summary>Переводит доставку из «Отправляется» в конечный статус «Доставлена».</summary>
+    /// <summary>Переводит доставку из "Отправляется" в конечный статус "Доставлена".</summary>
     public void MarkSent(DateTime now)
     {
         EnsureTransition(DeliveryStatus.Sent);
@@ -83,7 +79,7 @@ public sealed class Delivery
         DeliveryStatus = DeliveryStatus.Sent;
     }
 
-    /// <summary>Переводит доставку из «Отправляется» в конечный статус «Ошибка».</summary>
+    /// <summary>Переводит доставку из "Отправляется" в конечный статус "Ошибка".</summary>
     public void MarkFailed(DateTime now)
     {
         EnsureTransition(DeliveryStatus.Failed);
@@ -92,9 +88,9 @@ public sealed class Delivery
     }
 
     /// <summary>
-    /// Возвращает доставку из «Отправляется» в «Ожидает», если срок закрепления истёк.
+    /// Возвращает доставку из "Отправляется" в "Ожидает", если срок закрепления истёк.
     /// </summary>
-    /// <returns><see langword="true"/>, если доставка возвращена в «Ожидает».</returns>
+    /// <returns><see langword="true"/>, если доставка возвращена в "Ожидает".</returns>
     public bool TryReturnIfLockExpired(DateTime now)
     {
         if (DeliveryStatus != DeliveryStatus.InProgress)

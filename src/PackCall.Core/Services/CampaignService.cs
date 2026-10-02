@@ -1,6 +1,5 @@
-using PackCall.Core.Models;
+using PackCall.Core.Entities;
 using PackCall.Core.Repositorys;
-using PackCall.Core.Abstractions;
 
 namespace PackCall.Core.Services;
 
@@ -8,13 +7,11 @@ public sealed class CampaignService
 {
     private readonly ICampaingRepository _campaignRepository;
     private readonly IDeliveryRepository _deliveryRepository;
-    private readonly IClock _clock;
 
-    public CampaignService(ICampaingRepository campaignRepository, IDeliveryRepository deliveryRepository, IClock clock)
+    public CampaignService(ICampaingRepository campaignRepository, IDeliveryRepository deliveryRepository)
     {
         _campaignRepository = campaignRepository;
         _deliveryRepository = deliveryRepository;
-        _clock = clock;
     }
 
     public async Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct)
@@ -28,7 +25,7 @@ public sealed class CampaignService
     public async Task<Campaign> UpdateCampaignAsync(Guid campaignId, string name, string messageText, CancellationToken ct)
     {
         var campaign = await GetRequiredCampaignAsync(campaignId, ct);
-        campaign.UpdateDetails(name, messageText, _clock.UtcNow);
+        campaign.UpdateDetails(name, messageText, DateTime.UtcNow);
         ct.ThrowIfCancellationRequested();
         return await _campaignRepository.Update(campaign, ct);
     }
@@ -49,7 +46,7 @@ public sealed class CampaignService
     {
         var campaign = await GetRequiredCampaignAsync(campaignId, ct);
 
-        campaign.ToInProgress();    
+        campaign.ToInProgress();
         ct.ThrowIfCancellationRequested();
 
         await _campaignRepository.Update(campaign, ct);
@@ -74,7 +71,7 @@ public sealed class CampaignService
         return _deliveryRepository.GetPage(campaignId, pageNumber, pageSize, ct);
     }
 
-    public async Task<PageResult<RecipientModel>> GetRecipientsAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct)
+    public async Task<PageResult<Recipient>> GetRecipientsAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
         ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
@@ -90,8 +87,8 @@ public sealed class CampaignService
             .OrderBy(recipient => recipient.Id)
             .ToList();
         var items = recipients.Skip(checked((pageNumber - 1) * pageSize)).Take(pageSize).ToList();
-        
-        return new PageResult<RecipientModel>(items, recipients.Count);
+
+        return new PageResult<Recipient>(items, recipients.Count);
     }
 
     private async Task<Campaign> GetRequiredCampaignAsync(Guid campaignId, CancellationToken ct)

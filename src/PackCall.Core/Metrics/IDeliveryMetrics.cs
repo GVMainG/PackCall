@@ -1,4 +1,4 @@
-using PackCall.Core.Models;
+using PackCall.Core.Entities;
 
 namespace PackCall.Core.Metrics;
 
@@ -14,7 +14,7 @@ public interface IDeliveryMetrics
     /// <summary>Фиксирует смену статуса доставки (счётчики по статусам).</summary>
     void RecordStatusChange(DeliveryStatus previous, DeliveryStatus current);
 
-    /// <summary>Фиксирует число доставок, возвращённых в «Ожидает» из-за истёкшего закрепления.</summary>
+    /// <summary>Фиксирует число доставок, возвращённых в "Ожидает" из-за истёкшего закрепления.</summary>
     void RecordExpiredLockReturned(int count);
 
     /// <summary>Фиксирует повторный вызов mock-оператора с тем же ключом идемпотентности.</summary>

@@ -1,6 +1,6 @@
-namespace PackCall.Core.Models
+namespace PackCall.Core.Entities
 {
-    public class RecipientModel
+    public class Recipient
     {
         public Guid Id { get; set; }
         public string Email { get; set; }
