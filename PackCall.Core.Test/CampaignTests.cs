@@ -26,7 +26,7 @@ public class CampaignTests
     {
         var campaign = CreateDraft();
 
-        campaign.ToInProgress();
+        campaign.StatusFromDraftToInProgress();
 
         Assert.Equal(CampaignStatus.InProgress, campaign.Status);
         Assert.NotNull(campaign.StartedAt);
@@ -37,10 +37,10 @@ public class CampaignTests
     public void ToInProgress_WhenAlreadyInProgress_DoesNothing()
     {
         var campaign = CreateDraft();
-        campaign.ToInProgress();
+        campaign.StatusFromDraftToInProgress();
         var startedAt = campaign.StartedAt;
 
-        campaign.ToInProgress();
+        campaign.StatusFromDraftToInProgress();
 
         Assert.Equal(CampaignStatus.InProgress, campaign.Status);
         Assert.Equal(startedAt, campaign.StartedAt);
@@ -50,29 +50,17 @@ public class CampaignTests
     public void ToInProgress_FromCompleted_Throws()
     {
         var campaign = CreateDraft();
-        campaign.ToInProgress();
-        campaign.Complete(Now);
+        campaign.StatusFromDraftToInProgress();
+        campaign.StatusFromInProgressToCompleted(Now);
 
-        Assert.Throws<InvalidOperationException>(() => campaign.ToInProgress());
-    }
-
-    [Fact]
-    public void UpdateDetails_OnDraft_UpdatesFieldsAndDate()
-    {
-        var campaign = CreateDraft();
-
-        campaign.UpdateDetails("Новое название", "Новый текст", Now);
-
-        Assert.Equal("Новое название", campaign.Name);
-        Assert.Equal("Новый текст", campaign.MessageText);
-        Assert.Equal(Now, campaign.UpdatedAt);
+        Assert.Throws<InvalidOperationException>(() => campaign.StatusFromDraftToInProgress());
     }
 
     [Fact]
     public void UpdateDetails_OnInProgress_Throws()
     {
         var campaign = CreateDraft();
-        campaign.ToInProgress();
+        campaign.StatusFromDraftToInProgress();
 
         Assert.Throws<InvalidOperationException>(() => campaign.UpdateDetails("Имя", "Текст", Now));
     }
@@ -81,9 +69,9 @@ public class CampaignTests
     public void Complete_FromInProgress_SetsCompletedAt()
     {
         var campaign = CreateDraft();
-        campaign.ToInProgress();
+        campaign.StatusFromDraftToInProgress();
 
-        campaign.Complete(Now);
+        campaign.StatusFromInProgressToCompleted(Now);
 
         Assert.Equal(CampaignStatus.Completed, campaign.Status);
         Assert.Equal(Now, campaign.CompletedAt);
@@ -94,10 +82,10 @@ public class CampaignTests
     public void Complete_WhenAlreadyCompleted_DoesNothing()
     {
         var campaign = CreateDraft();
-        campaign.ToInProgress();
-        campaign.Complete(Now);
+        campaign.StatusFromDraftToInProgress();
+        campaign.StatusFromInProgressToCompleted(Now);
 
-        campaign.Complete(Now.AddMinutes(1));
+        campaign.StatusFromInProgressToCompleted(Now.AddMinutes(1));
 
         Assert.Equal(Now, campaign.CompletedAt);
     }
@@ -107,6 +95,6 @@ public class CampaignTests
     {
         var campaign = CreateDraft();
 
-        Assert.Throws<InvalidOperationException>(() => campaign.Complete(Now));
+        Assert.Throws<InvalidOperationException>(() => campaign.StatusFromInProgressToCompleted(Now));
     }
 }

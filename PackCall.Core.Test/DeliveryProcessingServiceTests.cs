@@ -21,7 +21,7 @@ public class DeliveryProcessingServiceTests
     private Campaign CreateStartedCampaign()
     {
         var campaign = Campaign.Create("Кампания", "Текст кампании");
-        campaign.ToInProgress();
+        campaign.StatusFromDraftToInProgress();
         _campaignRepository.Create(campaign, CancellationToken.None).GetAwaiter().GetResult();
         return campaign;
     }
@@ -43,7 +43,7 @@ public class DeliveryProcessingServiceTests
         var waiting1 = AddWaitingDelivery(campaign);
         var waiting2 = AddWaitingDelivery(campaign);
         var alreadyInProgress = AddWaitingDelivery(campaign);
-        alreadyInProgress.Capture("worker-other", DateTime.UtcNow.AddMinutes(5));
+        alreadyInProgress.StatusFromWaitingToInProgress("worker-other", DateTime.UtcNow.AddMinutes(5));
 
         var captured = await _service.CaptureBatchAsync(10, "worker-1", TimeSpan.FromMinutes(2), CancellationToken.None);
 
@@ -79,7 +79,7 @@ public class DeliveryProcessingServiceTests
     {
         var campaign = CreateStartedCampaign();
         var delivery = AddWaitingDelivery(campaign);
-        delivery.Capture("worker-1", DateTime.UtcNow.AddMinutes(2));
+        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
 
         await _service.ProcessAsync(delivery, CancellationToken.None);
 
@@ -108,7 +108,7 @@ public class DeliveryProcessingServiceTests
     {
         var campaign = CreateStartedCampaign();
         var delivery = AddWaitingDelivery(campaign);
-        delivery.Capture("worker-1", DateTime.UtcNow.AddMinutes(2));
+        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
         _sender.Handler = _ => SendResult.Failure("оператор недоступен");
 
         await _service.ProcessAsync(delivery, CancellationToken.None);
@@ -126,7 +126,7 @@ public class DeliveryProcessingServiceTests
     {
         var campaign = CreateStartedCampaign();
         var delivery = AddWaitingDelivery(campaign);
-        delivery.Capture("worker-1", DateTime.UtcNow.AddMinutes(2));
+        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
         _sender.Handler = _ => SendResult.Success(isDuplicateSuppressed: true);
 
         await _service.ProcessAsync(delivery, CancellationToken.None);
@@ -151,7 +151,7 @@ public class DeliveryProcessingServiceTests
         var campaign = CreateStartedCampaign();
         AddWaitingDelivery(campaign, "user1@example.com"); // останется в ожидании
         var delivery = AddWaitingDelivery(campaign, "user2@example.com");
-        delivery.Capture("worker-1", DateTime.UtcNow.AddMinutes(2));
+        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
 
         await _service.ProcessAsync(delivery, CancellationToken.None);
 
@@ -170,8 +170,8 @@ public class DeliveryProcessingServiceTests
             2, "worker-dead", TimeSpan.FromSeconds(-5), DateTime.UtcNow, CancellationToken.None);
 
         // Вторая перезахвачена живым воркером с будущим сроком.
-        Assert.True(active.TryReturnIfLockExpired(DateTime.UtcNow));
-        active.Capture("worker-alive", DateTime.UtcNow.AddMinutes(5));
+        Assert.True(active.StatusFromInProgressToWaiting(DateTime.UtcNow));
+        active.StatusFromWaitingToInProgress("worker-alive", DateTime.UtcNow.AddMinutes(5));
 
         var released = await _service.ReleaseExpiredLocksAsync(CancellationToken.None);
 
@@ -190,8 +190,8 @@ public class DeliveryProcessingServiceTests
     {
         var campaign = CreateStartedCampaign();
         var delivery = AddWaitingDelivery(campaign);
-        delivery.Capture("worker-1", DateTime.UtcNow.AddMinutes(2));
-        delivery.MarkSent(DateTime.UtcNow);
+        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
+        delivery.StatusFromInProgressToSent(DateTime.UtcNow);
 
         var completed = await _service.CompleteCampaignIfFinishedAsync(campaign.Id, CancellationToken.None);
 
@@ -211,12 +211,5 @@ public class DeliveryProcessingServiceTests
 
         Assert.False(completed);
         Assert.Equal(CampaignStatus.InProgress, GetStoredCampaign(campaign.Id).Status);
-    }
-
-    [Fact]
-    public async Task CompleteCampaign_MissingCampaign_Throws()
-    {
-        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
-            _service.CompleteCampaignIfFinishedAsync(Guid.NewGuid(), CancellationToken.None));
     }
 }

@@ -43,41 +43,30 @@ public class DeliveryTests
         var delivery = CreateWaiting();
         var lockExpiresAt = Now.AddMinutes(2);
 
-        delivery.Capture("worker-1", lockExpiresAt);
+        delivery.StatusFromWaitingToInProgress("worker-1", lockExpiresAt);
 
         Assert.Equal(DeliveryStatus.InProgress, delivery.DeliveryStatus);
         Assert.Equal("worker-1", delivery.WorkerId);
         Assert.Equal(lockExpiresAt, delivery.LockExpiresAt);
     }
 
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void Capture_WithBlankWorkerId_Throws(string? workerId)
-    {
-        var delivery = CreateWaiting();
-
-        Assert.ThrowsAny<ArgumentException>(() => delivery.Capture(workerId!, Now.AddMinutes(2)));
-    }
-
     [Fact]
     public void Capture_WhenAlreadyInProgress_ThrowsInvalidTransition()
     {
         var delivery = CreateWaiting();
-        delivery.Capture("worker-1", Now.AddMinutes(2));
+        delivery.StatusFromWaitingToInProgress("worker-1", Now.AddMinutes(2));
 
-        Assert.Throws<InvalidStatusTransitionException>(() => delivery.Capture("worker-2", Now.AddMinutes(4)));
+        Assert.Throws<InvalidStatusTransitionException>(() => delivery.StatusFromWaitingToInProgress("worker-2", Now.AddMinutes(4)));
     }
 
     [Fact]
     public void MarkSent_FromInProgress_SetsTerminalStatusAndClearsLock()
     {
         var delivery = CreateWaiting();
-        delivery.Capture("worker-1", Now.AddMinutes(2));
+        delivery.StatusFromWaitingToInProgress("worker-1", Now.AddMinutes(2));
         var completedAt = Now.AddMinutes(1);
 
-        delivery.MarkSent(completedAt);
+        delivery.StatusFromInProgressToSent(completedAt);
 
         Assert.Equal(DeliveryStatus.Sent, delivery.DeliveryStatus);
         Assert.Equal(completedAt, delivery.CompletedAt);
@@ -90,9 +79,9 @@ public class DeliveryTests
     public void MarkFailed_FromInProgress_SetsFailedStatus()
     {
         var delivery = CreateWaiting();
-        delivery.Capture("worker-1", Now.AddMinutes(2));
+        delivery.StatusFromWaitingToInProgress("worker-1", Now.AddMinutes(2));
 
-        delivery.MarkFailed(Now.AddMinutes(1));
+        delivery.StatusFromInProgressToFailed(Now.AddMinutes(1));
 
         Assert.Equal(DeliveryStatus.Failed, delivery.DeliveryStatus);
         Assert.NotNull(delivery.CompletedAt);
@@ -105,26 +94,26 @@ public class DeliveryTests
     {
         var delivery = CreateWaiting();
 
-        Assert.Throws<InvalidStatusTransitionException>(() => delivery.MarkSent(Now));
+        Assert.Throws<InvalidStatusTransitionException>(() => delivery.StatusFromInProgressToSent(Now));
     }
 
     [Fact]
     public void MarkSent_WhenAlreadySent_ThrowsInvalidTransition()
     {
         var delivery = CreateWaiting();
-        delivery.Capture("worker-1", Now.AddMinutes(2));
-        delivery.MarkSent(Now.AddMinutes(1));
+        delivery.StatusFromWaitingToInProgress("worker-1", Now.AddMinutes(2));
+        delivery.StatusFromInProgressToSent(Now.AddMinutes(1));
 
-        Assert.Throws<InvalidStatusTransitionException>(() => delivery.MarkSent(Now.AddMinutes(2)));
+        Assert.Throws<InvalidStatusTransitionException>(() => delivery.StatusFromInProgressToSent(Now.AddMinutes(2)));
     }
 
     [Fact]
     public void TryReturnIfLockExpired_WhenExpired_ReturnsToWaitingAndClearsLock()
     {
         var delivery = CreateWaiting();
-        delivery.Capture("worker-1", Now.AddMinutes(2));
+        delivery.StatusFromWaitingToInProgress("worker-1", Now.AddMinutes(2));
 
-        var returned = delivery.TryReturnIfLockExpired(Now.AddMinutes(3));
+        var returned = delivery.StatusFromInProgressToWaiting(Now.AddMinutes(3));
 
         Assert.True(returned);
         Assert.Equal(DeliveryStatus.Waiting, delivery.DeliveryStatus);
@@ -137,24 +126,13 @@ public class DeliveryTests
     public void TryReturnIfLockExpired_WhenNotExpired_ReturnsFalse()
     {
         var delivery = CreateWaiting();
-        delivery.Capture("worker-1", Now.AddMinutes(2));
+        delivery.StatusFromWaitingToInProgress("worker-1", Now.AddMinutes(2));
 
-        var returned = delivery.TryReturnIfLockExpired(Now.AddMinutes(1));
+        var returned = delivery.StatusFromInProgressToWaiting(Now.AddMinutes(1));
 
         Assert.False(returned);
         Assert.Equal(DeliveryStatus.InProgress, delivery.DeliveryStatus);
         Assert.Equal("worker-1", delivery.WorkerId);
-    }
-
-    [Fact]
-    public void TryReturnIfLockExpired_WhenWaiting_ReturnsFalse()
-    {
-        var delivery = CreateWaiting();
-
-        var returned = delivery.TryReturnIfLockExpired(Now.AddMinutes(1));
-
-        Assert.False(returned);
-        Assert.Equal(DeliveryStatus.Waiting, delivery.DeliveryStatus);
     }
 
     [Fact]

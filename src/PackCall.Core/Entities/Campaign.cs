@@ -48,6 +48,8 @@ public sealed class Campaign
         UpdatedAt = now;
     }
 
+    #region Смена статусов
+
     /// <summary>
     /// Переводит кампанию из черновика в состояние обработки и устанавливает даты начала и изменения.
     /// </summary>
@@ -64,7 +66,7 @@ public sealed class Campaign
     /// <exception cref="ArgumentException">
     /// Название или текст сообщения кампании пусты либо состоят только из пробельных символов.
     /// </exception>
-    public void ToInProgress()
+    public void StatusFromDraftToInProgress()
     {
         if (Status == CampaignStatus.InProgress)
             return;
@@ -87,7 +89,7 @@ public sealed class Campaign
     /// <param name="now">Дата и время завершения в UTC.</param>
     /// <remarks>Повторный вызов для завершённой кампании не изменяет её состояние.</remarks>
     /// <exception cref="InvalidOperationException">Кампания находится в статусе, отличном от "Запущена".</exception>
-    public void Complete(DateTime now)
+    public void StatusFromInProgressToCompleted(DateTime now)
     {
         if (Status == CampaignStatus.Completed)
             return;
@@ -98,6 +100,8 @@ public sealed class Campaign
         CompletedAt = now;
         UpdatedAt = now;
     }
+
+    #endregion Смена статусов
 }
 
 public enum CampaignStatus

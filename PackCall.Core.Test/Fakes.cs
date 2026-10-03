@@ -86,7 +86,7 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
             if (delivery.DeliveryStatus != DeliveryStatus.Waiting)
                 continue;
 
-            delivery.Capture(workerId, now + lockDuration);
+            delivery.StatusFromWaitingToInProgress(workerId, now + lockDuration);
             captured.Add(delivery);
         }
 
@@ -95,7 +95,7 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
 
     public Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(DateTime now, CancellationToken ct)
     {
-        var released = _store.Where(d => d.TryReturnIfLockExpired(now)).ToList();
+        var released = _store.Where(d => d.StatusFromInProgressToWaiting(now)).ToList();
         return Task.FromResult<IReadOnlyList<Delivery>>(released);
     }
 
