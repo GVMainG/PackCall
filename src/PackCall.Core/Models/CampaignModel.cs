@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-
-namespace PackCall.Core.Entities
+namespace PackCall.Core.Models
 {
-    public class Campaign
+    public class CampaignModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -14,7 +11,7 @@ namespace PackCall.Core.Entities
         public DateTime? StartedAt { get; set; }
         public DateTime? CompletedAt { get; set; }
 
-        public ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
+        public ICollection<DeliveryModel> Deliveries { get; set; } = new List<DeliveryModel>();
     }
 
     public enum CampaignStatus

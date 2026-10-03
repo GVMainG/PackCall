@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PackCall.Core.Entities;
+using PackCall.Core.Models;
 
 namespace PackCall.Infrastructure
 {
@@ -9,16 +9,16 @@ namespace PackCall.Infrastructure
         {
         }
 
-        public DbSet<Campaign> Campaigns { get; set; }
-        public DbSet<Recipient> Recipients { get; set; }
-        public DbSet<Delivery> Deliveries { get; set; }
+        public DbSet<CampaignModel> Campaigns { get; set; }
+        public DbSet<RecipientModel> Recipients { get; set; }
+        public DbSet<DeliveryModel> Deliveries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             // Campaign configuration
-            modelBuilder.Entity<Campaign>(entity =>
+            modelBuilder.Entity<CampaignModel>(entity =>
             {
                 entity.ToTable("campaigns");
                 entity.HasKey(e => e.Id).HasName("pk_campaigns_id");
@@ -38,7 +38,7 @@ namespace PackCall.Infrastructure
             });
 
             // Recipient configuration
-            modelBuilder.Entity<Recipient>(entity =>
+            modelBuilder.Entity<RecipientModel>(entity =>
             {
                 entity.ToTable("recipients");
                 entity.HasKey(e => e.Id).HasName("pk_recipients_id");
@@ -51,7 +51,7 @@ namespace PackCall.Infrastructure
             });
 
             // Delivery configuration
-            modelBuilder.Entity<Delivery>(entity =>
+            modelBuilder.Entity<DeliveryModel>(entity =>
             {
                 entity.ToTable("deliveries");
                 entity.HasKey(e => e.Id).HasName("pk_deliveries_id");

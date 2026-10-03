@@ -1,8 +1,6 @@
-using System;
-
-namespace PackCall.Core.Entities
+namespace PackCall.Core.Models
 {
-    public class Delivery
+    public class DeliveryModel
     {
         public Guid Id { get; set; }
         public Guid CampaignId { get; set; }
@@ -14,8 +12,8 @@ namespace PackCall.Core.Entities
         public DateTime? CompletedAt { get; set; }
         public string WorkerId { get; set; }
 
-        public Campaign Campaign { get; set; }
-        public Recipient Recipient { get; set; }
+        public CampaignModel Campaign { get; set; }
+        public RecipientModel Recipient { get; set; }
     }
 
     public enum DeliveryStatus
