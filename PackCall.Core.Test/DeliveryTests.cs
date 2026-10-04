@@ -43,9 +43,10 @@ public class DeliveryTests
         var delivery = CreateWaiting();
         var lockExpiresAt = Now.AddMinutes(2);
 
-        delivery.StatusFromWaitingToInProgress("worker-1", lockExpiresAt);
+        delivery.StatusFromWaitingToInProgress("worker-1", lockExpiresAt, Now.AddMinutes(1));
 
         Assert.Equal(DeliveryStatus.InProgress, delivery.DeliveryStatus);
+        Assert.Equal(Now.AddMinutes(1), delivery.UpdatedAt);
         Assert.Equal("worker-1", delivery.WorkerId);
         Assert.Equal(lockExpiresAt, delivery.LockExpiresAt);
     }

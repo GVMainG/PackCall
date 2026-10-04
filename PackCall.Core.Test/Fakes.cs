@@ -9,10 +9,15 @@ namespace PackCall.Core.Test;
 internal sealed class FakeCampaignRepository : ICampaingRepository
 {
     private readonly Dictionary<Guid, Campaign> _store = new();
+    private readonly FakeDeliveryRepository? _deliveries;
 
-    public FakeCampaignRepository()
+    public FakeCampaignRepository(FakeDeliveryRepository? deliveries = null)
     {
+        _deliveries = deliveries;
     }
+
+    public int CreateCount { get; private set; }
+    public int UpdateCount { get; private set; }
 
     public Task<IEnumerable<Campaign>> Get(Guid id, CancellationToken ct) =>
         Task.FromResult(_store.TryGetValue(id, out var campaign)
@@ -35,6 +40,9 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
     public Task<Campaign> Create(Campaign campaign, CancellationToken ct)
     {
         _store[campaign.Id] = campaign;
+        foreach (var delivery in campaign.Deliveries)
+            _deliveries?.Add(delivery);
+        CreateCount++;
         return Task.FromResult(campaign);
     }
 
@@ -43,11 +51,20 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         if (!_store.ContainsKey(campaign.Id))
             throw new KeyNotFoundException($"Кампания {campaign.Id} не найдена.");
         _store[campaign.Id] = campaign;
+        UpdateCount++;
         return Task.FromResult(campaign);
     }
 
     public Task<bool> Delete(Guid id, CancellationToken ct) =>
         Task.FromResult(_store.Remove(id));
+}
+
+internal sealed class FakeRecipientRepository : IRecipientRepository
+{
+    public List<Recipient> Items { get; } = new();
+
+    public Task<IReadOnlyList<Recipient>> GetAllAsync(CancellationToken ct) =>
+        Task.FromResult<IReadOnlyList<Recipient>>(Items.ToList());
 }
 
 internal sealed class FakeDeliveryRepository : IDeliveryRepository
@@ -85,8 +102,10 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
                 break;
             if (delivery.DeliveryStatus != DeliveryStatus.Waiting)
                 continue;
+            if (delivery.Campaign is not null && delivery.Campaign.Status != CampaignStatus.InProgress)
+                continue;
 
-            delivery.StatusFromWaitingToInProgress(workerId, now + lockDuration);
+            delivery.StatusFromWaitingToInProgress(workerId, now + lockDuration, now);
             captured.Add(delivery);
         }
 

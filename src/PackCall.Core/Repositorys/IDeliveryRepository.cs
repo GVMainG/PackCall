@@ -9,7 +9,8 @@ namespace PackCall.Core.Repositorys
         Task<PageResult<Delivery>> GetPage(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct);
 
         /// <summary>
-        /// Атомарно выбирает не более <paramref name="batchSize"/> доставок со статусом "Ожидает",
+        /// Атомарно выбирает не более <paramref name="batchSize"/> доставок со статусом "Ожидает"
+        /// только у запущенных кампаний,
         /// переводит их в "Отправляется", записывает идентификатор воркера и срок закрепления
         /// и возвращает только успешно захваченные доставки.
         /// </summary>
