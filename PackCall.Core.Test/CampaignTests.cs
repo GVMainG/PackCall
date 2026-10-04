@@ -1,4 +1,5 @@
 using PackCall.Core.Entities;
+using PackCall.Core.Exceptions;
 
 namespace PackCall.Core.Test;
 
@@ -53,7 +54,15 @@ public class CampaignTests
         campaign.StatusFromDraftToInProgress();
         campaign.StatusFromInProgressToCompleted(Now);
 
-        Assert.Throws<InvalidOperationException>(() => campaign.StatusFromDraftToInProgress());
+        var error = Assert.Throws<InvalidStatusTransitionException>(() => campaign.StatusFromDraftToInProgress());
+
+        Assert.Equal(nameof(Campaign), error.EntityName);
+        Assert.Equal(CampaignStatus.Completed, error.PreviousStatus);
+        Assert.Equal(CampaignStatus.InProgress, error.TargetStatus);
+        Assert.Contains("переходы из этого статуса запрещены", error.Message);
+        Assert.Equal(CampaignStatus.Completed, campaign.Status);
+        Assert.Equal(Now, campaign.CompletedAt);
+        Assert.Equal(Now, campaign.UpdatedAt);
     }
 
     [Fact]
@@ -95,6 +104,43 @@ public class CampaignTests
     {
         var campaign = CreateDraft();
 
-        Assert.Throws<InvalidOperationException>(() => campaign.StatusFromInProgressToCompleted(Now));
+        var updatedAt = campaign.UpdatedAt;
+
+        var error = Assert.Throws<InvalidStatusTransitionException>(() => campaign.StatusFromInProgressToCompleted(Now));
+
+        Assert.Equal(nameof(Campaign), error.EntityName);
+        Assert.Equal(CampaignStatus.Draft, error.PreviousStatus);
+        Assert.Equal(CampaignStatus.Completed, error.TargetStatus);
+        Assert.Contains("допустимые переходы: InProgress", error.Message);
+        Assert.Equal(CampaignStatus.Draft, campaign.Status);
+        Assert.Null(campaign.CompletedAt);
+        Assert.Equal(updatedAt, campaign.UpdatedAt);
+    }
+
+    [Theory]
+    [InlineData(CampaignStatus.Draft, false)]
+    [InlineData(CampaignStatus.InProgress, false)]
+    [InlineData(CampaignStatus.Completed, true)]
+    [InlineData(CampaignStatus.Failed, true)]
+    public void StatusTransitions_RecognizesTerminalStates(CampaignStatus status, bool expected)
+    {
+        Assert.Equal(expected, CampaignStatusTransitions.IsTerminal(status));
+    }
+
+    [Fact]
+    public void StatusTransitions_AllowsOnlyStartAndCompletion()
+    {
+        foreach (var from in Enum.GetValues<CampaignStatus>())
+        {
+            foreach (var to in Enum.GetValues<CampaignStatus>())
+            {
+                var expected = (from, to) is
+                    (CampaignStatus.Draft, CampaignStatus.InProgress) or
+                    (CampaignStatus.InProgress, CampaignStatus.Completed);
+
+                Assert.Equal(expected, CampaignStatusTransitions.CanTransition(from, to));
+                Assert.Equal(expected, CampaignStatusTransitions.GetAllowedTargets(from).Contains(to));
+            }
+        }
     }
 }
