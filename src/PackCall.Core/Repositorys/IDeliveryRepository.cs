@@ -1,6 +1,6 @@
 ﻿using PackCall.Core.Models;
 
-namespace PackCall.Core
+namespace PackCall.Core.Repositorys
 {
     public interface IDeliveryRepository
     {

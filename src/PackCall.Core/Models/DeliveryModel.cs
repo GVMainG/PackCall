@@ -12,7 +12,7 @@ namespace PackCall.Core.Models
         public DateTime? CompletedAt { get; set; }
         public string WorkerId { get; set; }
 
-        public CampaignModel Campaign { get; set; }
+        public Campaign Campaign { get; set; }
         public RecipientModel Recipient { get; set; }
     }
 

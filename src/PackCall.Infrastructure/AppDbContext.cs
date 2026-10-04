@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PackCall.Core.Models;
+using PackCall.Core;
 
 namespace PackCall.Infrastructure
 {
@@ -9,7 +10,7 @@ namespace PackCall.Infrastructure
         {
         }
 
-        public DbSet<CampaignModel> Campaigns { get; set; }
+        public DbSet<Campaign> Campaigns { get; set; }
         public DbSet<RecipientModel> Recipients { get; set; }
         public DbSet<DeliveryModel> Deliveries { get; set; }
 
@@ -18,7 +19,7 @@ namespace PackCall.Infrastructure
             base.OnModelCreating(modelBuilder);
 
             // Campaign configuration
-            modelBuilder.Entity<CampaignModel>(entity =>
+            modelBuilder.Entity<Campaign>(entity =>
             {
                 entity.ToTable("campaigns");
                 entity.HasKey(e => e.Id).HasName("pk_campaigns_id");

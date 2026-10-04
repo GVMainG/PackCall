@@ -1,40 +1,56 @@
-﻿using PackCall.Core.Models;
+using PackCall.Core.Models;
 
-namespace PackCall.Core.Services
+namespace PackCall.Core.Services;
+
+// Сценарии приложения: получение данных через порты Core,
+// вызов методов Campaign и сохранение результата.
+public sealed class CampaignService
 {
-    internal class CampaignService
+    public Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct)
     {
-        public Guid Create(string name, string messageText)
-        {
-            // Implementation for creating a campaign.
+        // TODO: вызвать Campaign.Create и сохранить новую кампанию.
+        throw new NotImplementedException();
+    }
 
-            return Guid.NewGuid(); // Placeholder return value
-        }
+    public Task<Campaign> UpdateCampaignAsync(Guid campaignId, string name, string messageText, CancellationToken ct)
+    {
+        // TODO: загрузить кампанию, вызвать UpdateDetails и сохранить изменения.
+        throw new NotImplementedException();
+    }
 
-        public CampaignModel Update(Guid campaignId, string name, string messageText)
-        {
-            // Implementation for updating a campaign.
+    public Task<bool> DeleteCampaignAsync(Guid campaignId, CancellationToken ct)
+    {
+        // TODO: загрузить кампанию, проверить допустимость удаления и удалить её.
+        throw new NotImplementedException();
+    }
 
-            return new CampaignModel(); // Placeholder return value
-        }
+    public Task StartCampaignAsync(Guid campaignId, CancellationToken ct)
+    {
+        // TODO: загрузить кампанию, вызвать Start и сохранить изменения.
+        throw new NotImplementedException();
+    }
 
-        public bool Delete(Guid campaignId)
-        {
-            // Implementation for deleting a campaign.
+    public Task<Campaign?> GetCampaignAsync(Guid campaignId, CancellationToken ct)
+    {
+        // TODO: получить кампанию через репозиторий.
+        throw new NotImplementedException();
+    }
 
-            return false;
-        }
+    public Task<PageResult<Campaign>> GetCampaignsAsync(int pageNumber, int pageSize, CancellationToken ct)
+    {
+        // TODO: получить страницу кампаний через репозиторий.
+        throw new NotImplementedException();
+    }
 
-        public void Start(Guid campaignId)
-        {
-            // Implementation for starting a campaign.
-        }
+    public Task<PageResult<DeliveryModel>> GetDeliveriesAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct)
+    {
+        // TODO: получить страницу доставок кампании через репозиторий.
+        throw new NotImplementedException();
+    }
 
-        public IEnumerable<CampaignModel> Get()
-        {
-            // Implementation for retrieving campaigns.
-
-            return new List<CampaignModel>(); // Placeholder return value
-        }
+    public Task<PageResult<RecipientModel>> GetRecipientsAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct)
+    {
+        // TODO: получить страницу получателей кампании через порт чтения.
+        throw new NotImplementedException();
     }
 }
