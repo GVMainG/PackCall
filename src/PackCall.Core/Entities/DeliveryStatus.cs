@@ -8,7 +8,9 @@ public enum DeliveryStatus
     Sent = 2
 }
 
-/// <summary>Допустимые переходы статусов доставки.</summary>
+/// <summary>
+/// Допустимые переходы статусов доставки.
+/// </summary>
 public static class DeliveryStatusTransitions
 {
     private static readonly IReadOnlyDictionary<DeliveryStatus, IReadOnlySet<DeliveryStatus>> Allowed =

@@ -17,11 +17,11 @@ public class CampaignWorkflowTests
         var recipients = new FakeRecipientRepository();
         recipients.Items.Add(new Recipient { Id = Guid.NewGuid(), Email = "first@example.com" });
         recipients.Items.Add(new Recipient { Id = Guid.NewGuid(), Email = "second@example.com" });
-        var campaignService = new CampaignService(campaigns, deliveries, recipients);
+        ICampaignService campaignService = new CampaignService(campaigns, deliveries, recipients);
         var sender = new FakeMessageSender();
         var journal = new FakeJournal();
         var metrics = new FakeMetrics();
-        var processing = new DeliveryProcessingService(deliveries, campaigns, sender, journal, metrics);
+        IDeliveryProcessingService processing = new DeliveryProcessingService(deliveries, campaigns, sender, journal, metrics);
 
         var id = await campaignService.CreateCampaignAsync("Рассылка", "Сообщение", CancellationToken.None);
         var campaign = (await campaignService.GetCampaignAsync(id, CancellationToken.None))!;
