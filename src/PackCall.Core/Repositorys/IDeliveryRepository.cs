@@ -30,10 +30,14 @@ namespace PackCall.Core.Repositorys
         /// </summary>
         Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(DateTime now, CancellationToken ct);
 
-        /// <summary>Сохраняет изменения доставки (смену статуса и служебных полей).</summary>
+        /// <summary>
+        /// Сохраняет изменения доставки (смену статуса и служебных полей).
+        /// </summary>
         Task SaveAsync(Delivery delivery, CancellationToken ct);
 
-        /// <summary>Проверяет, есть ли у кампании доставки в статусах "Ожидает" или "Отправляется".</summary>
+        /// <summary>
+        /// Проверяет, есть ли у кампании доставки в статусах "Ожидает" или "Отправляется".
+        /// </summary>
         Task<bool> HasPendingDeliveriesAsync(Guid campaignId, CancellationToken ct);
 
     }

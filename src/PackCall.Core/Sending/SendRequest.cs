@@ -1,6 +1,8 @@
 namespace PackCall.Core.Sending;
 
-/// <summary>Данные одной отправки сообщения.</summary>
+/// <summary>
+/// Данные одной отправки сообщения.
+/// </summary>
 /// <param name="DeliveryId">Идентификатор доставки — ключ идемпотентности для оператора.</param>
 /// <param name="CampaignId">Идентификатор кампании.</param>
 /// <param name="RecipientId">Идентификатор получателя.</param>

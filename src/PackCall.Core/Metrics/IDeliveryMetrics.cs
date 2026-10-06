@@ -2,7 +2,9 @@ using PackCall.Core.Entities;
 
 namespace PackCall.Core.Metrics;
 
-/// <summary>Метрики обработки доставок для наблюдаемости нагрузочного прогона.</summary>
+/// <summary>
+/// Метрики обработки доставок для наблюдаемости нагрузочного прогона.
+/// </summary>
 public interface IDeliveryMetrics
 {
     /// <summary>Фиксирует число захваченных доставок (активные закрепления).</summary>

@@ -2,7 +2,9 @@ using PackCall.Core.Entities;
 
 namespace PackCall.Core.Journaling;
 
-/// <summary>Запись журнала о смене статуса доставки.</summary>
+/// <summary>
+/// Запись журнала о смене статуса доставки.
+/// </summary>
 /// <param name="CampaignId">Идентификатор кампании.</param>
 /// <param name="DeliveryId">Идентификатор доставки.</param>
 /// <param name="PreviousStatus">Прежний статус доставки.</param>

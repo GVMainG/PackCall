@@ -19,6 +19,8 @@ public sealed class CampaignService : ICampaignService
         _recipientRepository = recipientRepository;
     }
 
+    // TODO: Добовлять контакты порционно, а не все сразу, чтобы не перегружать память или только перечень контактов, которые нужно добавить в кампанию. Сейчас добавляются все контакты из базы данных.
+    // TODO: Добавить новый статус компании при катором будет формироваться доставки. Это будет промежуточный статус между Draft и InProgress. В этом статусе нельзя будет запускать кампанию или как то редактировать. После завершения формирования доставок можно будет запустить.
     public async Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
