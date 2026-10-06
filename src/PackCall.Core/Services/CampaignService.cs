@@ -17,7 +17,7 @@ public sealed class CampaignService
     public async Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        var campaign = Campaign.Create(name, messageText, DateTime.UtcNow);
+        var campaign = Campaign.Create(name, messageText);
         var created = await _campaignRepository.Create(campaign, ct);
         return created.Id;
     }

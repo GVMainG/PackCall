@@ -1,4 +1,5 @@
 using PackCall.Core.Models;
+using PackCall.Core.Services;
 
 namespace PackCall.Core;
 
@@ -21,22 +22,65 @@ public sealed class Campaign
     // Для восстановления сущности хранилищем.
     private Campaign() { }
 
-    public static Campaign Create(string name, string messageText, DateTime now)
+    public static Campaign Create(string name, string messageText)
     {
-        // TODO: проверить данные и создать кампанию в начальном состоянии.
-        throw new NotImplementedException();
+        var now = DateTime.UtcNow;
+
+        var result = new Campaign
+        {
+            Id = Guid.NewGuid(),
+            Name = name,
+            MessageText = messageText,
+            Status = CampaignStatus.Draft,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+
+        return result;
     }
 
     public void UpdateDetails(string name, string messageText, DateTime now)
     {
-        // TODO: проверить допустимость редактирования и изменить данные.
-        throw new NotImplementedException();
+        if (Status != CampaignStatus.Draft)
+            throw new InvalidOperationException("Редактировать можно только кампанию в статусе черновика.");
+
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(messageText);
+
+        Name = name;
+        MessageText = messageText;
+        UpdatedAt = now;
     }
 
+    /// <summary>
+    /// Переводит кампанию из черновика в состояние обработки и устанавливает даты начала и изменения.
+    /// </summary>
+    /// <param name="now">Дата и время запуска в UTC.</param>
+    /// <remarks>
+    /// Если кампания уже находится в состоянии обработки, метод не изменяет её состояние и даты.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">
+    /// Кампания находится в состоянии, отличном от черновика или обработки.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">
+    /// Название или текст сообщения кампании равны <see langword="null" />.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Название или текст сообщения кампании пусты либо состоят только из пробельных символов.
+    /// </exception>
     public void Start(DateTime now)
     {
-        // TODO: проверить допустимость запуска и изменить состояние кампании.
-        throw new NotImplementedException();
+        if (Status == CampaignStatus.InProgress)
+            return;
+        if (Status != CampaignStatus.Draft)
+            throw new InvalidOperationException("Запустить можно только кампанию в статусе черновика.");
+
+        ArgumentException.ThrowIfNullOrWhiteSpace(Name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(MessageText);
+
+        Status = CampaignStatus.InProgress;
+        StartedAt = now;
+        UpdatedAt = now;
     }
 }
 
