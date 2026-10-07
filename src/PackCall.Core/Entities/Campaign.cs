@@ -1,7 +1,6 @@
-using PackCall.Core.Models;
 using PackCall.Core.Services;
 
-namespace PackCall.Core;
+namespace PackCall.Core.Models;
 
 /// <summary>
 /// Доменная сущность: состояние одной кампании и правила его изменения.
@@ -68,7 +67,7 @@ public sealed class Campaign
     /// <exception cref="ArgumentException">
     /// Название или текст сообщения кампании пусты либо состоят только из пробельных символов.
     /// </exception>
-    public void Start(DateTime now)
+    public void ToInProgress()
     {
         if (Status == CampaignStatus.InProgress)
             return;
@@ -79,6 +78,7 @@ public sealed class Campaign
         ArgumentException.ThrowIfNullOrWhiteSpace(MessageText);
 
         Status = CampaignStatus.InProgress;
+        var now = DateTime.UtcNow;
         StartedAt = now;
         UpdatedAt = now;
     }
