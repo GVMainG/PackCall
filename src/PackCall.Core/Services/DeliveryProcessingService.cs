@@ -1,8 +1,7 @@
-using PackCall.Core.Abstractions;
+using PackCall.Core.Entities;
 using PackCall.Core.Exceptions;
 using PackCall.Core.Journaling;
 using PackCall.Core.Metrics;
-using PackCall.Core.Models;
 using PackCall.Core.Repositorys;
 using PackCall.Core.Sending;
 
@@ -20,27 +19,24 @@ public sealed class DeliveryProcessingService
     private readonly IMessageSender _messageSender;
     private readonly IDeliveryStatusJournal _journal;
     private readonly IDeliveryMetrics _metrics;
-    private readonly IClock _clock;
 
     public DeliveryProcessingService(
         IDeliveryRepository deliveryRepository,
         ICampaingRepository campaignRepository,
         IMessageSender messageSender,
         IDeliveryStatusJournal journal,
-        IDeliveryMetrics metrics,
-        IClock clock)
+        IDeliveryMetrics metrics)
     {
         _deliveryRepository = deliveryRepository;
         _campaignRepository = campaignRepository;
         _messageSender = messageSender;
         _journal = journal;
         _metrics = metrics;
-        _clock = clock;
     }
 
     /// <summary>
     /// Атомарно захватывает не более <paramref name="batchSize"/> доставок со статусом
-    /// «Ожидает» и закрепляет их за воркером на <paramref name="lockDuration"/>.
+    /// "Ожидает" и закрепляет их за воркером на <paramref name="lockDuration"/>.
     /// </summary>
     /// <returns>Только успешно захваченные доставки.</returns>
     public async Task<IReadOnlyList<Delivery>> CaptureBatchAsync(
@@ -53,7 +49,7 @@ public sealed class DeliveryProcessingService
 
         ct.ThrowIfCancellationRequested();
 
-        var now = _clock.UtcNow;
+        var now = DateTime.UtcNow;
         var captured = await _deliveryRepository.CaptureBatchAsync(batchSize, workerId, lockDuration, now, ct);
 
         ct.ThrowIfCancellationRequested();
@@ -84,12 +80,12 @@ public sealed class DeliveryProcessingService
     {
         if (delivery.DeliveryStatus != DeliveryStatus.InProgress)
             throw new DomainException(
-                $"Обрабатывать можно только доставку в статусе «Отправляется». Текущий статус: {delivery.DeliveryStatus}.");
+                $"Обрабатывать можно только доставку в статусе \"Отправляется\". Текущий статус: {delivery.DeliveryStatus}.");
 
         ct.ThrowIfCancellationRequested();
 
         var previousStatus = delivery.DeliveryStatus;
-        var now = _clock.UtcNow;
+        var now = DateTime.UtcNow;
 
         var request = new SendRequest(
             delivery.Id,
@@ -136,14 +132,14 @@ public sealed class DeliveryProcessingService
     }
 
     /// <summary>
-    /// Возвращает доставки с истёкшим сроком закрепления из «Отправляется» в «Ожидает».
+    /// Возвращает доставки с истёкшим сроком закрепления из "Отправляется" в "Ожидает".
     /// </summary>
     /// <returns>Количество возвращённых доставок.</returns>
     public async Task<int> ReleaseExpiredLocksAsync(CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        var now = _clock.UtcNow;
+        var now = DateTime.UtcNow;
         var released = await _deliveryRepository.ReleaseExpiredLocksAsync(now, ct);
 
         ct.ThrowIfCancellationRequested();
@@ -167,7 +163,7 @@ public sealed class DeliveryProcessingService
     }
 
     /// <summary>
-    /// Переводит кампанию в «Завершена», если все её доставки получили конечный статус.
+    /// Переводит кампанию в "Завершена", если все её доставки получили конечный статус.
     /// </summary>
     /// <returns><see langword="true"/>, если кампания завершена этим вызовом.</returns>
     public async Task<bool> CompleteCampaignIfFinishedAsync(Guid campaignId, CancellationToken ct)
@@ -186,7 +182,7 @@ public sealed class DeliveryProcessingService
 
         ct.ThrowIfCancellationRequested();
 
-        campaign.Complete(_clock.UtcNow);
+        campaign.Complete(DateTime.UtcNow);
         await _campaignRepository.Update(campaign, ct);
         return true;
     }

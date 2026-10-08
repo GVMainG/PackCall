@@ -1,4 +1,4 @@
-using PackCall.Core.Models;
+using PackCall.Core.Entities;
 
 namespace PackCall.Core.Repositorys
 {
@@ -9,16 +9,16 @@ namespace PackCall.Core.Repositorys
         Task<PageResult<Delivery>> GetPage(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct);
 
         /// <summary>
-        /// Атомарно выбирает не более <paramref name="batchSize"/> доставок со статусом «Ожидает»,
-        /// переводит их в «Отправляется», записывает идентификатор воркера и срок закрепления
+        /// Атомарно выбирает не более <paramref name="batchSize"/> доставок со статусом "Ожидает",
+        /// переводит их в "Отправляется", записывает идентификатор воркера и срок закрепления
         /// и возвращает только успешно захваченные доставки.
         /// </summary>
         Task<IReadOnlyList<Delivery>> CaptureBatchAsync(
             int batchSize, string workerId, TimeSpan lockDuration, DateTime now, CancellationToken ct);
 
         /// <summary>
-        /// Атомарно возвращает доставки со статусом «Отправляется» и истёкшим сроком закрепления
-        /// в статус «Ожидает», очищая идентификатор воркера и срок закрепления.
+        /// Атомарно возвращает доставки со статусом "Отправляется" и истёкшим сроком закрепления
+        /// в статус "Ожидает", очищая идентификатор воркера и срок закрепления.
         /// Возвращает возвращённые доставки.
         /// </summary>
         Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(DateTime now, CancellationToken ct);
@@ -26,7 +26,7 @@ namespace PackCall.Core.Repositorys
         /// <summary>Сохраняет изменения доставки (смену статуса и служебных полей).</summary>
         Task SaveAsync(Delivery delivery, CancellationToken ct);
 
-        /// <summary>Проверяет, есть ли у кампании доставки в статусах «Ожидает» или «Отправляется».</summary>
+        /// <summary>Проверяет, есть ли у кампании доставки в статусах "Ожидает" или "Отправляется".</summary>
         Task<bool> HasPendingDeliveriesAsync(Guid campaignId, CancellationToken ct);
 
     }

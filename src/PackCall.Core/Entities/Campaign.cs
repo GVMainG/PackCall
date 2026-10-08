@@ -1,6 +1,4 @@
-using PackCall.Core.Services;
-
-namespace PackCall.Core.Models;
+namespace PackCall.Core.Entities;
 
 /// <summary>
 /// Доменная сущность: состояние одной кампании и правила его изменения.
@@ -18,7 +16,6 @@ public sealed class Campaign
 
     public ICollection<Delivery> Deliveries { get; private set; } = new List<Delivery>();
 
-    // Для восстановления сущности хранилищем.
     private Campaign() { }
 
     public static Campaign Create(string name, string messageText)
@@ -84,12 +81,12 @@ public sealed class Campaign
     }
 
     /// <summary>
-    /// Переводит кампанию из статуса «Запущена» в статус «Завершена»
+    /// Переводит кампанию из статуса "Запущена" в статус "Завершена"
     /// и устанавливает даты завершения и изменения.
     /// </summary>
     /// <param name="now">Дата и время завершения в UTC.</param>
     /// <remarks>Повторный вызов для завершённой кампании не изменяет её состояние.</remarks>
-    /// <exception cref="InvalidOperationException">Кампания находится в статусе, отличном от «Запущена».</exception>
+    /// <exception cref="InvalidOperationException">Кампания находится в статусе, отличном от "Запущена".</exception>
     public void Complete(DateTime now)
     {
         if (Status == CampaignStatus.Completed)

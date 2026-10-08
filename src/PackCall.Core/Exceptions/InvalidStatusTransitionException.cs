@@ -1,4 +1,4 @@
-using PackCall.Core.Models;
+using PackCall.Core.Entities;
 
 namespace PackCall.Core.Exceptions;
 
@@ -29,6 +29,6 @@ public sealed class InvalidStatusTransitionException : DomainException
             ? "переходы из этого статуса запрещены"
             : $"допустимые переходы: {allowed}";
 
-        return $"Недопустимый переход статуса сущности {entityName} из «{previousStatus}» в «{targetStatus}»: {suffix}.";
+        return $"Недопустимый переход статуса сущности {entityName} из \"{previousStatus}\" в \"{targetStatus}\": {suffix}.";
     }
 }

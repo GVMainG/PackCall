@@ -1,4 +1,4 @@
-namespace PackCall.Core.Models;
+namespace PackCall.Core.Entities;
 
 public enum DeliveryStatus
 {
