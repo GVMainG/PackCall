@@ -99,9 +99,9 @@ public sealed class DeliveryProcessingService
         ct.ThrowIfCancellationRequested();
 
         if (result.IsSuccess)
-            delivery.MarkSent(now);
+            delivery.StatusFromInProgressToSent(now);
         else
-            delivery.MarkFailed(now);
+            delivery.StatusFromInProgressToFailed(now);
 
         await _deliveryRepository.SaveAsync(delivery, ct);
 
@@ -182,7 +182,7 @@ public sealed class DeliveryProcessingService
 
         ct.ThrowIfCancellationRequested();
 
-        campaign.Complete(DateTime.UtcNow);
+        campaign.StatusFromInProgressToCompleted(DateTime.UtcNow);
         await _campaignRepository.Update(campaign, ct);
         return true;
     }

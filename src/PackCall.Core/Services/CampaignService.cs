@@ -46,7 +46,7 @@ public sealed class CampaignService
     {
         var campaign = await GetRequiredCampaignAsync(campaignId, ct);
 
-        campaign.ToInProgress();
+        campaign.StatusFromDraftToInProgress();
         ct.ThrowIfCancellationRequested();
 
         await _campaignRepository.Update(campaign, ct);
