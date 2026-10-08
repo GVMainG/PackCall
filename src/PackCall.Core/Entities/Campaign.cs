@@ -16,7 +16,7 @@ public sealed class Campaign
     public DateTime? StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
 
-    public ICollection<DeliveryModel> Deliveries { get; private set; } = new List<DeliveryModel>();
+    public ICollection<Delivery> Deliveries { get; private set; } = new List<Delivery>();
 
     // Для восстановления сущности хранилищем.
     private Campaign() { }
@@ -80,6 +80,25 @@ public sealed class Campaign
         Status = CampaignStatus.InProgress;
         var now = DateTime.UtcNow;
         StartedAt = now;
+        UpdatedAt = now;
+    }
+
+    /// <summary>
+    /// Переводит кампанию из статуса «Запущена» в статус «Завершена»
+    /// и устанавливает даты завершения и изменения.
+    /// </summary>
+    /// <param name="now">Дата и время завершения в UTC.</param>
+    /// <remarks>Повторный вызов для завершённой кампании не изменяет её состояние.</remarks>
+    /// <exception cref="InvalidOperationException">Кампания находится в статусе, отличном от «Запущена».</exception>
+    public void Complete(DateTime now)
+    {
+        if (Status == CampaignStatus.Completed)
+            return;
+        if (Status != CampaignStatus.InProgress)
+            throw new InvalidOperationException("Завершить можно только запущенную кампанию.");
+
+        Status = CampaignStatus.Completed;
+        CompletedAt = now;
         UpdatedAt = now;
     }
 }

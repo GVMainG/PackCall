@@ -1,5 +1,6 @@
 using PackCall.Core.Models;
 using PackCall.Core.Repositorys;
+using PackCall.Core.Abstractions;
 
 namespace PackCall.Core.Services;
 
@@ -7,11 +8,13 @@ public sealed class CampaignService
 {
     private readonly ICampaingRepository _campaignRepository;
     private readonly IDeliveryRepository _deliveryRepository;
+    private readonly IClock _clock;
 
-    public CampaignService(ICampaingRepository campaignRepository, IDeliveryRepository deliveryRepository)
+    public CampaignService(ICampaingRepository campaignRepository, IDeliveryRepository deliveryRepository, IClock clock)
     {
         _campaignRepository = campaignRepository;
         _deliveryRepository = deliveryRepository;
+        _clock = clock;
     }
 
     public async Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct)
@@ -25,7 +28,7 @@ public sealed class CampaignService
     public async Task<Campaign> UpdateCampaignAsync(Guid campaignId, string name, string messageText, CancellationToken ct)
     {
         var campaign = await GetRequiredCampaignAsync(campaignId, ct);
-        campaign.UpdateDetails(name, messageText, DateTime.UtcNow);
+        campaign.UpdateDetails(name, messageText, _clock.UtcNow);
         ct.ThrowIfCancellationRequested();
         return await _campaignRepository.Update(campaign, ct);
     }
@@ -65,7 +68,7 @@ public sealed class CampaignService
         return _campaignRepository.GetPage(pageNumber, pageSize, ct);
     }
 
-    public Task<PageResult<DeliveryModel>> GetDeliveriesAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct)
+    public Task<PageResult<Delivery>> GetDeliveriesAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         return _deliveryRepository.GetPage(campaignId, pageNumber, pageSize, ct);

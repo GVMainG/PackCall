@@ -7,6 +7,6 @@ namespace PackCall.Core.Models
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
-        public ICollection<DeliveryModel> Deliveries { get; set; } = new List<DeliveryModel>();
+        public ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
     }
 }
