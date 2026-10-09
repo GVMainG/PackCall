@@ -5,4 +5,7 @@
     <Project Path="src/PackCall.Core/PackCall.Core.csproj" Id="1fa951fc-6ffa-4bdf-a71f-f9e87f4e986a" />
     <Project Path="src/PackCall.Infrastructure/PackCall.Infrastructure.csproj" Id="767aed83-0305-4501-8497-3615131bf8d0" />
   </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
 </Solution>
