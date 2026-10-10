@@ -42,6 +42,18 @@ public interface ICampaignService
     /// <summary>Возвращает кампанию или null, если она не найдена.</summary>
     Task<Campaign?> GetCampaignAsync(Guid campaignId, CancellationToken ct);
 
+    /// <summary>Возвращает доставку или null, если она не найдена.</summary>
+    Task<Delivery?> GetDeliveryAsync(Guid deliveryId, CancellationToken ct);
+
+    /// <summary>Возвращает число доставок кампании по статусам.</summary>
+    Task<DeliveryStatusCounts> GetDeliveryStatusCountsAsync(Guid campaignId, CancellationToken ct);
+
+    /// <summary>Возвращает получателя или null, если он не найден.</summary>
+    Task<Recipient?> GetRecipientAsync(Guid recipientId, CancellationToken ct);
+
+    /// <summary>Возвращает страницу всех получателей в порядке Id.</summary>
+    Task<PageResult<Recipient>> GetRecipientsAsync(int pageNumber, int pageSize, CancellationToken ct);
+
     /// <summary>Возвращает страницу кампаний в порядке Id и общее число кампаний.</summary>
     /// <exception cref="ArgumentOutOfRangeException">Номер или размер страницы меньше 1.</exception>
     Task<PageResult<Campaign>> GetCampaignsAsync(int pageNumber, int pageSize, CancellationToken ct);

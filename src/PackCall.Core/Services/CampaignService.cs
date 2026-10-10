@@ -79,6 +79,32 @@ public sealed class CampaignService : ICampaignService
         return campaigns.SingleOrDefault();
     }
 
+    public async Task<Delivery?> GetDeliveryAsync(Guid deliveryId, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        return (await _deliveryRepository.Get(deliveryId, ct)).SingleOrDefault();
+    }
+
+    public Task<DeliveryStatusCounts> GetDeliveryStatusCountsAsync(Guid campaignId, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        return _deliveryRepository.GetStatusCountsAsync(campaignId, ct);
+    }
+
+    public Task<Recipient?> GetRecipientAsync(Guid recipientId, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        return _recipientRepository.GetAsync(recipientId, ct);
+    }
+
+    public Task<PageResult<Recipient>> GetRecipientsAsync(int pageNumber, int pageSize, CancellationToken ct)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
+        ct.ThrowIfCancellationRequested();
+        return _recipientRepository.GetPageAsync(pageNumber, pageSize, ct);
+    }
+
     public Task<PageResult<Campaign>> GetCampaignsAsync(int pageNumber, int pageSize, CancellationToken ct)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);

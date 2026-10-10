@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\PackCall.Core\PackCall.Core.csproj" />
+    <ProjectReference Include="..\src\PackCall.Api\PackCall.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
