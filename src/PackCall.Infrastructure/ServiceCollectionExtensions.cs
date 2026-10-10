@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PackCall.Core.Journaling;
 using PackCall.Core.Repositorys;
 using PackCall.Core.Sending;
+using PackCall.Infrastructure.Journaling;
 using PackCall.Infrastructure.Repositories;
 using PackCall.Infrastructure.Sending;
 
@@ -30,6 +32,7 @@ namespace PackCall.Infrastructure
             services.AddScoped<ICampaingRepository, CampaignRepository>();
             services.AddScoped<IRecipientRepository, RecipientRepository>();
             services.AddScoped<IDeliveryRepository, DeliveryRepository>();
+            services.AddSingleton<IDeliveryStatusJournal, DeliveryStatusJournal>();
             services.AddSingleton<IMessageSender, MockEmailSender>();
 
             return services;
