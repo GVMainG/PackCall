@@ -35,7 +35,9 @@ namespace PackCall.Infrastructure
             services.AddScoped<IRecipientRepository, RecipientRepository>();
             services.AddScoped<IDeliveryRepository, DeliveryRepository>();
             services.AddSingleton<IDeliveryStatusJournal, DeliveryStatusJournal>();
-            services.AddSingleton<IDeliveryMetrics, DeliveryMetrics>();
+            services.AddSingleton<DeliveryMetrics>();
+            services.AddSingleton<IDeliveryMetrics>(provider => provider.GetRequiredService<DeliveryMetrics>());
+            services.AddScoped<IDeliveryStateSnapshotReader, DeliveryStateSnapshotReader>();
             services.AddSingleton<IMessageSender, MockEmailSender>();
 
             return services;

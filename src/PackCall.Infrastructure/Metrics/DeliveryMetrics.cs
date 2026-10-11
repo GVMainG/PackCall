@@ -16,6 +16,13 @@ public sealed class DeliveryMetrics : IDeliveryMetrics, IDisposable
     private readonly Counter<long> _operatorRetries;
     private readonly Counter<long> _operatorDuplicatesSuppressed;
     private readonly Counter<long> _operatorCalls;
+    private long _capturedTotal;
+    private long _processedTotal;
+    private long _expiredLocksReturnedTotal;
+    private long _operatorRetriesTotal;
+    private long _operatorDuplicatesSuppressedTotal;
+    private long _operatorSuccessTotal;
+    private long _operatorErrorTotal;
 
     public DeliveryMetrics()
     {
@@ -59,10 +66,17 @@ public sealed class DeliveryMetrics : IDeliveryMetrics, IDisposable
     {
         ArgumentOutOfRangeException.ThrowIfNegative(count);
         if (count > 0)
+        {
             _captured.Add(count);
+            Interlocked.Add(ref _capturedTotal, count);
+        }
     }
 
-    public void RecordProcessed() => _processed.Add(1);
+    public void RecordProcessed()
+    {
+        _processed.Add(1);
+        Interlocked.Increment(ref _processedTotal);
+    }
 
     public void RecordStatusChange(DeliveryStatus previous, DeliveryStatus current) =>
         _statusChanges.Add(
@@ -74,18 +88,41 @@ public sealed class DeliveryMetrics : IDeliveryMetrics, IDisposable
     {
         ArgumentOutOfRangeException.ThrowIfNegative(count);
         if (count > 0)
+        {
             _expiredLocksReturned.Add(count);
+            Interlocked.Add(ref _expiredLocksReturnedTotal, count);
+        }
     }
 
-    public void RecordOperatorRetry() => _operatorRetries.Add(1);
+    public void RecordOperatorRetry()
+    {
+        _operatorRetries.Add(1);
+        Interlocked.Increment(ref _operatorRetriesTotal);
+    }
 
-    public void RecordOperatorDuplicateSuppressed() => _operatorDuplicatesSuppressed.Add(1);
+    public void RecordOperatorDuplicateSuppressed()
+    {
+        _operatorDuplicatesSuppressed.Add(1);
+        Interlocked.Increment(ref _operatorDuplicatesSuppressedTotal);
+    }
 
-    public void RecordOperatorSuccess() =>
+    public void RecordOperatorSuccess()
+    {
         _operatorCalls.Add(1, new KeyValuePair<string, object?>("result", "success"));
+        Interlocked.Increment(ref _operatorSuccessTotal);
+    }
 
-    public void RecordOperatorError() =>
+    public void RecordOperatorError()
+    {
         _operatorCalls.Add(1, new KeyValuePair<string, object?>("result", "error"));
+        Interlocked.Increment(ref _operatorErrorTotal);
+    }
+
+    public DeliveryMetricTotals GetTotals() => new(
+        Interlocked.Read(ref _capturedTotal), Interlocked.Read(ref _processedTotal),
+        Interlocked.Read(ref _expiredLocksReturnedTotal), Interlocked.Read(ref _operatorRetriesTotal),
+        Interlocked.Read(ref _operatorDuplicatesSuppressedTotal),
+        Interlocked.Read(ref _operatorSuccessTotal), Interlocked.Read(ref _operatorErrorTotal));
 
     public void Dispose() => _meter.Dispose();
 }
