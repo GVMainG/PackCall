@@ -6,8 +6,24 @@ using System.Linq.Expressions;
 
 namespace PackCall.Infrastructure.Repositories;
 
-public sealed class DeliveryRepository(AppDbContext dbContext) : IDeliveryRepository
+public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory<AppDbContext> contextFactory) : IDeliveryRepository
 {
+    public async Task AddBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(deliveries);
+        if (deliveries.Count == 0)
+            return;
+
+        await using var context = await contextFactory.CreateDbContextAsync(ct);
+        // Новые экземпляры с теми же Id и FK исключают загрузку в контекст графа
+        // Campaign/Recipient и удержание уже сохранённых доставок в памяти запроса.
+        var rows = deliveries.Select(delivery => Delivery.Create(
+            delivery.CampaignId, delivery.RecipientId, delivery.RecipientEmail,
+            delivery.CreatedAt, delivery.Id));
+        await context.Deliveries.AddRangeAsync(rows, ct);
+        await context.SaveChangesAsync(ct);
+    }
+
     public async Task<IEnumerable<Delivery>> Get(Guid id, CancellationToken ct) =>
         await dbContext.Deliveries
             .Include(delivery => delivery.Recipient)

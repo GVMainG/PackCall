@@ -5,6 +5,7 @@ namespace PackCall.Core.Services;
 
 public sealed class CampaignService : ICampaignService
 {
+    private const int FormationBatchSize = 500;
     private readonly ICampaingRepository _campaignRepository;
     private readonly IDeliveryRepository _deliveryRepository;
     private readonly IRecipientRepository _recipientRepository;
@@ -19,23 +20,50 @@ public sealed class CampaignService : ICampaignService
         _recipientRepository = recipientRepository;
     }
 
-    // TODO: Добовлять контакты порционно, а не все сразу, чтобы не перегружать память или только перечень контактов, которые нужно добавить в кампанию. Сейчас добавляются все контакты из базы данных.
-    // TODO: Добавить новый статус компании при катором будет формироваться доставки. Это будет промежуточный статус между Draft и InProgress. В этом статусе нельзя будет запускать кампанию или как то редактировать. После завершения формирования доставок можно будет запустить.
     public async Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         var campaign = Campaign.Create(name, messageText);
-        var recipients = await _recipientRepository.GetAllAsync(ct);
-        var now = DateTime.UtcNow;
-        foreach (var recipient in recipients.DistinctBy(recipient => recipient.Id))
-        {
-            ct.ThrowIfCancellationRequested();
-            campaign.Deliveries.Add(Delivery.Create(campaign, recipient, now));
-        }
+        campaign.StatusFromDraftToForming();
+        await _campaignRepository.Create(campaign, ct);
 
-        ct.ThrowIfCancellationRequested();
-        var created = await _campaignRepository.Create(campaign, ct);
-        return created.Id;
+        try
+        {
+            var offset = 0;
+            while (true)
+            {
+                ct.ThrowIfCancellationRequested();
+                var recipients = await _recipientRepository.GetBatchAsync(offset, FormationBatchSize, ct);
+                if (recipients.Count == 0)
+                    break;
+
+                var now = DateTime.UtcNow;
+                var deliveries = recipients.Select(recipient => Delivery.Create(campaign, recipient, now)).ToList();
+                ct.ThrowIfCancellationRequested();
+                await _deliveryRepository.AddBatchAsync(deliveries, ct);
+                offset = checked(offset + recipients.Count);
+                if (recipients.Count < FormationBatchSize)
+                    break;
+            }
+
+            ct.ThrowIfCancellationRequested();
+            campaign.StatusFromFormingToDraft();
+            await _campaignRepository.Update(campaign, ct);
+            return campaign.Id;
+        }
+        catch (Exception creationError)
+        {
+            try
+            {
+                await _campaignRepository.Delete(campaign.Id, CancellationToken.None);
+            }
+            catch (Exception cleanupError)
+            {
+                throw new AggregateException("Не удалось удалить частично сформированную кампанию.",
+                    creationError, cleanupError);
+            }
+            throw;
+        }
     }
 
     public async Task<Campaign> UpdateCampaignAsync(Guid campaignId, string name, string messageText, CancellationToken ct)

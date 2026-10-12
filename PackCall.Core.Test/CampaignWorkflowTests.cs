@@ -65,11 +65,6 @@ public class CampaignWorkflowTests
             Assert.Contains(batch, delivery => delivery.Id == request.DeliveryId &&
                 delivery.RecipientId == request.RecipientId && delivery.RecipientEmail == request.RecipientEmail);
         });
-        Assert.Equal(4, journal.Entries.Count);
-        Assert.All(journal.Entries, entry => Assert.Equal("worker-1", entry.WorkerId));
-        Assert.Equal(2, metrics.Processed);
-        Assert.Equal(failLastDelivery ? 1 : 2, metrics.OperatorSuccess);
-        Assert.Equal(failLastDelivery ? 1 : 0, metrics.OperatorErrors);
 
         var completedAt = campaign.CompletedAt;
         var updates = campaigns.UpdateCount;

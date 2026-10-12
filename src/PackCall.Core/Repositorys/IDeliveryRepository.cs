@@ -5,6 +5,8 @@ namespace PackCall.Core.Repositorys
 {
     public interface IDeliveryRepository
     {
+        /// <summary>Сохраняет порцию новых доставок без накопления отслеживаемых сущностей.</summary>
+        Task AddBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct);
         Task<IEnumerable<Delivery>> Get(Guid id, CancellationToken ct);
         /// <summary>
         /// Фильтрует доставки указанной кампании в хранилище, загружая также Recipient.

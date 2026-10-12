@@ -44,13 +44,16 @@ public sealed class Delivery
     /// <param name="recipientId">Идентификатор получателя.</param>
     /// <param name="recipientEmail">Адрес получателя, сохраняемый как снимок.</param>
     /// <param name="now">Дата и время создания.</param>
-    public static Delivery Create(Guid campaignId, Guid recipientId, string recipientEmail, DateTime now)
+    /// <param name="deliveryId">Существующий идентификатор при копировании для сохранения; иначе создаётся новый.</param>
+    public static Delivery Create(Guid campaignId, Guid recipientId, string recipientEmail, DateTime now, Guid? deliveryId = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(recipientEmail);
+        if (deliveryId == Guid.Empty)
+            throw new ArgumentException("Идентификатор доставки не может быть пустым.", nameof(deliveryId));
 
         return new Delivery
         {
-            Id = Guid.NewGuid(),
+            Id = deliveryId ?? Guid.NewGuid(),
             CampaignId = campaignId,
             RecipientId = recipientId,
             RecipientEmail = recipientEmail,

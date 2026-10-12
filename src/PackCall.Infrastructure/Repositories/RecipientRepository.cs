@@ -7,10 +7,14 @@ namespace PackCall.Infrastructure.Repositories;
 
 public sealed class RecipientRepository(AppDbContext dbContext) : IRecipientRepository
 {
-    public async Task<IReadOnlyList<Recipient>> GetAllAsync(CancellationToken ct) =>
-        await dbContext.Recipients
+    public async Task<IReadOnlyList<Recipient>> GetBatchAsync(int offset, int batchSize, CancellationToken ct)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(offset);
+        ArgumentOutOfRangeException.ThrowIfLessThan(batchSize, 1);
+        return await dbContext.Recipients.AsNoTracking()
             .OrderBy(recipient => recipient.Id)
-            .ToListAsync(ct);
+            .Skip(offset).Take(batchSize).ToListAsync(ct);
+    }
 
     public Task<Recipient?> GetAsync(Guid id, CancellationToken ct) =>
         dbContext.Recipients.AsNoTracking().SingleOrDefaultAsync(recipient => recipient.Id == id, ct);
