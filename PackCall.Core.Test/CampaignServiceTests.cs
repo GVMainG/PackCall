@@ -9,7 +9,7 @@ public class CampaignServiceTests
     private readonly FakeCampaignRepository _campaignRepository;
     private readonly FakeDeliveryRepository _deliveryRepository = new();
     private readonly FakeRecipientRepository _recipientRepository = new();
-    private readonly CampaignService _service;
+    private readonly ICampaignService _service;
 
     public CampaignServiceTests()
     {
@@ -140,5 +140,39 @@ public class CampaignServiceTests
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _service.DeleteCampaignAsync(id, CancellationToken.None));
+    }
+
+    [Theory]
+    [InlineData(0, 10)]
+    [InlineData(-1, 10)]
+    [InlineData(1, 0)]
+    [InlineData(1, -1)]
+    public async Task PageQueries_WithInvalidPage_RejectArguments(int pageNumber, int pageSize)
+    {
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            _service.GetCampaignsAsync(pageNumber, pageSize, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            _service.GetDeliveriesAsync(Guid.NewGuid(), pageNumber, pageSize, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            _service.GetRecipientsAsync(Guid.NewGuid(), pageNumber, pageSize, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task MissingCampaign_QueriesReturnEmptyAndCommandsReportNotFound()
+    {
+        var id = Guid.NewGuid();
+
+        Assert.Null(await _service.GetCampaignAsync(id, CancellationToken.None));
+        Assert.False(await _service.DeleteCampaignAsync(id, CancellationToken.None));
+        var deliveries = await _service.GetDeliveriesAsync(id, 1, 10, CancellationToken.None);
+        Assert.Empty(deliveries.Items);
+        Assert.Equal(0, deliveries.TotalCount);
+        var recipients = await _service.GetRecipientsAsync(id, 1, 10, CancellationToken.None);
+        Assert.Empty(recipients.Items);
+        Assert.Equal(0, recipients.TotalCount);
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            _service.StartCampaignAsync(id, CancellationToken.None));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            _service.UpdateCampaignAsync(id, "Название", "Текст", CancellationToken.None));
     }
 }

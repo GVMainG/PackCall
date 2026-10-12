@@ -12,7 +12,7 @@ namespace PackCall.Core.Services;
 /// mock-оператору, фиксация результата, возврат истёкших закреплений
 /// и завершение кампании.
 /// </summary>
-public sealed class DeliveryProcessingService
+public sealed class DeliveryProcessingService : IDeliveryProcessingService
 {
     private readonly IDeliveryRepository _deliveryRepository;
     private readonly ICampaingRepository _campaignRepository;
@@ -78,6 +78,7 @@ public sealed class DeliveryProcessingService
     /// </summary>
     public async Task ProcessAsync(Delivery delivery, CancellationToken ct)
     {
+        ArgumentNullException.ThrowIfNull(delivery);
         if (delivery.DeliveryStatus != DeliveryStatus.InProgress)
             throw new DomainException(
                 $"Обрабатывать можно только доставку в статусе \"Отправляется\". Текущий статус: {delivery.DeliveryStatus}.");

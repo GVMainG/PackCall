@@ -3,7 +3,7 @@ using PackCall.Core.Repositorys;
 
 namespace PackCall.Core.Services;
 
-public sealed class CampaignService
+public sealed class CampaignService : ICampaignService
 {
     private readonly ICampaingRepository _campaignRepository;
     private readonly IDeliveryRepository _deliveryRepository;
@@ -79,12 +79,16 @@ public sealed class CampaignService
 
     public Task<PageResult<Campaign>> GetCampaignsAsync(int pageNumber, int pageSize, CancellationToken ct)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
         ct.ThrowIfCancellationRequested();
         return _campaignRepository.GetPage(pageNumber, pageSize, ct);
     }
 
     public Task<PageResult<Delivery>> GetDeliveriesAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
         ct.ThrowIfCancellationRequested();
         return _deliveryRepository.GetPage(campaignId, pageNumber, pageSize, ct);
     }

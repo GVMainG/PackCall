@@ -12,7 +12,7 @@ public class DeliveryProcessingServiceTests
     private readonly FakeMessageSender _sender = new();
     private readonly FakeJournal _journal = new();
     private readonly FakeMetrics _metrics = new();
-    private readonly DeliveryProcessingService _service;
+    private readonly IDeliveryProcessingService _service;
 
     public DeliveryProcessingServiceTests() =>
         _service = new DeliveryProcessingService(
@@ -248,5 +248,22 @@ public class DeliveryProcessingServiceTests
 
         Assert.False(completed);
         Assert.Equal(CampaignStatus.InProgress, GetStoredCampaign(campaign.Id).Status);
+    }
+
+    [Fact]
+    public async Task Process_WhenDeliveryIsNull_ReportsInvalidArgument()
+    {
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _service.ProcessAsync(null!, CancellationToken.None));
+
+        Assert.Empty(_sender.Requests);
+        Assert.Empty(_journal.Entries);
+        Assert.Equal(0, _metrics.Processed);
+    }
+
+    [Fact]
+    public async Task CompleteCampaign_WhenMissing_ReportsNotFound()
+    {
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            _service.CompleteCampaignIfFinishedAsync(Guid.NewGuid(), CancellationToken.None));
     }
 }

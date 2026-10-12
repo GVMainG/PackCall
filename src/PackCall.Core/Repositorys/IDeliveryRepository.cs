@@ -1,11 +1,17 @@
 using PackCall.Core.Entities;
+using System.Linq.Expressions;
 
 namespace PackCall.Core.Repositorys
 {
     public interface IDeliveryRepository
     {
         Task<IEnumerable<Delivery>> Get(Guid id, CancellationToken ct);
-        Task<IEnumerable<Delivery>> Get(Guid campaignId, Func<Delivery, bool> predicate, CancellationToken ct);
+        /// <summary>
+        /// Фильтрует доставки указанной кампании в хранилище, загружая также Recipient.
+        /// Выражение должно допускать перевод в SQL.
+        /// </summary>
+        Task<IEnumerable<Delivery>> Get(Guid campaignId, Expression<Func<Delivery, bool>> predicate, CancellationToken ct);
+        /// <summary>Возвращает страницу в порядке Id и общее число доставок кампании; нумерация с 1.</summary>
         Task<PageResult<Delivery>> GetPage(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct);
 
         /// <summary>
