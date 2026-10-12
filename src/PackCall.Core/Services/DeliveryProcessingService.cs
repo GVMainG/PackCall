@@ -85,19 +85,23 @@ public sealed class DeliveryProcessingService
         ct.ThrowIfCancellationRequested();
 
         var previousStatus = delivery.DeliveryStatus;
-        var now = DateTime.UtcNow;
+        var workerId = delivery.WorkerId;
+        var campaign = await GetCampaignAsync(delivery.CampaignId, ct);
+        if (campaign.Status != CampaignStatus.InProgress)
+            throw new DomainException("Обрабатывать доставки можно только у запущенной кампании.");
 
         var request = new SendRequest(
             delivery.Id,
             delivery.CampaignId,
             delivery.RecipientId,
             delivery.RecipientEmail,
-            await GetMessageTextAsync(delivery, ct));
+            campaign.MessageText);
 
         var result = await _messageSender.SendAsync(request, ct);
 
         ct.ThrowIfCancellationRequested();
 
+        var now = DateTime.UtcNow;
         if (result.IsSuccess)
             delivery.StatusFromInProgressToSent(now);
         else
@@ -124,7 +128,7 @@ public sealed class DeliveryProcessingService
             delivery.Id,
             previousStatus,
             delivery.DeliveryStatus,
-            WorkerId: null,
+            workerId,
             now,
             OperatorResult: result.Error ?? "Success"), ct);
 
@@ -187,13 +191,10 @@ public sealed class DeliveryProcessingService
         return true;
     }
 
-    private async Task<string> GetMessageTextAsync(Delivery delivery, CancellationToken ct)
+    private async Task<Campaign> GetCampaignAsync(Guid campaignId, CancellationToken ct)
     {
-        if (delivery.Campaign is not null)
-            return delivery.Campaign.MessageText;
-
-        var campaigns = await _campaignRepository.Get(delivery.CampaignId, ct);
-        return campaigns.SingleOrDefault()?.MessageText
-            ?? throw new KeyNotFoundException($"Кампания {delivery.CampaignId} не найдена.");
+        var campaigns = await _campaignRepository.Get(campaignId, ct);
+        return campaigns.SingleOrDefault()
+            ?? throw new KeyNotFoundException($"Кампания {campaignId} не найдена.");
     }
 }

@@ -143,6 +143,43 @@ public class DeliveryProcessingServiceTests
         var delivery = AddWaitingDelivery(campaign);
 
         await Assert.ThrowsAsync<DomainException>(() => _service.ProcessAsync(delivery, CancellationToken.None));
+        Assert.Empty(_sender.Requests);
+    }
+
+    [Fact]
+    public async Task Process_WhenCampaignIsDraft_DoesNotSendOrCompleteDelivery()
+    {
+        var campaign = Campaign.Create("Кампания", "Текст");
+        await _campaignRepository.Create(campaign, CancellationToken.None);
+        var delivery = AddWaitingDelivery(campaign);
+        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
+
+        await Assert.ThrowsAsync<DomainException>(() => _service.ProcessAsync(delivery, CancellationToken.None));
+
+        Assert.Empty(_sender.Requests);
+        Assert.Equal(DeliveryStatus.InProgress, delivery.DeliveryStatus);
+        Assert.Null(delivery.CompletedAt);
+        Assert.Equal(CampaignStatus.Draft, campaign.Status);
+    }
+
+    [Fact]
+    public async Task Process_WhenOperatorThrows_PreservesLockForRecovery()
+    {
+        var campaign = CreateStartedCampaign();
+        var delivery = AddWaitingDelivery(campaign);
+        var expiresAt = DateTime.UtcNow.AddMinutes(2);
+        delivery.StatusFromWaitingToInProgress("worker-1", expiresAt);
+        _sender.Handler = _ => throw new InvalidOperationException("Ответ оператора неизвестен");
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.ProcessAsync(delivery, CancellationToken.None));
+
+        Assert.Equal(DeliveryStatus.InProgress, delivery.DeliveryStatus);
+        Assert.Equal("worker-1", delivery.WorkerId);
+        Assert.Equal(expiresAt, delivery.LockExpiresAt);
+        Assert.Null(delivery.CompletedAt);
+        Assert.Empty(_journal.Entries);
+        Assert.Equal(0, _metrics.Processed);
+        Assert.Equal(CampaignStatus.InProgress, campaign.Status);
     }
 
     [Fact]

@@ -60,6 +60,20 @@ public sealed class Delivery
         };
     }
 
+    /// <summary>Создаёт доставку с привязкой к кампании и существующему получателю.</summary>
+    public static Delivery Create(Campaign campaign, Recipient recipient, DateTime now)
+    {
+        ArgumentNullException.ThrowIfNull(campaign);
+        ArgumentNullException.ThrowIfNull(recipient);
+        if (recipient.Id == Guid.Empty)
+            throw new ArgumentException("Получатель должен иметь идентификатор.", nameof(recipient));
+
+        var delivery = Create(campaign.Id, recipient.Id, recipient.Email, now);
+        delivery.Campaign = campaign;
+        delivery.Recipient = recipient;
+        return delivery;
+    }
+
     #region Смена статусов
 
     /// <summary>
@@ -68,7 +82,8 @@ public sealed class Delivery
     /// </summary>
     /// <param name="workerId">Идентификатор воркера.</param>
     /// <param name="lockExpiresAt">Срок закрепления в UTC.</param>
-    public void StatusFromWaitingToInProgress(string workerId, DateTime lockExpiresAt)
+    /// <param name="now">Дата захвата в UTC; по умолчанию используется текущее время.</param>
+    public void StatusFromWaitingToInProgress(string workerId, DateTime lockExpiresAt, DateTime? now = null)
     {
         EnsureTransition(DeliveryStatus.InProgress);
         ArgumentException.ThrowIfNullOrWhiteSpace(workerId);
@@ -76,6 +91,7 @@ public sealed class Delivery
         DeliveryStatus = DeliveryStatus.InProgress;
         WorkerId = workerId;
         LockExpiresAt = lockExpiresAt;
+        UpdatedAt = now ?? DateTime.UtcNow;
     }
 
     /// <summary>

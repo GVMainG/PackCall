@@ -7,17 +7,31 @@ public sealed class CampaignService
 {
     private readonly ICampaingRepository _campaignRepository;
     private readonly IDeliveryRepository _deliveryRepository;
+    private readonly IRecipientRepository _recipientRepository;
 
-    public CampaignService(ICampaingRepository campaignRepository, IDeliveryRepository deliveryRepository)
+    public CampaignService(
+        ICampaingRepository campaignRepository,
+        IDeliveryRepository deliveryRepository,
+        IRecipientRepository recipientRepository)
     {
         _campaignRepository = campaignRepository;
         _deliveryRepository = deliveryRepository;
+        _recipientRepository = recipientRepository;
     }
 
     public async Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         var campaign = Campaign.Create(name, messageText);
+        var recipients = await _recipientRepository.GetAllAsync(ct);
+        var now = DateTime.UtcNow;
+        foreach (var recipient in recipients.DistinctBy(recipient => recipient.Id))
+        {
+            ct.ThrowIfCancellationRequested();
+            campaign.Deliveries.Add(Delivery.Create(campaign, recipient, now));
+        }
+
+        ct.ThrowIfCancellationRequested();
         var created = await _campaignRepository.Create(campaign, ct);
         return created.Id;
     }
@@ -46,6 +60,10 @@ public sealed class CampaignService
     {
         var campaign = await GetRequiredCampaignAsync(campaignId, ct);
 
+        if (campaign.Status == CampaignStatus.InProgress)
+            return;
+
+        ct.ThrowIfCancellationRequested();
         campaign.StatusFromDraftToInProgress();
         ct.ThrowIfCancellationRequested();
 
