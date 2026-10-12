@@ -21,9 +21,12 @@ public sealed class InvalidStatusTransitionException : DomainException
 
     private static string BuildMessage(string entityName, object previousStatus, object targetStatus)
     {
-        var allowed = previousStatus is DeliveryStatus from
-            ? string.Join(", ", DeliveryStatusTransitions.GetAllowedTargets(from))
-            : string.Empty;
+        var allowed = previousStatus switch
+        {
+            DeliveryStatus from => string.Join(", ", DeliveryStatusTransitions.GetAllowedTargets(from)),
+            CampaignStatus from => string.Join(", ", CampaignStatusTransitions.GetAllowedTargets(from)),
+            _ => string.Empty
+        };
 
         var suffix = allowed.Length == 0
             ? "переходы из этого статуса запрещены"

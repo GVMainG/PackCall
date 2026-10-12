@@ -1,3 +1,5 @@
+using PackCall.Core.Exceptions;
+
 namespace PackCall.Core.Entities;
 
 /// <summary>
@@ -53,11 +55,10 @@ public sealed class Campaign
     /// <summary>
     /// Переводит кампанию из черновика в состояние обработки и устанавливает даты начала и изменения.
     /// </summary>
-    /// <param name="now">Дата и время запуска в UTC.</param>
     /// <remarks>
     /// Если кампания уже находится в состоянии обработки, метод не изменяет её состояние и даты.
     /// </remarks>
-    /// <exception cref="InvalidOperationException">
+    /// <exception cref="InvalidStatusTransitionException">
     /// Кампания находится в состоянии, отличном от черновика или обработки.
     /// </exception>
     /// <exception cref="ArgumentNullException">
@@ -70,8 +71,7 @@ public sealed class Campaign
     {
         if (Status == CampaignStatus.InProgress)
             return;
-        if (Status != CampaignStatus.Draft)
-            throw new InvalidOperationException("Запустить можно только кампанию в статусе черновика.");
+        EnsureTransition(CampaignStatus.InProgress);
 
         ArgumentException.ThrowIfNullOrWhiteSpace(Name);
         ArgumentException.ThrowIfNullOrWhiteSpace(MessageText);
@@ -88,26 +88,23 @@ public sealed class Campaign
     /// </summary>
     /// <param name="now">Дата и время завершения в UTC.</param>
     /// <remarks>Повторный вызов для завершённой кампании не изменяет её состояние.</remarks>
-    /// <exception cref="InvalidOperationException">Кампания находится в статусе, отличном от "Запущена".</exception>
+    /// <exception cref="InvalidStatusTransitionException">Кампания находится в статусе, отличном от "Запущена".</exception>
     public void StatusFromInProgressToCompleted(DateTime now)
     {
         if (Status == CampaignStatus.Completed)
             return;
-        if (Status != CampaignStatus.InProgress)
-            throw new InvalidOperationException("Завершить можно только запущенную кампанию.");
+        EnsureTransition(CampaignStatus.Completed);
 
         Status = CampaignStatus.Completed;
         CompletedAt = now;
         UpdatedAt = now;
     }
 
-    #endregion Смена статусов
-}
+    private void EnsureTransition(CampaignStatus target)
+    {
+        if (!CampaignStatusTransitions.CanTransition(Status, target))
+            throw new InvalidStatusTransitionException(nameof(Campaign), Status, target);
+    }
 
-public enum CampaignStatus
-{
-    Draft = 0,
-    InProgress = 1,
-    Completed = 2,
-    Failed = -1
+    #endregion Смена статусов
 }
