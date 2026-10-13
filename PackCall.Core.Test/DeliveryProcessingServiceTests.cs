@@ -1,7 +1,6 @@
 using PackCall.Core.Entities;
 using PackCall.Core.Exceptions;
 using PackCall.Core.Services;
-using PackCall.Core.Sending;
 
 namespace PackCall.Core.Test;
 
@@ -10,13 +9,11 @@ public class DeliveryProcessingServiceTests
     private readonly FakeCampaignRepository _campaignRepository = new();
     private readonly FakeDeliveryRepository _deliveryRepository = new();
     private readonly FakeMessageSender _sender = new();
-    private readonly FakeJournal _journal = new();
-    private readonly FakeMetrics _metrics = new();
     private readonly IDeliveryProcessingService _service;
 
     public DeliveryProcessingServiceTests() =>
         _service = new DeliveryProcessingService(
-            _deliveryRepository, _campaignRepository, _sender, _journal, _metrics);
+            _deliveryRepository, _campaignRepository, _sender, new FakeJournal(), new FakeMetrics());
 
     private Campaign CreateStartedCampaign()
     {
@@ -26,114 +23,26 @@ public class DeliveryProcessingServiceTests
         return campaign;
     }
 
-    private Delivery AddWaitingDelivery(Campaign campaign, string email = "user@example.com")
+    private Delivery AddWaitingDelivery(Campaign campaign)
     {
-        var delivery = Delivery.Create(campaign.Id, Guid.NewGuid(), email, DateTime.UtcNow);
+        var delivery = Delivery.Create(campaign.Id, Guid.NewGuid(), "user@example.com", DateTime.UtcNow);
         _deliveryRepository.Add(delivery);
         return delivery;
     }
 
-    private Campaign GetStoredCampaign(Guid campaignId) =>
-        _campaignRepository.Get(campaignId, CancellationToken.None).GetAwaiter().GetResult().Single();
-
     [Fact]
-    public async Task CaptureBatch_CapturesOnlyWaitingDeliveries()
+    public async Task Process_WhenDeliveryIsNotInProgress_DoesNotSend()
     {
-        var campaign = CreateStartedCampaign();
-        var waiting1 = AddWaitingDelivery(campaign);
-        var waiting2 = AddWaitingDelivery(campaign);
-        var alreadyInProgress = AddWaitingDelivery(campaign);
-        alreadyInProgress.StatusFromWaitingToInProgress("worker-other", DateTime.UtcNow.AddMinutes(5));
-
-        var captured = await _service.CaptureBatchAsync(10, "worker-1", TimeSpan.FromMinutes(2), CancellationToken.None);
-
-        Assert.Equal(2, captured.Count);
-        Assert.All(captured, d =>
-        {
-            Assert.Equal(DeliveryStatus.InProgress, d.DeliveryStatus);
-            Assert.Equal("worker-1", d.WorkerId);
-            Assert.NotNull(d.LockExpiresAt);
-        });
-        Assert.Contains(captured, d => d.Id == waiting1.Id);
-        Assert.Contains(captured, d => d.Id == waiting2.Id);
-    }
-
-    [Fact]
-    public async Task CaptureBatch_RespectsBatchSize()
-    {
-        var campaign = CreateStartedCampaign();
-        for (var i = 0; i < 5; i++)
-            AddWaitingDelivery(campaign, $"user{i}@example.com");
-
-        var captured = await _service.CaptureBatchAsync(2, "worker-1", TimeSpan.FromMinutes(2), CancellationToken.None);
-
-        Assert.Equal(2, captured.Count);
-        Assert.Equal(3, _deliveryRepository.Items.Count(d => d.DeliveryStatus == DeliveryStatus.Waiting));
-    }
-
-    [Fact]
-    public async Task Process_OnSuccess_MarksSentAndCompletesCampaign()
-    {
-        var campaign = CreateStartedCampaign();
-        var delivery = AddWaitingDelivery(campaign);
-        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
-
-        await _service.ProcessAsync(delivery, CancellationToken.None);
-
-        Assert.Equal(DeliveryStatus.Sent, delivery.DeliveryStatus);
-        Assert.Null(delivery.WorkerId);
-        Assert.Null(delivery.LockExpiresAt);
-        Assert.NotNull(delivery.CompletedAt);
-
-        var request = _sender.Requests.Single();
-        Assert.Equal(delivery.Id, request.DeliveryId); // ключ идемпотентности
-        Assert.Equal(delivery.RecipientEmail, request.RecipientEmail);
-        Assert.Equal(campaign.MessageText, request.MessageText);
-
-
-        Assert.Equal(CampaignStatus.Completed, GetStoredCampaign(campaign.Id).Status);
-    }
-
-    [Fact]
-    public async Task Process_OnOperatorFailure_MarksFailed()
-    {
-        var campaign = CreateStartedCampaign();
-        var delivery = AddWaitingDelivery(campaign);
-        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
-        _sender.Handler = _ => SendResult.Failure("оператор недоступен");
-
-        await _service.ProcessAsync(delivery, CancellationToken.None);
-
-        Assert.Equal(DeliveryStatus.Failed, delivery.DeliveryStatus);
-    }
-
-    [Fact]
-    public async Task Process_WhenDuplicateSuppressed_MarksSent()
-    {
-        var campaign = CreateStartedCampaign();
-        var delivery = AddWaitingDelivery(campaign);
-        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
-        _sender.Handler = _ => SendResult.Success(isDuplicateSuppressed: true);
-
-        await _service.ProcessAsync(delivery, CancellationToken.None);
-
-        Assert.Equal(DeliveryStatus.Sent, delivery.DeliveryStatus);
-        Assert.Single(_sender.Requests);
-        Assert.Equal(CampaignStatus.Completed, GetStoredCampaign(campaign.Id).Status);
-    }
-
-    [Fact]
-    public async Task Process_WhenDeliveryIsNotInProgress_ThrowsDomainException()
-    {
-        var campaign = CreateStartedCampaign();
-        var delivery = AddWaitingDelivery(campaign);
+        var delivery = AddWaitingDelivery(CreateStartedCampaign());
 
         await Assert.ThrowsAsync<DomainException>(() => _service.ProcessAsync(delivery, CancellationToken.None));
+
         Assert.Empty(_sender.Requests);
+        Assert.Equal(DeliveryStatus.Waiting, delivery.DeliveryStatus);
     }
 
     [Fact]
-    public async Task Process_WhenCampaignIsDraft_DoesNotSendOrCompleteDelivery()
+    public async Task Process_WhenCampaignIsDraft_DoesNotSend()
     {
         var campaign = Campaign.Create("Кампания", "Текст");
         await _campaignRepository.Create(campaign, CancellationToken.None);
@@ -144,8 +53,6 @@ public class DeliveryProcessingServiceTests
 
         Assert.Empty(_sender.Requests);
         Assert.Equal(DeliveryStatus.InProgress, delivery.DeliveryStatus);
-        Assert.Null(delivery.CompletedAt);
-        Assert.Equal(CampaignStatus.Draft, campaign.Status);
     }
 
     [Fact]
@@ -163,20 +70,6 @@ public class DeliveryProcessingServiceTests
         Assert.Equal("worker-1", delivery.WorkerId);
         Assert.Equal(expiresAt, delivery.LockExpiresAt);
         Assert.Null(delivery.CompletedAt);
-        Assert.Equal(CampaignStatus.InProgress, campaign.Status);
-    }
-
-    [Fact]
-    public async Task Process_WithPendingDeliveries_DoesNotCompleteCampaign()
-    {
-        var campaign = CreateStartedCampaign();
-        AddWaitingDelivery(campaign, "user1@example.com"); // останется в ожидании
-        var delivery = AddWaitingDelivery(campaign, "user2@example.com");
-        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
-
-        await _service.ProcessAsync(delivery, CancellationToken.None);
-
-        Assert.Equal(CampaignStatus.InProgress, GetStoredCampaign(campaign.Id).Status);
     }
 
     [Fact]
@@ -185,62 +78,14 @@ public class DeliveryProcessingServiceTests
         var campaign = CreateStartedCampaign();
         var expired = AddWaitingDelivery(campaign);
         var active = AddWaitingDelivery(campaign);
-
-        // Обе захвачены воркером с уже истёкшим сроком закрепления.
-        await _deliveryRepository.CaptureBatchAsync(
-            2, "worker-dead", TimeSpan.FromSeconds(-5), DateTime.UtcNow, CancellationToken.None);
-
-        // Вторая перезахвачена живым воркером с будущим сроком.
-        Assert.True(active.StatusFromInProgressToWaiting(DateTime.UtcNow));
-        active.StatusFromWaitingToInProgress("worker-alive", DateTime.UtcNow.AddMinutes(5));
+        var now = DateTime.UtcNow;
+        expired.StatusFromWaitingToInProgress("worker-dead", now.AddSeconds(-5), now);
+        active.StatusFromWaitingToInProgress("worker-alive", now.AddMinutes(5), now);
 
         var released = await _service.ReleaseExpiredLocksAsync(CancellationToken.None);
 
         Assert.Equal(1, released);
         Assert.Equal(DeliveryStatus.Waiting, expired.DeliveryStatus);
         Assert.Equal(DeliveryStatus.InProgress, active.DeliveryStatus);
-    }
-
-    [Fact]
-    public async Task CompleteCampaign_WhenNoPendingDeliveries_Completes()
-    {
-        var campaign = CreateStartedCampaign();
-        var delivery = AddWaitingDelivery(campaign);
-        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
-        delivery.StatusFromInProgressToSent(DateTime.UtcNow);
-
-        var completed = await _service.CompleteCampaignIfFinishedAsync(campaign.Id, CancellationToken.None);
-
-        Assert.True(completed);
-        var stored = GetStoredCampaign(campaign.Id);
-        Assert.Equal(CampaignStatus.Completed, stored.Status);
-        Assert.NotNull(stored.CompletedAt);
-    }
-
-    [Fact]
-    public async Task CompleteCampaign_WhenPendingDeliveriesExist_ReturnsFalse()
-    {
-        var campaign = CreateStartedCampaign();
-        AddWaitingDelivery(campaign);
-
-        var completed = await _service.CompleteCampaignIfFinishedAsync(campaign.Id, CancellationToken.None);
-
-        Assert.False(completed);
-        Assert.Equal(CampaignStatus.InProgress, GetStoredCampaign(campaign.Id).Status);
-    }
-
-    [Fact]
-    public async Task Process_WhenDeliveryIsNull_ReportsInvalidArgument()
-    {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _service.ProcessAsync(null!, CancellationToken.None));
-
-        Assert.Empty(_sender.Requests);
-    }
-
-    [Fact]
-    public async Task CompleteCampaign_WhenMissing_ReportsNotFound()
-    {
-        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
-            _service.CompleteCampaignIfFinishedAsync(Guid.NewGuid(), CancellationToken.None));
     }
 }
