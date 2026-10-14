@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using PackCall.Api.Background;
 using PackCall.Api.Middleware;
@@ -30,6 +31,13 @@ builder.Services.AddOptions<DeliveryWorkerOptions>()
 builder.Services.AddHostedService<DeliveryWorker>();
 
 var app = builder.Build();
+
+await using (var dbContext = await app.Services
+    .GetRequiredService<IDbContextFactory<AppDbContext>>()
+    .CreateDbContextAsync())
+{
+    await dbContext.Database.MigrateAsync();
+}
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();
