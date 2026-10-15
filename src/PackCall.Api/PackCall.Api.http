@@ -3,6 +3,18 @@
 @deliveryId = 00000000-0000-0000-0000-000000000000
 @recipientId = 00000000-0000-0000-0000-000000000000
 
+### Добавить получателя (выполнить до создания кампании)
+# @name createRecipient
+POST {{baseUrl}}/api/recipients
+Content-Type: application/json
+
+{
+  "email": "user@example.com"
+}
+
+### Проверить добавленного получателя
+GET {{baseUrl}}/api/recipients/{{createRecipient.response.body.$.id}}
+
 ### Метрики для Prometheus
 GET {{baseUrl}}/metrics
 

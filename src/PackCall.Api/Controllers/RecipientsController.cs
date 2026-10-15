@@ -4,11 +4,23 @@ using PackCall.Core.Services;
 
 namespace PackCall.Api.Controllers;
 
-/// <summary>Чтение статичной аудитории.</summary>
+/// <summary>Управление аудиторией будущих кампаний.</summary>
 [ApiController]
 [Route("api/recipients")]
 public sealed class RecipientsController(ICampaignService campaigns) : ControllerBase
 {
+    /// <summary>Добавляет получателя в аудиторию будущих кампаний.</summary>
+    [HttpPost]
+    [ProducesResponseType(typeof(RecipientResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<RecipientResponse>> CreateRecipient(
+        CreateRecipientRequest request, CancellationToken ct)
+    {
+        var recipient = await campaigns.CreateRecipientAsync(request.Email ?? "", ct);
+        return CreatedAtAction(nameof(GetRecipient), new { id = recipient.Id }, recipient.ToResponse());
+    }
+
     /// <summary>Возвращает страницу получателей.</summary>
     [HttpGet]
     [ProducesResponseType(typeof(PageResponse<RecipientResponse>), StatusCodes.Status200OK)]

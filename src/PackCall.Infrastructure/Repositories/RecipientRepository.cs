@@ -2,11 +2,33 @@ using Microsoft.EntityFrameworkCore;
 using PackCall.Core.Entities;
 using PackCall.Core;
 using PackCall.Core.Repositorys;
+using PackCall.Core.Exceptions;
+using Npgsql;
 
 namespace PackCall.Infrastructure.Repositories;
 
 public sealed class RecipientRepository(AppDbContext dbContext) : IRecipientRepository
 {
+    public async Task<Recipient> CreateAsync(Recipient recipient, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(recipient);
+        await dbContext.Recipients.AddAsync(recipient, ct);
+        try
+        {
+            await dbContext.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException exception) when (exception.InnerException is PostgresException
+            { SqlState: PostgresErrorCodes.UniqueViolation, ConstraintName: "ix_recipients_email" })
+        {
+            throw new RecipientAlreadyExistsException(exception);
+        }
+        return recipient;
+    }
+
+    public Task<Recipient?> GetByEmailAsync(string email, CancellationToken ct) =>
+        dbContext.Recipients.AsNoTracking()
+            .FirstOrDefaultAsync(recipient => recipient.Email.ToLower() == email, ct);
+
     public async Task<IReadOnlyList<Recipient>> GetBatchAsync(int offset, int batchSize, CancellationToken ct)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(offset);

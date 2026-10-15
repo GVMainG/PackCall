@@ -18,6 +18,26 @@ public class ApiControllerTests
     }
 
     [Fact]
+    public async Task CreateRecipient_ReturnsCreatedResourceAndIncludesItInNewCampaign()
+    {
+        var recipients = new RecipientsController(_service);
+        var created = await recipients.CreateRecipient(
+            new CreateRecipientRequest { Email = " User@Example.com " }, CancellationToken.None);
+
+        var result = Assert.IsType<CreatedAtActionResult>(created.Result);
+        var recipient = Assert.IsType<RecipientResponse>(result.Value);
+        Assert.Equal(nameof(RecipientsController.GetRecipient), result.ActionName);
+        Assert.Equal(recipient.Id, result.RouteValues!["id"]);
+        Assert.Equal("user@example.com", recipient.Email);
+
+        var campaignId = await _service.CreateCampaignAsync("Кампания", "Текст", CancellationToken.None);
+        var delivery = Assert.Single(_deliveries.Items);
+        Assert.Equal(campaignId, delivery.CampaignId);
+        Assert.Equal(recipient.Id, delivery.RecipientId);
+        Assert.Equal(recipient.Email, delivery.RecipientEmail);
+    }
+
+    [Fact]
     public async Task CampaignEndpoints_CreateReadAndPatchPreserveOtherField()
     {
         _recipients.Items.Add(new Recipient { Id = Guid.NewGuid(), Email = "user@example.com" });

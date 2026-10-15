@@ -1,5 +1,7 @@
 using PackCall.Core.Entities;
 using PackCall.Core.Repositorys;
+using PackCall.Core.Exceptions;
+using System.Net.Mail;
 
 namespace PackCall.Core.Services;
 
@@ -123,6 +125,32 @@ public sealed class CampaignService : ICampaignService
     {
         ct.ThrowIfCancellationRequested();
         return _recipientRepository.GetAsync(recipientId, ct);
+    }
+
+    public async Task<Recipient> CreateRecipientAsync(string email, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Укажите email получателя.", nameof(email));
+
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+        if (normalizedEmail.Length > 255 ||
+            !MailAddress.TryCreate(normalizedEmail, out var address) ||
+            !string.Equals(address.Address, normalizedEmail, StringComparison.Ordinal))
+            throw new ArgumentException("Укажите корректный email длиной не более 255 символов.", nameof(email));
+
+        if (await _recipientRepository.GetByEmailAsync(normalizedEmail, ct) is not null)
+            throw new RecipientAlreadyExistsException();
+
+        ct.ThrowIfCancellationRequested();
+        var now = DateTime.UtcNow;
+        return await _recipientRepository.CreateAsync(new Recipient
+        {
+            Id = Guid.NewGuid(),
+            Email = normalizedEmail,
+            CreatedAt = now,
+            UpdatedAt = now
+        }, ct);
     }
 
     public Task<PageResult<Recipient>> GetRecipientsAsync(int pageNumber, int pageSize, CancellationToken ct)

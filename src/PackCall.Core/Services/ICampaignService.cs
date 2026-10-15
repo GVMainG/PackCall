@@ -53,6 +53,11 @@ public interface ICampaignService
     /// <summary>Возвращает получателя или null, если он не найден.</summary>
     Task<Recipient?> GetRecipientAsync(Guid recipientId, CancellationToken ct);
 
+    /// <summary>Добавляет получателя в аудиторию будущих кампаний.</summary>
+    /// <exception cref="ArgumentException">Email пуст или некорректен.</exception>
+    /// <exception cref="DomainException">Получатель с таким email уже существует.</exception>
+    Task<Recipient> CreateRecipientAsync(string email, CancellationToken ct);
+
     /// <summary>Возвращает страницу всех получателей в порядке Id.</summary>
     Task<PageResult<Recipient>> GetRecipientsAsync(int pageNumber, int pageSize, CancellationToken ct);
 
