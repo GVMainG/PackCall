@@ -170,6 +170,57 @@ namespace PackCall.Infrastructure.Migrations
                     b.ToTable("recipients", (string)null);
                 });
 
+            modelBuilder.Entity("PackCall.Infrastructure.Journaling.DeliveryStatusJournalRecord", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<Guid>("CampaignId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("campaign_id");
+
+                    b.Property<Guid>("DeliveryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("delivery_id");
+
+                    b.Property<int>("NewStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("new_status");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_at");
+
+                    b.Property<string>("OperatorResult")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("operator_result");
+
+                    b.Property<int>("PreviousStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("previous_status");
+
+                    b.Property<string>("WorkerId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("worker_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_delivery_status_journal_id");
+
+                    b.HasIndex("CampaignId", "OccurredAt")
+                        .HasDatabaseName("ix_delivery_status_journal_campaign_occurred_at");
+
+                    b.HasIndex("DeliveryId", "OccurredAt")
+                        .HasDatabaseName("ix_delivery_status_journal_delivery_occurred_at");
+
+                    b.ToTable("delivery_status_journal", (string)null);
+                });
+
             modelBuilder.Entity("PackCall.Infrastructure.Sending.MockEmailSend", b =>
                 {
                     b.Property<Guid>("DeliveryId")

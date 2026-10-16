@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PackCall.Core.Entities;
+using PackCall.Infrastructure.Journaling;
 using PackCall.Infrastructure.Sending;
 
 namespace PackCall.Infrastructure
@@ -13,6 +14,7 @@ namespace PackCall.Infrastructure
         public DbSet<Campaign> Campaigns { get; set; } = null!;
         public DbSet<Recipient> Recipients { get; set; } = null!;
         public DbSet<Delivery> Deliveries { get; set; } = null!;
+        internal DbSet<DeliveryStatusJournalRecord> DeliveryStatusJournal => Set<DeliveryStatusJournalRecord>();
         internal DbSet<MockEmailSend> MockEmailSends => Set<MockEmailSend>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -88,6 +90,24 @@ namespace PackCall.Infrastructure
                 entity.Property(e => e.Error).HasColumnName("error").HasMaxLength(1000);
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasColumnType("timestamp with time zone").IsRequired();
                 entity.HasIndex(e => e.CreatedAt).HasDatabaseName("ix_mock_email_sends_created_at");
+            });
+
+            modelBuilder.Entity<DeliveryStatusJournalRecord>(entity =>
+            {
+                entity.ToTable("delivery_status_journal");
+                entity.HasKey(e => e.Id).HasName("pk_delivery_status_journal_id");
+                entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+                entity.Property(e => e.CampaignId).HasColumnName("campaign_id").IsRequired();
+                entity.Property(e => e.DeliveryId).HasColumnName("delivery_id").IsRequired();
+                entity.Property(e => e.PreviousStatus).HasColumnName("previous_status").IsRequired();
+                entity.Property(e => e.NewStatus).HasColumnName("new_status").IsRequired();
+                entity.Property(e => e.WorkerId).HasColumnName("worker_id").HasMaxLength(255);
+                entity.Property(e => e.OccurredAt).HasColumnName("occurred_at").HasColumnType("timestamp with time zone").IsRequired();
+                entity.Property(e => e.OperatorResult).HasColumnName("operator_result").HasMaxLength(1000);
+                entity.HasIndex(e => new { e.CampaignId, e.OccurredAt })
+                    .HasDatabaseName("ix_delivery_status_journal_campaign_occurred_at");
+                entity.HasIndex(e => new { e.DeliveryId, e.OccurredAt })
+                    .HasDatabaseName("ix_delivery_status_journal_delivery_occurred_at");
             });
         }
     }
