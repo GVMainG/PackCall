@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PackCall.Core.Repositorys;
+using PackCall.Infrastructure.Repositories;
 
 namespace PackCall.Infrastructure
 {
@@ -14,6 +16,10 @@ namespace PackCall.Infrastructure
                     connectionString,
                     pgOptions => pgOptions
                         .MigrationsHistoryTable("__ef_migrations_history")));
+
+            services.AddScoped<ICampaingRepository, CampaignRepository>();
+            services.AddScoped<IRecipientRepository, RecipientRepository>();
+            services.AddScoped<IDeliveryRepository, DeliveryRepository>();
 
             return services;
         }
