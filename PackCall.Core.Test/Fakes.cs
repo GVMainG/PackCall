@@ -56,16 +56,22 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         return Task.FromResult(campaign);
     }
 
-    public Task<bool> Delete(Guid id, CancellationToken ct) =>
-        Task.FromResult(_store.Remove(id));
+    public Task<bool> Delete(Guid id, CancellationToken ct)
+    {
+        if (!_store.Remove(id))
+            return Task.FromResult(false);
+        _deliveries?.RemoveByCampaign(id);
+        return Task.FromResult(true);
+    }
 }
 
 internal sealed class FakeRecipientRepository : IRecipientRepository
 {
     public List<Recipient> Items { get; } = new();
 
-    public Task<IReadOnlyList<Recipient>> GetAllAsync(CancellationToken ct) =>
-        Task.FromResult<IReadOnlyList<Recipient>>(Items.ToList());
+    public Task<IReadOnlyList<Recipient>> GetBatchAsync(int offset, int batchSize, CancellationToken ct) =>
+        Task.FromResult<IReadOnlyList<Recipient>>(Items.DistinctBy(recipient => recipient.Id)
+            .OrderBy(recipient => recipient.Id).Skip(offset).Take(batchSize).ToList());
 
     public Task<Recipient?> GetAsync(Guid id, CancellationToken ct) =>
         Task.FromResult(Items.FirstOrDefault(recipient => recipient.Id == id));
@@ -86,7 +92,19 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
 
     public IReadOnlyList<Delivery> Items => _store;
 
+    public Func<IReadOnlyList<Delivery>, Task>? BeforeAddBatchAsync { get; set; }
+
+    public async Task AddBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct)
+    {
+        if (BeforeAddBatchAsync is not null)
+            await BeforeAddBatchAsync(deliveries);
+        _store.AddRange(deliveries);
+    }
+
     public void Add(Delivery delivery) => _store.Add(delivery);
+
+    public void RemoveByCampaign(Guid campaignId) =>
+        _store.RemoveAll(delivery => delivery.CampaignId == campaignId);
 
     public Task<IEnumerable<Delivery>> Get(Guid id, CancellationToken ct) =>
         Task.FromResult(_store.Where(d => d.Id == id).ToList().AsEnumerable());
@@ -157,44 +175,23 @@ internal sealed class FakeMessageSender : IMessageSender
     }
 }
 
-// TODO: Убрать тестирование журнала из тестов.
 internal sealed class FakeJournal : IDeliveryStatusJournal
 {
-    public List<StatusChangeEntry> Entries { get; } = new();
-
-    public Task AppendAsync(StatusChangeEntry entry, CancellationToken ct)
-    {
-        Entries.Add(entry);
-        return Task.CompletedTask;
-    }
+    public Task AppendAsync(StatusChangeEntry entry, CancellationToken ct) => Task.CompletedTask;
 }
 
-// TODO: Убрать тестирование метрик из тестов.
 internal sealed class FakeMetrics : IDeliveryMetrics
 {
-    public int Captured { get; private set; }
-    public int Processed { get; private set; }
-    public int ExpiredLockReturned { get; private set; }
-    public int OperatorRetries { get; private set; }
-    public int OperatorDuplicateSuppressed { get; private set; }
-    public int OperatorSuccess { get; private set; }
-    public int OperatorErrors { get; private set; }
-
-    public void RecordCaptured(int count) => Captured += count;
-
-    public void RecordProcessed() => Processed++;
+    public void RecordCaptured(int count) { }
+    public void RecordProcessed() { }
 
     public void RecordStatusChange(DeliveryStatus previous, DeliveryStatus current)
     {
     }
 
-    public void RecordExpiredLockReturned(int count) => ExpiredLockReturned += count;
-
-    public void RecordOperatorRetry() => OperatorRetries++;
-
-    public void RecordOperatorDuplicateSuppressed() => OperatorDuplicateSuppressed++;
-
-    public void RecordOperatorSuccess() => OperatorSuccess++;
-
-    public void RecordOperatorError() => OperatorErrors++;
+    public void RecordExpiredLockReturned(int count) { }
+    public void RecordOperatorRetry() { }
+    public void RecordOperatorDuplicateSuppressed() { }
+    public void RecordOperatorSuccess() { }
+    public void RecordOperatorError() { }
 }

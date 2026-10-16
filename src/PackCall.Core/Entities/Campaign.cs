@@ -52,6 +52,22 @@ public sealed class Campaign
 
     #region Смена статусов
 
+    /// <summary>Блокирует изменение и запуск кампании на время создания доставок.</summary>
+    public void StatusFromDraftToForming()
+    {
+        EnsureTransition(CampaignStatus.Forming);
+        Status = CampaignStatus.Forming;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    /// <summary>Делает кампанию доступной после создания всех доставок.</summary>
+    public void StatusFromFormingToDraft()
+    {
+        EnsureTransition(CampaignStatus.Draft);
+        Status = CampaignStatus.Draft;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
     /// <summary>
     /// Переводит кампанию из черновика в состояние обработки и устанавливает даты начала и изменения.
     /// </summary>

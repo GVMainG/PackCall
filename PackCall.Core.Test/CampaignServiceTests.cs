@@ -36,11 +36,11 @@ public class CampaignServiceTests
         Assert.Equal("Текст", campaign.MessageText);
         Assert.Equal(CampaignStatus.Draft, campaign.Status);
         Assert.NotNull(campaign.CreatedAt);
-        Assert.Equal(campaign.CreatedAt, campaign.UpdatedAt);
+        Assert.True(campaign.UpdatedAt >= campaign.CreatedAt);
         Assert.Null(campaign.StartedAt);
         Assert.Null(campaign.CompletedAt);
         Assert.Equal(2, _deliveryRepository.Items.Count);
-        Assert.Equal(2, campaign.Deliveries.Count);
+        Assert.Empty(campaign.Deliveries);
         Assert.All(_deliveryRepository.Items, delivery =>
         {
             Assert.Equal(id, delivery.CampaignId);
@@ -67,7 +67,8 @@ public class CampaignServiceTests
 
         await Assert.ThrowsAsync<ArgumentException>(() => CreateCampaignAsync());
 
-        Assert.Equal(0, _campaignRepository.CreateCount);
+        Assert.Equal(1, _campaignRepository.CreateCount);
+        Assert.Empty((await _service.GetCampaignsAsync(1, 10, CancellationToken.None)).Items);
         Assert.Empty(_deliveryRepository.Items);
     }
 
@@ -81,6 +82,72 @@ public class CampaignServiceTests
             _service.CreateCampaignAsync("Кампания", "Текст", cancellation.Token));
 
         Assert.Equal(0, _campaignRepository.CreateCount);
+        Assert.Empty(_deliveryRepository.Items);
+    }
+
+    [Fact]
+    public async Task CreateCampaign_FormsDeliveriesInBatchesAndBlocksChangesUntilReady()
+    {
+        _recipientRepository.Items.AddRange(Enumerable.Range(0, 1001)
+            .Select(index => new Recipient { Id = Guid.NewGuid(), Email = $"user{index}@example.com" }));
+        var batchSizes = new List<int>();
+        _deliveryRepository.BeforeAddBatchAsync = async deliveries =>
+        {
+            batchSizes.Add(deliveries.Count);
+            var campaignId = deliveries[0].CampaignId;
+            Assert.Equal(CampaignStatus.Forming,
+                (await _service.GetCampaignAsync(campaignId, CancellationToken.None))!.Status);
+            await Assert.ThrowsAsync<InvalidStatusTransitionException>(() =>
+                _service.StartCampaignAsync(campaignId, CancellationToken.None));
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _service.UpdateCampaignAsync(campaignId, "Новое имя", "Новый текст", CancellationToken.None));
+        };
+
+        var id = await CreateCampaignAsync();
+
+        Assert.Equal(new[] { 500, 500, 1 }, batchSizes);
+        Assert.Equal(1001, _deliveryRepository.Items.Count);
+        Assert.Equal(CampaignStatus.Draft, (await _service.GetCampaignAsync(id, CancellationToken.None))!.Status);
+        await _service.StartCampaignAsync(id, CancellationToken.None);
+        Assert.Equal(CampaignStatus.InProgress, (await _service.GetCampaignAsync(id, CancellationToken.None))!.Status);
+    }
+
+    [Fact]
+    public async Task CreateCampaign_WhenLaterBatchFails_RemovesPartialCampaign()
+    {
+        _recipientRepository.Items.AddRange(Enumerable.Range(0, 501)
+            .Select(index => new Recipient { Id = Guid.NewGuid(), Email = $"user{index}@example.com" }));
+        var batchNumber = 0;
+        _deliveryRepository.BeforeAddBatchAsync = _ =>
+        {
+            if (++batchNumber == 2)
+                throw new InvalidOperationException("Ошибка сохранения порции");
+            return Task.CompletedTask;
+        };
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateCampaignAsync());
+
+        Assert.Equal(2, batchNumber);
+        Assert.Empty((await _service.GetCampaignsAsync(1, 10, CancellationToken.None)).Items);
+        Assert.Empty(_deliveryRepository.Items);
+    }
+
+    [Fact]
+    public async Task CreateCampaign_WhenCancelledAfterFirstBatch_RemovesPartialCampaign()
+    {
+        _recipientRepository.Items.AddRange(Enumerable.Range(0, 501)
+            .Select(index => new Recipient { Id = Guid.NewGuid(), Email = $"user{index}@example.com" }));
+        using var cancellation = new CancellationTokenSource();
+        _deliveryRepository.BeforeAddBatchAsync = _ =>
+        {
+            cancellation.Cancel();
+            return Task.CompletedTask;
+        };
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() =>
+            _service.CreateCampaignAsync("Кампания", "Текст", cancellation.Token));
+
+        Assert.Empty((await _service.GetCampaignsAsync(1, 10, CancellationToken.None)).Items);
         Assert.Empty(_deliveryRepository.Items);
     }
 
@@ -113,7 +180,7 @@ public class CampaignServiceTests
 
         Assert.Equal(startedAt, campaign.StartedAt);
         Assert.Equal(updatedAt, campaign.UpdatedAt);
-        Assert.Equal(1, _campaignRepository.UpdateCount);
+        Assert.Equal(2, _campaignRepository.UpdateCount);
         Assert.Same(delivery, Assert.Single(_deliveryRepository.Items));
         Assert.Equal(DeliveryStatus.InProgress, delivery.DeliveryStatus);
     }

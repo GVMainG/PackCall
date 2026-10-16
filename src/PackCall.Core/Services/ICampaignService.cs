@@ -15,7 +15,9 @@ public interface ICampaignService
     /// <summary>Создаёт черновик и по одной ожидающей доставке на каждого уникального получателя аудитории.</summary>
     /// <returns>Идентификатор сохранённой кампании.</returns>
     /// <remarks>
-    /// Кампания и доставки сохраняются совместно. Адрес получателя сохраняется как снимок.
+    /// При формировании доставок кампания имеет статус Forming и недоступна для изменения
+    /// или запуска. Доставки сохраняются порциями; после завершения статус становится Draft.
+    /// При ошибке или отмене создания частичная кампания удаляется. Адрес получателя сохраняется как снимок.
     /// Каждый вызов создаёт новую кампанию; повторный запрос не дедуплицируется.
     /// Название и сообщение проверяются при запуске, поэтому возможен незаполненный черновик.
     /// </remarks>
@@ -24,7 +26,7 @@ public interface ICampaignService
 
     /// <summary>Изменяет название и сообщение черновика и возвращает сохранённую кампанию.</summary>
     /// <exception cref="KeyNotFoundException">Кампания не найдена.</exception>
-    /// <exception cref="InvalidOperationException">Кампания уже запущена или завершена.</exception>
+    /// <exception cref="InvalidOperationException">Кампания формируется, запущена или завершена.</exception>
     /// <exception cref="ArgumentException">Название или сообщение не заполнены.</exception>
     Task<Campaign> UpdateCampaignAsync(Guid campaignId, string name, string messageText, CancellationToken ct);
 

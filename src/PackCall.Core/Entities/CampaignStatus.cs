@@ -5,6 +5,7 @@ public enum CampaignStatus
     Draft = 0,
     InProgress = 1,
     Completed = 2,
+    Forming = 3,
     Failed = -1
 }
 
@@ -14,7 +15,8 @@ public static class CampaignStatusTransitions
     private static readonly IReadOnlyDictionary<CampaignStatus, IReadOnlySet<CampaignStatus>> Allowed =
         new Dictionary<CampaignStatus, IReadOnlySet<CampaignStatus>>
         {
-            [CampaignStatus.Draft] = new HashSet<CampaignStatus> { CampaignStatus.InProgress },
+            [CampaignStatus.Draft] = new HashSet<CampaignStatus> { CampaignStatus.Forming, CampaignStatus.InProgress },
+            [CampaignStatus.Forming] = new HashSet<CampaignStatus> { CampaignStatus.Draft },
             [CampaignStatus.InProgress] = new HashSet<CampaignStatus> { CampaignStatus.Completed },
             [CampaignStatus.Completed] = new HashSet<CampaignStatus>(),
             [CampaignStatus.Failed] = new HashSet<CampaignStatus>()

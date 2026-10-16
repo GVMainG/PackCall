@@ -111,7 +111,9 @@ public class CampaignTests
         Assert.Equal(nameof(Campaign), error.EntityName);
         Assert.Equal(CampaignStatus.Draft, error.PreviousStatus);
         Assert.Equal(CampaignStatus.Completed, error.TargetStatus);
-        Assert.Contains("допустимые переходы: InProgress", error.Message);
+        Assert.Contains("допустимые переходы:", error.Message);
+        Assert.Contains("InProgress", error.Message);
+        Assert.Contains("Forming", error.Message);
         Assert.Equal(CampaignStatus.Draft, campaign.Status);
         Assert.Null(campaign.CompletedAt);
         Assert.Equal(updatedAt, campaign.UpdatedAt);
@@ -119,6 +121,7 @@ public class CampaignTests
 
     [Theory]
     [InlineData(CampaignStatus.Draft, false)]
+    [InlineData(CampaignStatus.Forming, false)]
     [InlineData(CampaignStatus.InProgress, false)]
     [InlineData(CampaignStatus.Completed, true)]
     [InlineData(CampaignStatus.Failed, true)]
@@ -135,6 +138,8 @@ public class CampaignTests
             foreach (var to in Enum.GetValues<CampaignStatus>())
             {
                 var expected = (from, to) is
+                    (CampaignStatus.Draft, CampaignStatus.Forming) or
+                    (CampaignStatus.Forming, CampaignStatus.Draft) or
                     (CampaignStatus.Draft, CampaignStatus.InProgress) or
                     (CampaignStatus.InProgress, CampaignStatus.Completed);
 

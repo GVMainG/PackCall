@@ -56,9 +56,6 @@ public class DeliveryProcessingServiceTests
         });
         Assert.Contains(captured, d => d.Id == waiting1.Id);
         Assert.Contains(captured, d => d.Id == waiting2.Id);
-        Assert.Equal(2, _metrics.Captured);
-        Assert.Equal(2, _journal.Entries.Count(e =>
-            e.PreviousStatus == DeliveryStatus.Waiting && e.NewStatus == DeliveryStatus.InProgress));
     }
 
     [Fact]
@@ -93,12 +90,6 @@ public class DeliveryProcessingServiceTests
         Assert.Equal(delivery.RecipientEmail, request.RecipientEmail);
         Assert.Equal(campaign.MessageText, request.MessageText);
 
-        Assert.Equal(1, _metrics.Processed);
-        Assert.Equal(1, _metrics.OperatorSuccess);
-        Assert.Contains(_journal.Entries, e =>
-            e.DeliveryId == delivery.Id &&
-            e.PreviousStatus == DeliveryStatus.InProgress &&
-            e.NewStatus == DeliveryStatus.Sent);
 
         Assert.Equal(CampaignStatus.Completed, GetStoredCampaign(campaign.Id).Status);
     }
@@ -114,15 +105,10 @@ public class DeliveryProcessingServiceTests
         await _service.ProcessAsync(delivery, CancellationToken.None);
 
         Assert.Equal(DeliveryStatus.Failed, delivery.DeliveryStatus);
-        Assert.Equal(1, _metrics.OperatorErrors);
-        Assert.Contains(_journal.Entries, e =>
-            e.DeliveryId == delivery.Id &&
-            e.NewStatus == DeliveryStatus.Failed &&
-            e.OperatorResult == "оператор недоступен");
     }
 
     [Fact]
-    public async Task Process_WhenDuplicateSuppressed_RecordsRetryMetrics()
+    public async Task Process_WhenDuplicateSuppressed_MarksSent()
     {
         var campaign = CreateStartedCampaign();
         var delivery = AddWaitingDelivery(campaign);
@@ -132,8 +118,8 @@ public class DeliveryProcessingServiceTests
         await _service.ProcessAsync(delivery, CancellationToken.None);
 
         Assert.Equal(DeliveryStatus.Sent, delivery.DeliveryStatus);
-        Assert.Equal(1, _metrics.OperatorRetries);
-        Assert.Equal(1, _metrics.OperatorDuplicateSuppressed);
+        Assert.Single(_sender.Requests);
+        Assert.Equal(CampaignStatus.Completed, GetStoredCampaign(campaign.Id).Status);
     }
 
     [Fact]
@@ -177,8 +163,6 @@ public class DeliveryProcessingServiceTests
         Assert.Equal("worker-1", delivery.WorkerId);
         Assert.Equal(expiresAt, delivery.LockExpiresAt);
         Assert.Null(delivery.CompletedAt);
-        Assert.Empty(_journal.Entries);
-        Assert.Equal(0, _metrics.Processed);
         Assert.Equal(CampaignStatus.InProgress, campaign.Status);
     }
 
@@ -215,11 +199,6 @@ public class DeliveryProcessingServiceTests
         Assert.Equal(1, released);
         Assert.Equal(DeliveryStatus.Waiting, expired.DeliveryStatus);
         Assert.Equal(DeliveryStatus.InProgress, active.DeliveryStatus);
-        Assert.Equal(1, _metrics.ExpiredLockReturned);
-        Assert.Contains(_journal.Entries, e =>
-            e.DeliveryId == expired.Id &&
-            e.PreviousStatus == DeliveryStatus.InProgress &&
-            e.NewStatus == DeliveryStatus.Waiting);
     }
 
     [Fact]
@@ -256,8 +235,6 @@ public class DeliveryProcessingServiceTests
         await Assert.ThrowsAsync<ArgumentNullException>(() => _service.ProcessAsync(null!, CancellationToken.None));
 
         Assert.Empty(_sender.Requests);
-        Assert.Empty(_journal.Entries);
-        Assert.Equal(0, _metrics.Processed);
     }
 
     [Fact]
