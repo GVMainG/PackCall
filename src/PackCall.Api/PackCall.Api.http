@@ -1,6 +1,45 @@
-@PackCall.Api_HostAddress = http://localhost:5112
+@baseUrl = http://localhost:5112
+@campaignId = 00000000-0000-0000-0000-000000000000
+@deliveryId = 00000000-0000-0000-0000-000000000000
+@recipientId = 00000000-0000-0000-0000-000000000000
 
-GET {{PackCall.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Список кампаний
+GET {{baseUrl}}/api/campaigns?pageNumber=1&pageSize=20
 
-###
+### Кампания со статистикой
+GET {{baseUrl}}/api/campaigns/{{campaignId}}
+
+### Создать кампанию
+POST {{baseUrl}}/api/campaigns
+Content-Type: application/json
+
+{
+  "name": "Первая рассылка",
+  "messageText": "Добрый день!"
+}
+
+### Изменить черновик
+PATCH {{baseUrl}}/api/campaigns/{{campaignId}}
+Content-Type: application/json
+
+{
+  "name": "Обновлённая рассылка"
+}
+
+### Запустить кампанию
+POST {{baseUrl}}/api/campaigns/{{campaignId}}/start
+
+### Доставки кампании
+GET {{baseUrl}}/api/campaigns/{{campaignId}}/deliveries?pageNumber=1&pageSize=20
+
+### Доставка
+GET {{baseUrl}}/api/deliveries/{{deliveryId}}
+
+### Получатели
+GET {{baseUrl}}/api/recipients?pageNumber=1&pageSize=20
+
+### Получатель
+GET {{baseUrl}}/api/recipients/{{recipientId}}
+
+### Удалить кампанию
+DELETE {{baseUrl}}/api/campaigns/{{campaignId}}

@@ -8,4 +8,6 @@ namespace PackCall.Core.Repositorys;
 public interface IRecipientRepository
 {
     Task<IReadOnlyList<Recipient>> GetAllAsync(CancellationToken ct);
+    Task<Recipient?> GetAsync(Guid id, CancellationToken ct);
+    Task<PageResult<Recipient>> GetPageAsync(int pageNumber, int pageSize, CancellationToken ct);
 }

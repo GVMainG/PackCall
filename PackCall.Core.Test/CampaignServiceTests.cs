@@ -175,4 +175,24 @@ public class CampaignServiceTests
         await Assert.ThrowsAsync<KeyNotFoundException>(() =>
             _service.UpdateCampaignAsync(id, "Название", "Текст", CancellationToken.None));
     }
+
+    [Fact]
+    public async Task ReadOperations_ReturnDeliveryRecipientAndStatusCounts()
+    {
+        var recipient = new Recipient { Id = Guid.NewGuid(), Email = "user@example.com" };
+        _recipientRepository.Items.Add(recipient);
+        var campaignId = await CreateCampaignAsync();
+        var delivery = Assert.Single(_deliveryRepository.Items);
+
+        Assert.Same(delivery, await _service.GetDeliveryAsync(delivery.Id, CancellationToken.None));
+        Assert.Same(recipient, await _service.GetRecipientAsync(recipient.Id, CancellationToken.None));
+        Assert.Null(await _service.GetDeliveryAsync(Guid.NewGuid(), CancellationToken.None));
+        Assert.Null(await _service.GetRecipientAsync(Guid.NewGuid(), CancellationToken.None));
+
+        var recipients = await _service.GetRecipientsAsync(1, 10, CancellationToken.None);
+        Assert.Same(recipient, Assert.Single(recipients.Items));
+        Assert.Equal(1, recipients.TotalCount);
+        Assert.Equal(new DeliveryStatusCounts(1, 1, 0, 0, 0),
+            await _service.GetDeliveryStatusCountsAsync(campaignId, CancellationToken.None));
+    }
 }

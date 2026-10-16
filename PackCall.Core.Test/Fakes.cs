@@ -66,6 +66,14 @@ internal sealed class FakeRecipientRepository : IRecipientRepository
 
     public Task<IReadOnlyList<Recipient>> GetAllAsync(CancellationToken ct) =>
         Task.FromResult<IReadOnlyList<Recipient>>(Items.ToList());
+
+    public Task<Recipient?> GetAsync(Guid id, CancellationToken ct) =>
+        Task.FromResult(Items.FirstOrDefault(recipient => recipient.Id == id));
+
+    public Task<PageResult<Recipient>> GetPageAsync(int pageNumber, int pageSize, CancellationToken ct) =>
+        Task.FromResult(new PageResult<Recipient>(
+            Items.OrderBy(recipient => recipient.Id).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList(),
+            Items.Count));
 }
 
 internal sealed class FakeDeliveryRepository : IDeliveryRepository
@@ -91,6 +99,16 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
         var deliveries = _store.Where(d => d.CampaignId == campaignId).OrderBy(d => d.Id).ToList();
         var items = deliveries.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
         return Task.FromResult(new PageResult<Delivery>(items, deliveries.Count));
+    }
+
+    public Task<DeliveryStatusCounts> GetStatusCountsAsync(Guid campaignId, CancellationToken ct)
+    {
+        var deliveries = _store.Where(delivery => delivery.CampaignId == campaignId).ToList();
+        return Task.FromResult(new DeliveryStatusCounts(deliveries.Count,
+            deliveries.Count(delivery => delivery.DeliveryStatus == DeliveryStatus.Waiting),
+            deliveries.Count(delivery => delivery.DeliveryStatus == DeliveryStatus.InProgress),
+            deliveries.Count(delivery => delivery.DeliveryStatus == DeliveryStatus.Sent),
+            deliveries.Count(delivery => delivery.DeliveryStatus == DeliveryStatus.Failed)));
     }
 
     public Task<IReadOnlyList<Delivery>> CaptureBatchAsync(
@@ -139,6 +157,7 @@ internal sealed class FakeMessageSender : IMessageSender
     }
 }
 
+// TODO: Убрать тестирование журнала из тестов.
 internal sealed class FakeJournal : IDeliveryStatusJournal
 {
     public List<StatusChangeEntry> Entries { get; } = new();
@@ -150,6 +169,7 @@ internal sealed class FakeJournal : IDeliveryStatusJournal
     }
 }
 
+// TODO: Убрать тестирование метрик из тестов.
 internal sealed class FakeMetrics : IDeliveryMetrics
 {
     public int Captured { get; private set; }

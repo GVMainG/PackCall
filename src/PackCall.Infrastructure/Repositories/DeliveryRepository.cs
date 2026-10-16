@@ -42,6 +42,20 @@ public sealed class DeliveryRepository(AppDbContext dbContext) : IDeliveryReposi
         return new PageResult<Delivery>(items, totalCount);
     }
 
+    public async Task<DeliveryStatusCounts> GetStatusCountsAsync(Guid campaignId, CancellationToken ct)
+    {
+        var counts = await dbContext.Deliveries.AsNoTracking()
+            .Where(delivery => delivery.CampaignId == campaignId)
+            .GroupBy(delivery => delivery.DeliveryStatus)
+            .Select(group => new { Status = group.Key, Count = group.Count() })
+            .ToListAsync(ct);
+
+        int Count(DeliveryStatus status) => counts.FirstOrDefault(item => item.Status == status)?.Count ?? 0;
+        return new DeliveryStatusCounts(counts.Sum(item => item.Count),
+            Count(DeliveryStatus.Waiting), Count(DeliveryStatus.InProgress),
+            Count(DeliveryStatus.Sent), Count(DeliveryStatus.Failed));
+    }
+
     public async Task<IReadOnlyList<Delivery>> CaptureBatchAsync(
         int batchSize,
         string workerId,

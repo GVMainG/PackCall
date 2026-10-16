@@ -13,6 +13,8 @@ namespace PackCall.Core.Repositorys
         Task<IEnumerable<Delivery>> Get(Guid campaignId, Expression<Func<Delivery, bool>> predicate, CancellationToken ct);
         /// <summary>Возвращает страницу в порядке Id и общее число доставок кампании; нумерация с 1.</summary>
         Task<PageResult<Delivery>> GetPage(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct);
+        /// <summary>Подсчитывает доставки кампании по статусам в хранилище.</summary>
+        Task<DeliveryStatusCounts> GetStatusCountsAsync(Guid campaignId, CancellationToken ct);
 
         /// <summary>
         /// Атомарно выбирает не более <paramref name="batchSize"/> доставок со статусом "Ожидает"
