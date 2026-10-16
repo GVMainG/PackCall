@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: src/PackCall.Api/Dockerfile
     environment:
-      ConnectionStrings__Postgres: Host=packcall.db;Port=5432;Database=${POSTGRES_DB:-packcall};Username=${POSTGRES_USER:-packcall};Password=${POSTGRES_PASSWORD:-packcall_dev}
+      ConnectionStrings__Postgres: Host=packcall.db;Port=5432;Database=${POSTGRES_DB:-packcall};Username=${POSTGRES_USER:-packcall};Password=${POSTGRES_PASSWORD:-packcall}
     depends_on:
       packcall.db:
         condition: service_healthy
@@ -15,7 +15,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-packcall}
       POSTGRES_USER: ${POSTGRES_USER:-packcall}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-packcall_dev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-packcall}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
       interval: 5s
