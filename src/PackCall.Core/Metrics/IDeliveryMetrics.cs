@@ -7,13 +7,13 @@ namespace PackCall.Core.Metrics;
 /// </summary>
 public interface IDeliveryMetrics
 {
-    /// <summary>Фиксирует число захваченных доставок (активные закрепления).</summary>
+    /// <summary>Увеличивает накопительный счётчик захваченных доставок.</summary>
     void RecordCaptured(int count);
 
     /// <summary>Фиксирует одну обработанную доставку (скорость обработки).</summary>
     void RecordProcessed();
 
-    /// <summary>Фиксирует смену статуса доставки (счётчики по статусам).</summary>
+    /// <summary>Фиксирует переход доставки между статусами.</summary>
     void RecordStatusChange(DeliveryStatus previous, DeliveryStatus current);
 
     /// <summary>Фиксирует число доставок, возвращённых в "Ожидает" из-за истёкшего закрепления.</summary>
