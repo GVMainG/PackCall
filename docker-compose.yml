@@ -1,0 +1,30 @@
+services:
+  packcall.api:
+    image: ${DOCKER_REGISTRY-}packcallapi
+    build:
+      context: .
+      dockerfile: src/PackCall.Api/Dockerfile
+    environment:
+      ConnectionStrings__Postgres: Host=packcall.db;Port=5432;Database=${POSTGRES_DB:-packcall};Username=${POSTGRES_USER:-packcall};Password=${POSTGRES_PASSWORD:-packcall_dev}
+    depends_on:
+      packcall.db:
+        condition: service_healthy
+
+  packcall.db:
+    image: postgres:18.6-alpine3.24
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-packcall}
+      POSTGRES_USER: ${POSTGRES_USER:-packcall}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-packcall_dev}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - packcall-postgres-data:/var/lib/postgresql
+    restart: unless-stopped
+
+volumes:
+  packcall-postgres-data:
