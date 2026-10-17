@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PackCall.Api.Metrics;
 using PackCall.Core.Metrics;
 using PackCall.Infrastructure.Metrics;
+using Serilog;
 
 namespace PackCall.Api.Controllers;
 
@@ -12,8 +13,10 @@ namespace PackCall.Api.Controllers;
 public sealed class MetricsController(
     DeliveryMetrics metrics,
     IDeliveryStateSnapshotReader stateReader,
-    ILogger<MetricsController> logger) : ControllerBase
+    Serilog.ILogger logger) : ControllerBase
 {
+    private readonly Serilog.ILogger _logger = logger.ForContext<MetricsController>();
+
     /// <summary>Возвращает накопительные счётчики процесса и текущее состояние доставок.</summary>
     [HttpGet]
     [Produces("text/plain")]
@@ -27,7 +30,7 @@ public sealed class MetricsController(
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            logger.LogError(exception, "Не удалось прочитать текущее состояние доставок для метрик");
+            _logger.Error(exception, "Не удалось прочитать текущее состояние доставок для метрик");
             state = null;
         }
 

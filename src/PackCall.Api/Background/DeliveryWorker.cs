@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using PackCall.Core.Entities;
 using PackCall.Core.Services;
+using Serilog;
 
 namespace PackCall.Api.Background;
 
@@ -9,17 +10,17 @@ public sealed class DeliveryWorker : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly DeliveryWorkerOptions _options;
-    private readonly ILogger<DeliveryWorker> _logger;
+    private readonly Serilog.ILogger _logger;
     private readonly string _workerId;
 
     public DeliveryWorker(
         IServiceScopeFactory scopeFactory,
         IOptions<DeliveryWorkerOptions> options,
-        ILogger<DeliveryWorker> logger)
+        Serilog.ILogger logger)
     {
         _scopeFactory = scopeFactory;
         _options = options.Value;
-        _logger = logger;
+        _logger = logger.ForContext<DeliveryWorker>();
 
         if (!_options.IsValid())
             throw new OptionsValidationException(DeliveryWorkerOptions.SectionName,
@@ -33,7 +34,7 @@ public sealed class DeliveryWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Фоновый обработчик доставок запущен. WorkerId={WorkerId}, Parallelism={Parallelism}",
+        _logger.Information("Фоновый обработчик доставок запущен. WorkerId={WorkerId}, Parallelism={Parallelism}",
             _workerId, _options.Parallelism);
 
         var processing = Enumerable.Range(0, _options.Parallelism)
@@ -66,7 +67,7 @@ public sealed class DeliveryWorker : BackgroundService
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Ошибка обработки доставок. WorkerId={WorkerId}, Lane={Lane}",
+                _logger.Error(exception, "Ошибка обработки доставок. WorkerId={WorkerId}, Lane={Lane}",
                     _workerId, lane);
                 await DelayAfterErrorAsync(ct);
             }
@@ -78,7 +79,7 @@ public sealed class DeliveryWorker : BackgroundService
     {
         if (delivery.WorkerId != _workerId || delivery.LockExpiresAt is not { } expiresAt)
         {
-            _logger.LogWarning("Захваченная доставка {DeliveryId} не закреплена за воркером {WorkerId}",
+            _logger.Warning("Захваченная доставка {DeliveryId} не закреплена за воркером {WorkerId}",
                 delivery.Id, _workerId);
             return;
         }
@@ -88,7 +89,7 @@ public sealed class DeliveryWorker : BackgroundService
         var remaining = expiresAt - DateTime.UtcNow - safetyMargin;
         if (remaining <= TimeSpan.Zero)
         {
-            _logger.LogWarning("Закрепление доставки {DeliveryId} истекает до начала обработки", delivery.Id);
+            _logger.Warning("Закрепление доставки {DeliveryId} истекает до начала обработки", delivery.Id);
             return;
         }
 
@@ -100,7 +101,7 @@ public sealed class DeliveryWorker : BackgroundService
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested && leaseCancellation.IsCancellationRequested)
         {
-            _logger.LogWarning("Время закрепления доставки {DeliveryId} истекает; доставка будет возвращена для повтора",
+            _logger.Warning("Время закрепления доставки {DeliveryId} истекает; доставка будет возвращена для повтора",
                 delivery.Id);
         }
     }
@@ -115,7 +116,7 @@ public sealed class DeliveryWorker : BackgroundService
                 var processor = scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
                 var released = await processor.ReleaseExpiredLocksAsync(ct);
                 if (released > 0)
-                    _logger.LogInformation("Возвращено просроченных доставок: {Count}", released);
+                    _logger.Information("Возвращено просроченных доставок: {Count}", released);
 
                 await Task.Delay(_options.RecoveryInterval, ct);
             }
@@ -125,7 +126,7 @@ public sealed class DeliveryWorker : BackgroundService
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Ошибка возврата просроченных доставок");
+                _logger.Error(exception, "Ошибка возврата просроченных доставок");
                 await DelayAfterErrorAsync(ct);
             }
         }
