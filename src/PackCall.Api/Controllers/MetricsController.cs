@@ -8,6 +8,7 @@ using Serilog;
 namespace PackCall.Api.Controllers;
 
 /// <summary>Метрики обработки доставок для сбора Prometheus.</summary>
+[NonController] // Временно отключён маршрут /metrics.
 [ApiController]
 [Route("metrics")]
 public sealed class MetricsController(
