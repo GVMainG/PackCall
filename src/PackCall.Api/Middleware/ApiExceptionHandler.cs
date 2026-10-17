@@ -29,6 +29,7 @@ internal sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) :
             {
                 400 => "Некорректный запрос",
                 404 => "Ресурс не найден",
+                409 when exception is RecipientAlreadyExistsException => "Получатель с таким email уже существует",
                 _ => "Операция недоступна в текущем состоянии"
             },
             Instance = httpContext.Request.Path

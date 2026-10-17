@@ -1,4 +1,5 @@
 using PackCall.Core.Entities;
+using PackCall.Core.Exceptions;
 using PackCall.Core.Journaling;
 using PackCall.Core.Metrics;
 using PackCall.Core.Repositorys;
@@ -68,6 +69,19 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
 internal sealed class FakeRecipientRepository : IRecipientRepository
 {
     public List<Recipient> Items { get; } = new();
+
+    public Task<Recipient> CreateAsync(Recipient recipient, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (Items.Any(item => string.Equals(item.Email, recipient.Email, StringComparison.OrdinalIgnoreCase)))
+            throw new RecipientAlreadyExistsException();
+        Items.Add(recipient);
+        return Task.FromResult(recipient);
+    }
+
+    public Task<Recipient?> GetByEmailAsync(string email, CancellationToken ct) =>
+        Task.FromResult(Items.FirstOrDefault(recipient =>
+            string.Equals(recipient.Email, email, StringComparison.OrdinalIgnoreCase)));
 
     public Task<IReadOnlyList<Recipient>> GetBatchAsync(int offset, int batchSize, CancellationToken ct) =>
         Task.FromResult<IReadOnlyList<Recipient>>(Items.DistinctBy(recipient => recipient.Id)

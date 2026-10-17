@@ -20,6 +20,27 @@ public class CampaignServiceTests
     private Task<Guid> CreateCampaignAsync() =>
         _service.CreateCampaignAsync("Кампания", "Текст", CancellationToken.None);
 
+    [Theory]
+    [InlineData("")]
+    [InlineData("invalid-email")]
+    [InlineData("Name <user@example.com>")]
+    public async Task CreateRecipient_RejectsInvalidEmail(string email)
+    {
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            _service.CreateRecipientAsync(email, CancellationToken.None));
+        Assert.Empty(_recipientRepository.Items);
+    }
+
+    [Fact]
+    public async Task CreateRecipient_RejectsDuplicateIgnoringCase()
+    {
+        _recipientRepository.Items.Add(new Recipient { Id = Guid.NewGuid(), Email = "User@Example.com" });
+
+        await Assert.ThrowsAsync<RecipientAlreadyExistsException>(() =>
+            _service.CreateRecipientAsync(" user@example.com ", CancellationToken.None));
+        Assert.Single(_recipientRepository.Items);
+    }
+
     [Fact]
     public async Task CreateCampaign_PersistsDraftAndOneWaitingDeliveryPerRecipient()
     {
