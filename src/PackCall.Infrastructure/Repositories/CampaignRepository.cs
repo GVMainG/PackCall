@@ -38,7 +38,7 @@ public sealed class CampaignRepository(AppDbContext dbContext) : ICampaingReposi
         ArgumentNullException.ThrowIfNull(campaign);
 
         await dbContext.Campaigns.AddAsync(campaign, ct);
-        await dbContext.SaveChangesAsync(ct); // TODO: Тут возникает ошибка - "Microsoft.EntityFrameworkCore.DbUpdateException: "An error occurred while saving the entity changes. See the inner exception for details."".
+        await dbContext.SaveChangesAsync(ct);
         return campaign;
     }
 
