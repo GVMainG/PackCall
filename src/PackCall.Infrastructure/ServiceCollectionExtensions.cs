@@ -35,9 +35,11 @@ namespace PackCall.Infrastructure
             services.AddScoped<IRecipientRepository, RecipientRepository>();
             services.AddScoped<IDeliveryRepository, DeliveryRepository>();
             services.AddSingleton<IDeliveryStatusJournal, DeliveryStatusJournal>();
-            services.AddSingleton<DeliveryMetrics>();
-            services.AddSingleton<IDeliveryMetrics>(provider => provider.GetRequiredService<DeliveryMetrics>());
-            services.AddScoped<IDeliveryStateSnapshotReader, DeliveryStateSnapshotReader>();
+            // Сбор и публикация метрик временно отключены.
+            // services.AddSingleton<DeliveryMetrics>();
+            // services.AddSingleton<IDeliveryMetrics>(provider => provider.GetRequiredService<DeliveryMetrics>());
+            // services.AddScoped<IDeliveryStateSnapshotReader, DeliveryStateSnapshotReader>();
+            services.AddSingleton<IDeliveryMetrics, NoOpDeliveryMetrics>();
             services.AddSingleton<IMessageSender, MockEmailSender>();
 
             return services;
