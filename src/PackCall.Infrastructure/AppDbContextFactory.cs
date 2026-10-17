@@ -7,8 +7,11 @@ internal sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbCon
 {
     public AppDbContext CreateDbContext(string[] args)
     {
-        var connectionString = Environment.GetEnvironmentVariable("PACKCALL_CONNECTION_STRING")
-            ?? "Host=localhost;Database=packcall;Username=postgres;Password=postgres";
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__Postgres")
+            ?? Environment.GetEnvironmentVariable("PACKCALL_CONNECTION_STRING");
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException(
+                "Не задана строка подключения ConnectionStrings__Postgres.");
 
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseNpgsql(
