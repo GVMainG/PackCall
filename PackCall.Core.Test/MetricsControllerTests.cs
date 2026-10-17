@@ -1,7 +1,7 @@
-using Microsoft.Extensions.Logging.Abstractions;
 using PackCall.Api.Controllers;
 using PackCall.Core.Metrics;
 using PackCall.Infrastructure.Metrics;
+using Serilog;
 
 namespace PackCall.Core.Test;
 
@@ -19,9 +19,10 @@ public class MetricsControllerTests
         metrics.RecordOperatorSuccess();
         metrics.RecordOperatorError();
 
+        using var logger = new LoggerConfiguration().CreateLogger();
         var controller = new MetricsController(metrics,
             new SnapshotReader(new DeliveryStateSnapshot(3, 2, 5, 1, 2, 0)),
-            NullLogger<MetricsController>.Instance);
+            logger);
         var result = await controller.GetMetrics(CancellationToken.None);
 
         Assert.Contains("text/plain; version=0.0.4", result.ContentType);
@@ -40,8 +41,9 @@ public class MetricsControllerTests
     {
         using var metrics = new DeliveryMetrics();
         metrics.RecordProcessed();
+        using var logger = new LoggerConfiguration().CreateLogger();
         var controller = new MetricsController(metrics, new FailingSnapshotReader(),
-            NullLogger<MetricsController>.Instance);
+            logger);
 
         var result = await controller.GetMetrics(CancellationToken.None);
 

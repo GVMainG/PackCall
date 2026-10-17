@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using PackCall.Api.Background;
 using PackCall.Core.Entities;
 using PackCall.Core.Services;
+using Serilog;
 
 namespace PackCall.Core.Test;
 
@@ -25,8 +25,9 @@ public class DeliveryWorkerTests
             RecoveryInterval = TimeSpan.FromMilliseconds(10),
             ErrorDelay = TimeSpan.FromMilliseconds(10)
         });
+        using var logger = new LoggerConfiguration().CreateLogger();
         using var worker = new DeliveryWorker(provider.GetRequiredService<IServiceScopeFactory>(),
-            options, NullLogger<DeliveryWorker>.Instance);
+            options, logger);
 
         await worker.StartAsync(CancellationToken.None);
         try

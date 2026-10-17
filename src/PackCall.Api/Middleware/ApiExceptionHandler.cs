@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using PackCall.Core.Exceptions;
+using Serilog;
 
 namespace PackCall.Api.Middleware;
 
-internal sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : IExceptionHandler
+internal sealed class ApiExceptionHandler(Serilog.ILogger logger) : IExceptionHandler
 {
+    private readonly Serilog.ILogger _logger = logger.ForContext<ApiExceptionHandler>();
+
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
@@ -19,7 +22,7 @@ internal sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) :
         if (status == 0)
             return false;
 
-        logger.LogWarning(exception, "Ошибка запроса API: {StatusCode}", status);
+        _logger.Warning(exception, "Ошибка запроса API: {StatusCode}", status);
         httpContext.Response.StatusCode = status;
         httpContext.Response.ContentType = "application/problem+json";
         await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
