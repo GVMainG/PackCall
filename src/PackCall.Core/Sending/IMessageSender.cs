@@ -6,9 +6,10 @@ namespace PackCall.Core.Sending;
 public interface IMessageSender
 {
     /// <summary>
-    /// Отправляет сообщение получателю.
+    /// Передаёт сообщение провайдеру и ожидает его ответа.
+    /// Успешный ответ не подтверждает доставку сообщения получателю.
     /// </summary>
-    /// <param name="request">Данные отправки; <see cref="SendRequest.DeliveryId"/> — ключ идемпотентности.</param>
+    /// <param name="request">Данные отправки.</param>
     /// <param name="ct">Токен отмены.</param>
     Task<SendResult> SendAsync(SendRequest request, CancellationToken ct);
 }

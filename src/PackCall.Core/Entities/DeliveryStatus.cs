@@ -5,6 +5,7 @@ public enum DeliveryStatus
     Failed = -1,
     Waiting = 0,
     InProgress = 1,
+    /// <summary>Провайдер подтвердил приём сообщения; доставка адресату неизвестна.</summary>
     Sent = 2
 }
 

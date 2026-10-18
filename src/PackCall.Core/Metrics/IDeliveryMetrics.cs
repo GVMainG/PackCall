@@ -19,12 +19,6 @@ public interface IDeliveryMetrics
     /// <summary>Фиксирует число доставок, возвращённых в "Ожидает" из-за истёкшего закрепления.</summary>
     void RecordExpiredLockReturned(int count);
 
-    /// <summary>Фиксирует повторный вызов mock-оператора с тем же ключом идемпотентности.</summary>
-    void RecordOperatorRetry();
-
-    /// <summary>Фиксирует подавленный оператором дубль фактической отправки.</summary>
-    void RecordOperatorDuplicateSuppressed();
-
     /// <summary>Фиксирует успешный вызов mock-оператора.</summary>
     void RecordOperatorSuccess();
 

@@ -17,11 +17,6 @@ internal static class PrometheusMetricsFormatter
             "Deliveries processed by this API instance; use rate() for deliveries per second.", totals.Processed);
         Write(text, "packcall_deliveries_expired_locks_returned_total", "counter",
             "Expired delivery locks returned to Waiting by this API instance.", totals.ExpiredLocksReturned);
-        Write(text, "packcall_mock_email_retries_total", "counter",
-            "Repeated mock-email calls by this API instance.", totals.OperatorRetries);
-        Write(text, "packcall_mock_email_duplicates_suppressed_total", "counter",
-            "Duplicate mock-email sends suppressed by this API instance.", totals.OperatorDuplicatesSuppressed);
-
         text.Append("# HELP packcall_mock_email_calls_total Mock-email calls by result on this API instance.\n");
         text.Append("# TYPE packcall_mock_email_calls_total counter\n");
         WriteValue(text, "packcall_mock_email_calls_total{result=\"success\"}", totals.OperatorSuccess);

@@ -2,8 +2,8 @@ namespace PackCall.Infrastructure.Sending;
 
 public sealed class MockEmailOptions
 {
-    /// <summary>Искусственная задержка ответа mock-оператора.</summary>
-    public TimeSpan Delay { get; set; }
+    /// <summary>Искусственная задержка ответа провайдера.</summary>
+    public TimeSpan Delay { get; set; } = TimeSpan.FromMilliseconds(10);
 
     /// <summary>Адреса, для которых mock-оператор возвращает явную ошибку.</summary>
     public ISet<string> FailedRecipients { get; } =

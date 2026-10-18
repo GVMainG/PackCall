@@ -179,13 +179,15 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
 internal sealed class FakeMessageSender : IMessageSender
 {
     public Func<SendRequest, SendResult>? Handler { get; set; }
+    public Func<SendRequest, CancellationToken, Task<SendResult>>? AsyncHandler { get; set; }
 
     public List<SendRequest> Requests { get; } = new();
 
     public Task<SendResult> SendAsync(SendRequest request, CancellationToken ct)
     {
         Requests.Add(request);
-        return Task.FromResult(Handler?.Invoke(request) ?? SendResult.Success());
+        return AsyncHandler?.Invoke(request, ct) ??
+            Task.FromResult(Handler?.Invoke(request) ?? SendResult.Success());
     }
 }
 
@@ -204,8 +206,6 @@ internal sealed class FakeMetrics : IDeliveryMetrics
     }
 
     public void RecordExpiredLockReturned(int count) { }
-    public void RecordOperatorRetry() { }
-    public void RecordOperatorDuplicateSuppressed() { }
     public void RecordOperatorSuccess() { }
     public void RecordOperatorError() { }
 }

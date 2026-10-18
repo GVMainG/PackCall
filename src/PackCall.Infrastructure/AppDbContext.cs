@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PackCall.Core.Entities;
 using PackCall.Infrastructure.Journaling;
-using PackCall.Infrastructure.Sending;
 
 namespace PackCall.Infrastructure
 {
@@ -15,7 +14,6 @@ namespace PackCall.Infrastructure
         public DbSet<Recipient> Recipients { get; set; } = null!;
         public DbSet<Delivery> Deliveries { get; set; } = null!;
         internal DbSet<DeliveryStatusJournalRecord> DeliveryStatusJournal => Set<DeliveryStatusJournalRecord>();
-        internal DbSet<MockEmailSend> MockEmailSends => Set<MockEmailSend>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,21 +73,6 @@ namespace PackCall.Infrastructure
                 entity.HasIndex(e => e.DeliveryStatus).HasDatabaseName("ix_deliveries_status");
                 entity.HasIndex(e => new { e.DeliveryStatus, e.LockExpiresAt }).HasDatabaseName("ix_deliveries_status_lock_expires_at");
                 entity.HasIndex(e => e.CreatedAt).HasDatabaseName("ix_deliveries_created_at");
-            });
-
-            modelBuilder.Entity<MockEmailSend>(entity =>
-            {
-                entity.ToTable("mock_email_sends");
-                entity.HasKey(e => e.DeliveryId).HasName("pk_mock_email_sends_delivery_id");
-                entity.Property(e => e.DeliveryId).HasColumnName("delivery_id");
-                entity.Property(e => e.CampaignId).HasColumnName("campaign_id").IsRequired();
-                entity.Property(e => e.RecipientId).HasColumnName("recipient_id").IsRequired();
-                entity.Property(e => e.RecipientEmail).HasColumnName("recipient_email").HasMaxLength(255).IsRequired();
-                entity.Property(e => e.MessageText).HasColumnName("message_text").HasColumnType("text").IsRequired();
-                entity.Property(e => e.IsSuccess).HasColumnName("is_success").IsRequired();
-                entity.Property(e => e.Error).HasColumnName("error").HasMaxLength(1000);
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasColumnType("timestamp with time zone").IsRequired();
-                entity.HasIndex(e => e.CreatedAt).HasDatabaseName("ix_mock_email_sends_created_at");
             });
 
             modelBuilder.Entity<DeliveryStatusJournalRecord>(entity =>

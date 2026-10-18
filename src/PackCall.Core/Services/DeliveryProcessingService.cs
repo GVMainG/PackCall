@@ -73,8 +73,8 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     }
 
     /// <summary>
-    /// Обрабатывает одну захваченную доставку: передаёт сообщение mock-оператору
-    /// с ключом идемпотентности, фиксирует результат и проверяет завершение кампании.
+    /// Обрабатывает одну захваченную доставку: передаёт сообщение mock-оператору,
+    /// фиксирует ответ и проверяет завершение кампании.
     /// </summary>
     public async Task ProcessAsync(Delivery delivery, CancellationToken ct)
     {
@@ -118,12 +118,6 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
             _metrics.RecordOperatorSuccess();
         else
             _metrics.RecordOperatorError();
-        if (result.IsDuplicateSuppressed)
-        {
-            _metrics.RecordOperatorRetry();
-            _metrics.RecordOperatorDuplicateSuppressed();
-        }
-
         await _journal.AppendAsync(new StatusChangeEntry(
             delivery.CampaignId,
             delivery.Id,
@@ -131,7 +125,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
             delivery.DeliveryStatus,
             workerId,
             now,
-            OperatorResult: result.Error ?? "Success"), ct);
+            OperatorResult: result.Error ?? "AcceptedByProvider"), ct);
 
         await CompleteCampaignIfFinishedAsync(delivery.CampaignId, ct);
     }

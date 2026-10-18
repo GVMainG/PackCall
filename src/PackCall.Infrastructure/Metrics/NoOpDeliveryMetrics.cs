@@ -13,10 +13,6 @@ internal sealed class NoOpDeliveryMetrics : IDeliveryMetrics
 
     public void RecordExpiredLockReturned(int count) { }
 
-    public void RecordOperatorRetry() { }
-
-    public void RecordOperatorDuplicateSuppressed() { }
-
     public void RecordOperatorSuccess() { }
 
     public void RecordOperatorError() { }

@@ -1,5 +1,6 @@
 using PackCall.Core.Entities;
 using PackCall.Core.Exceptions;
+using PackCall.Core.Sending;
 using PackCall.Core.Services;
 
 namespace PackCall.Core.Test;
@@ -53,6 +54,37 @@ public class DeliveryProcessingServiceTests
 
         Assert.Empty(_sender.Requests);
         Assert.Equal(DeliveryStatus.InProgress, delivery.DeliveryStatus);
+    }
+
+    [Fact]
+    public async Task Process_WaitsForProviderAcknowledgementBeforeMarkingSent()
+    {
+        var campaign = CreateStartedCampaign();
+        var delivery = AddWaitingDelivery(campaign);
+        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
+
+        var requestReceived = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var acknowledgement = new TaskCompletionSource<SendResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _sender.AsyncHandler = (_, _) =>
+        {
+            requestReceived.SetResult();
+            return acknowledgement.Task;
+        };
+
+        var processing = _service.ProcessAsync(delivery, CancellationToken.None);
+        await requestReceived.Task;
+
+        Assert.False(processing.IsCompleted);
+        Assert.Equal(DeliveryStatus.InProgress, delivery.DeliveryStatus);
+        Assert.Null(delivery.CompletedAt);
+        Assert.Equal(CampaignStatus.InProgress, campaign.Status);
+
+        acknowledgement.SetResult(SendResult.Success());
+        await processing;
+
+        Assert.Equal(DeliveryStatus.Sent, delivery.DeliveryStatus);
+        Assert.NotNull(delivery.CompletedAt);
+        Assert.Equal(CampaignStatus.Completed, campaign.Status);
     }
 
     [Fact]

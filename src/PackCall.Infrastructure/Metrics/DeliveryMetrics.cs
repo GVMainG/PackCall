@@ -13,14 +13,10 @@ public sealed class DeliveryMetrics : IDeliveryMetrics, IDisposable
     private readonly Counter<long> _processed;
     private readonly Counter<long> _statusChanges;
     private readonly Counter<long> _expiredLocksReturned;
-    private readonly Counter<long> _operatorRetries;
-    private readonly Counter<long> _operatorDuplicatesSuppressed;
     private readonly Counter<long> _operatorCalls;
     private long _capturedTotal;
     private long _processedTotal;
     private long _expiredLocksReturnedTotal;
-    private long _operatorRetriesTotal;
-    private long _operatorDuplicatesSuppressedTotal;
     private long _operatorSuccessTotal;
     private long _operatorErrorTotal;
 
@@ -45,16 +41,6 @@ public sealed class DeliveryMetrics : IDeliveryMetrics, IDisposable
             "packcall.deliveries.expired_locks_returned",
             unit: "{delivery}",
             description: "Number of deliveries returned to Waiting after lock expiration.");
-
-        _operatorRetries = _meter.CreateCounter<long>(
-            "packcall.mock_email.retries",
-            unit: "{call}",
-            description: "Number of repeated mock-email calls with an existing idempotency key.");
-
-        _operatorDuplicatesSuppressed = _meter.CreateCounter<long>(
-            "packcall.mock_email.duplicates_suppressed",
-            unit: "{call}",
-            description: "Number of duplicate mock-email sends suppressed by idempotency.");
 
         _operatorCalls = _meter.CreateCounter<long>(
             "packcall.mock_email.calls",
@@ -94,18 +80,6 @@ public sealed class DeliveryMetrics : IDeliveryMetrics, IDisposable
         }
     }
 
-    public void RecordOperatorRetry()
-    {
-        _operatorRetries.Add(1);
-        Interlocked.Increment(ref _operatorRetriesTotal);
-    }
-
-    public void RecordOperatorDuplicateSuppressed()
-    {
-        _operatorDuplicatesSuppressed.Add(1);
-        Interlocked.Increment(ref _operatorDuplicatesSuppressedTotal);
-    }
-
     public void RecordOperatorSuccess()
     {
         _operatorCalls.Add(1, new KeyValuePair<string, object?>("result", "success"));
@@ -120,8 +94,7 @@ public sealed class DeliveryMetrics : IDeliveryMetrics, IDisposable
 
     public DeliveryMetricTotals GetTotals() => new(
         Interlocked.Read(ref _capturedTotal), Interlocked.Read(ref _processedTotal),
-        Interlocked.Read(ref _expiredLocksReturnedTotal), Interlocked.Read(ref _operatorRetriesTotal),
-        Interlocked.Read(ref _operatorDuplicatesSuppressedTotal),
+        Interlocked.Read(ref _expiredLocksReturnedTotal),
         Interlocked.Read(ref _operatorSuccessTotal), Interlocked.Read(ref _operatorErrorTotal));
 
     public void Dispose() => _meter.Dispose();

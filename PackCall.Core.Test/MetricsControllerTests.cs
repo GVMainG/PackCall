@@ -14,8 +14,6 @@ public class MetricsControllerTests
         metrics.RecordCaptured(2);
         metrics.RecordProcessed();
         metrics.RecordExpiredLockReturned(1);
-        metrics.RecordOperatorRetry();
-        metrics.RecordOperatorDuplicateSuppressed();
         metrics.RecordOperatorSuccess();
         metrics.RecordOperatorError();
 
