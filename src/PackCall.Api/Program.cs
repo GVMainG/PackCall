@@ -22,7 +22,7 @@ await using (var dbContext = await app.Services
     .GetRequiredService<IDbContextFactory<AppDbContext>>()
     .CreateDbContextAsync())
 {
-    await dbContext.Database.MigrateAsync();
+    await dbContext.Database.EnsureCreatedAsync();
 }
 
 app.UseExceptionHandler();

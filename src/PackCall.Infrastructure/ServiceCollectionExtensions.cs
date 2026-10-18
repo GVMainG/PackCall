@@ -21,10 +21,7 @@ namespace PackCall.Infrastructure
             ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
 
             services.AddDbContextFactory<AppDbContext>(options =>
-                options.UseNpgsql(
-                    connectionString,
-                    pgOptions => pgOptions
-                        .MigrationsHistoryTable("__ef_migrations_history")));
+                options.UseNpgsql(connectionString));
 
             if (configureMockEmail is null)
                 services.AddOptions<MockEmailOptions>();

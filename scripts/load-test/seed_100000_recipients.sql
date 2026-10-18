@@ -1,4 +1,4 @@
--- Test recipients for PackCall. Requires the EF Core migrations.
+-- Test recipients for PackCall. Requires the schema created at API startup.
 -- PostgreSQL generates all 100000 rows; safe to run again.
 BEGIN;
 
