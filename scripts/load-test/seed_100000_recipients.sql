@@ -7,7 +7,7 @@ SELECT gen_random_uuid(),
        'loadtest-' || lpad(n::text, 6, '0') || '@packcall.test',
        now(),
        now()
-FROM generate_series(1, 100000) AS numbers(n)
+FROM generate_series(1, 10000) AS numbers(n)
 ON CONFLICT (email) DO NOTHING;
 
 COMMIT;

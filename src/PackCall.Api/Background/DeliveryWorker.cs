@@ -25,7 +25,7 @@ public sealed class DeliveryWorker : BackgroundService
         if (!_options.IsValid())
             throw new OptionsValidationException(DeliveryWorkerOptions.SectionName,
                 typeof(DeliveryWorkerOptions),
-                ["Параметры DeliveryWorker некорректны: Parallelism 1..64, LockDuration не менее 10 секунд, " +
+                ["Параметры DeliveryWorker некорректны: Parallelism 1..64, BatchSize не менее 1, LockDuration не менее 10 секунд, " +
                  "все интервалы положительны, LockDuration + RecoveryInterval не более 2 минут."]);
 
         var host = Environment.MachineName;
@@ -34,8 +34,8 @@ public sealed class DeliveryWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.Information("Фоновый обработчик доставок запущен. WorkerId={WorkerId}, Parallelism={Parallelism}",
-            _workerId, _options.Parallelism);
+        _logger.Information("Фоновый обработчик доставок запущен. WorkerId={WorkerId}, Parallelism={Parallelism}, BatchSize={BatchSize}",
+            _workerId, _options.Parallelism, _options.BatchSize);
 
         var processing = Enumerable.Range(0, _options.Parallelism)
             .Select(lane => ProcessLoopAsync(lane, stoppingToken));
@@ -50,7 +50,7 @@ public sealed class DeliveryWorker : BackgroundService
             {
                 await using var scope = _scopeFactory.CreateAsyncScope();
                 var processor = scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
-                var captured = await processor.CaptureBatchAsync(1, _workerId, _options.LockDuration, ct);
+                var captured = await processor.CaptureBatchAsync(_options.BatchSize, _workerId, _options.LockDuration, ct);
 
                 if (captured.Count == 0)
                 {
