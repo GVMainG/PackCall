@@ -44,6 +44,12 @@ Content-Type: application/json
 ### Запустить кампанию
 POST {{baseUrl}}/api/campaigns/{{campaignId}}/start
 
+### Приостановить кампанию (уже начатые отправки могут завершиться)
+POST {{baseUrl}}/api/campaigns/{{campaignId}}/pause
+
+### Возобновить кампанию
+POST {{baseUrl}}/api/campaigns/{{campaignId}}/resume
+
 ### Доставки кампании
 GET {{baseUrl}}/api/campaigns/{{campaignId}}/deliveries?pageNumber=1&pageSize=20
 

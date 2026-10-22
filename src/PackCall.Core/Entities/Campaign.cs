@@ -87,6 +87,8 @@ public sealed class Campaign
     {
         if (Status == CampaignStatus.InProgress)
             return;
+        if (Status != CampaignStatus.Draft)
+            throw new InvalidStatusTransitionException(nameof(Campaign), Status, CampaignStatus.InProgress);
         EnsureTransition(CampaignStatus.InProgress);
 
         ArgumentException.ThrowIfNullOrWhiteSpace(Name);
@@ -95,6 +97,28 @@ public sealed class Campaign
         Status = CampaignStatus.InProgress;
         var now = DateTime.UtcNow;
         StartedAt = now;
+        UpdatedAt = now;
+    }
+
+    /// <summary>Приостанавливает запущенную кампанию; повторная пауза не меняет даты.</summary>
+    public void StatusFromInProgressToPaused(DateTime now)
+    {
+        if (Status == CampaignStatus.Paused)
+            return;
+        EnsureTransition(CampaignStatus.Paused);
+        Status = CampaignStatus.Paused;
+        UpdatedAt = now;
+    }
+
+    /// <summary>Возобновляет кампанию, сохраняя дату первого запуска.</summary>
+    public void StatusFromPausedToInProgress(DateTime now)
+    {
+        if (Status == CampaignStatus.InProgress)
+            return;
+        if (Status != CampaignStatus.Paused)
+            throw new InvalidStatusTransitionException(nameof(Campaign), Status, CampaignStatus.InProgress);
+        EnsureTransition(CampaignStatus.InProgress);
+        Status = CampaignStatus.InProgress;
         UpdatedAt = now;
     }
 

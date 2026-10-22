@@ -81,8 +81,8 @@ public sealed class CampaignService : ICampaignService
         var campaign = await GetCampaignAsync(campaignId, ct);
         if (campaign is null)
             return false;
-        if (campaign.Status == CampaignStatus.InProgress)
-            throw new InvalidOperationException("Нельзя удалить запущенную кампанию.");
+        if (campaign.Status is CampaignStatus.InProgress or CampaignStatus.Paused)
+            throw new InvalidOperationException("Нельзя удалить запущенную или приостановленную кампанию.");
 
         ct.ThrowIfCancellationRequested();
         return await _campaignRepository.Delete(campaignId, ct);
@@ -96,10 +96,45 @@ public sealed class CampaignService : ICampaignService
             return;
 
         ct.ThrowIfCancellationRequested();
+        var previousStatus = campaign.Status;
         campaign.StatusFromDraftToInProgress();
         ct.ThrowIfCancellationRequested();
 
-        await _campaignRepository.Update(campaign, ct);
+        await SaveStatusChangeAsync(campaign, previousStatus, ct);
+    }
+
+    public async Task PauseCampaignAsync(Guid campaignId, CancellationToken ct)
+    {
+        var campaign = await GetRequiredCampaignAsync(campaignId, ct);
+        var previousStatus = campaign.Status;
+        campaign.StatusFromInProgressToPaused(DateTime.UtcNow);
+        await SaveStatusChangeAsync(campaign, previousStatus, ct);
+    }
+
+    public async Task ResumeCampaignAsync(Guid campaignId, CancellationToken ct)
+    {
+        var campaign = await GetRequiredCampaignAsync(campaignId, ct);
+        var previousStatus = campaign.Status;
+        campaign.StatusFromPausedToInProgress(DateTime.UtcNow);
+        await SaveStatusChangeAsync(campaign, previousStatus, ct);
+
+        if (!await _deliveryRepository.HasPendingDeliveriesAsync(campaignId, ct))
+        {
+            campaign.StatusFromInProgressToCompleted(DateTime.UtcNow);
+            await _campaignRepository.TryUpdateStatusAsync(campaign, CampaignStatus.InProgress, ct);
+        }
+    }
+
+    private async Task SaveStatusChangeAsync(Campaign campaign, CampaignStatus previousStatus, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (previousStatus == campaign.Status ||
+            await _campaignRepository.TryUpdateStatusAsync(campaign, previousStatus, ct))
+            return;
+
+        var current = await GetRequiredCampaignAsync(campaign.Id, ct);
+        if (current.Status != campaign.Status)
+            throw new DomainException("Статус кампании изменился другим запросом. Повторите операцию.");
     }
 
     public async Task<Campaign?> GetCampaignAsync(Guid campaignId, CancellationToken ct)

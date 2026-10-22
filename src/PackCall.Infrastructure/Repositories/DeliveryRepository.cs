@@ -144,6 +144,24 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
             .ToListAsync(ct);
     }
 
+    public async Task<Delivery?> ReleaseCapturedAsync(
+        Guid deliveryId, string workerId, DateTime lockExpiresAt, DateTime now, CancellationToken ct)
+    {
+        var waiting = (int)DeliveryStatus.Waiting;
+        var inProgress = (int)DeliveryStatus.InProgress;
+        var released = await dbContext.Deliveries
+            .FromSqlInterpolated($$"""
+                UPDATE deliveries
+                SET delivery_status = {{waiting}}, worker_id = NULL, lock_expires_at = NULL, updated_at = {{now}}
+                WHERE id = {{deliveryId}} AND delivery_status = {{inProgress}}
+                  AND worker_id = {{workerId}} AND lock_expires_at = {{lockExpiresAt}}
+                RETURNING *
+                """)
+            .AsNoTracking()
+            .ToListAsync(ct);
+        return released.SingleOrDefault();
+    }
+
     public async Task SaveAsync(Delivery delivery, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(delivery);

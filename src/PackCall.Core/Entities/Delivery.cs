@@ -129,11 +129,18 @@ public sealed class Delivery
         if (LockExpiresAt is null || LockExpiresAt > now)
             return false;
 
+        ReleaseUnsentCapture(now);
+        return true;
+    }
+
+    /// <summary>Освобождает ещё не отправленную доставку при паузе кампании, не дожидаясь истечения закрепления.</summary>
+    public void ReleaseUnsentCapture(DateTime now)
+    {
+        EnsureTransition(DeliveryStatus.Waiting);
         DeliveryStatus = DeliveryStatus.Waiting;
         WorkerId = null;
         LockExpiresAt = null;
         UpdatedAt = now;
-        return true;
     }
 
     private void Complete(DateTime now)

@@ -6,6 +6,7 @@ public enum CampaignStatus
     InProgress = 1,
     Completed = 2,
     Forming = 3,
+    Paused = 4,
     Failed = -1
 }
 
@@ -17,7 +18,8 @@ public static class CampaignStatusTransitions
         {
             [CampaignStatus.Draft] = new HashSet<CampaignStatus> { CampaignStatus.Forming, CampaignStatus.InProgress },
             [CampaignStatus.Forming] = new HashSet<CampaignStatus> { CampaignStatus.Draft },
-            [CampaignStatus.InProgress] = new HashSet<CampaignStatus> { CampaignStatus.Completed },
+            [CampaignStatus.InProgress] = new HashSet<CampaignStatus> { CampaignStatus.Completed, CampaignStatus.Paused },
+            [CampaignStatus.Paused] = new HashSet<CampaignStatus> { CampaignStatus.InProgress },
             [CampaignStatus.Completed] = new HashSet<CampaignStatus>(),
             [CampaignStatus.Failed] = new HashSet<CampaignStatus>()
         };
