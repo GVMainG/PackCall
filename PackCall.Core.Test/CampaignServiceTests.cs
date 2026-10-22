@@ -153,7 +153,7 @@ public class CampaignServiceTests
         var startedAt = campaign.StartedAt;
         var updatedAt = campaign.UpdatedAt;
         var delivery = _deliveryRepository.Items.Single();
-        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
+        delivery.SetCapturedForTest("worker-1", DateTime.UtcNow.AddMinutes(2));
 
         await _service.StartCampaignAsync(id, CancellationToken.None);
 

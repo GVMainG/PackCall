@@ -27,9 +27,6 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
             ? new[] { campaign }.AsEnumerable()
             : Enumerable.Empty<Campaign>());
 
-    public Task<IEnumerable<Campaign>> Get(Expression<Func<Campaign, bool>> predicate, CancellationToken ct) =>
-        Task.FromResult(_store.Values.AsQueryable().Where(predicate).ToList().AsEnumerable());
-
     public Task<PageResult<Campaign>> GetPage(int pageNumber, int pageSize, CancellationToken ct)
     {
         var items = _store.Values
@@ -168,7 +165,7 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
             if (delivery.Campaign is not null && delivery.Campaign.Status != CampaignStatus.InProgress)
                 continue;
 
-            delivery.StatusFromWaitingToInProgress(workerId, now + lockDuration, now);
+            delivery.SetCapturedForTest(workerId, now + lockDuration, now);
             captured.Add(delivery);
         }
 
@@ -177,7 +174,10 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
 
     public Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(DateTime now, CancellationToken ct)
     {
-        var released = _store.Where(d => d.StatusFromInProgressToWaiting(now)).ToList();
+        var released = _store.Where(d => d.DeliveryStatus == DeliveryStatus.InProgress &&
+            d.LockExpiresAt is not null && d.LockExpiresAt <= now).ToList();
+        foreach (var delivery in released)
+            delivery.SetWaitingForTest(now);
         return Task.FromResult<IReadOnlyList<Delivery>>(released);
     }
 
@@ -186,7 +186,7 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
     {
         var delivery = _store.SingleOrDefault(row => row.Id == deliveryId &&
             row.DeliveryStatus == DeliveryStatus.InProgress && row.WorkerId == workerId && row.LockExpiresAt == lockExpiresAt);
-        delivery?.ReleaseUnsentCapture(now);
+        delivery?.SetWaitingForTest(now);
         return Task.FromResult(delivery);
     }
 

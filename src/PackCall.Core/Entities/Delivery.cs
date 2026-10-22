@@ -80,24 +80,6 @@ public sealed class Delivery
     #region Смена статусов
 
     /// <summary>
-    /// Переводит доставку из "Ожидает" в "Отправляется", закрепляя её за воркером
-    /// на ограниченное время.
-    /// </summary>
-    /// <param name="workerId">Идентификатор воркера.</param>
-    /// <param name="lockExpiresAt">Срок закрепления в UTC.</param>
-    /// <param name="now">Дата захвата в UTC; по умолчанию используется текущее время.</param>
-    public void StatusFromWaitingToInProgress(string workerId, DateTime lockExpiresAt, DateTime? now = null)
-    {
-        EnsureTransition(DeliveryStatus.InProgress);
-        ArgumentException.ThrowIfNullOrWhiteSpace(workerId);
-
-        DeliveryStatus = DeliveryStatus.InProgress;
-        WorkerId = workerId;
-        LockExpiresAt = lockExpiresAt;
-        UpdatedAt = now ?? DateTime.UtcNow;
-    }
-
-    /// <summary>
     /// Переводит доставку из "Отправляется" в конечный статус "Отправлено"
     /// после подтверждения приёма сообщения провайдером.
     /// </summary>
@@ -116,31 +98,6 @@ public sealed class Delivery
         EnsureTransition(DeliveryStatus.Failed);
         Complete(now);
         DeliveryStatus = DeliveryStatus.Failed;
-    }
-
-    /// <summary>
-    /// Возвращает доставку из "Отправляется" в "Ожидает", если срок закрепления истёк.
-    /// </summary>
-    /// <returns><see langword="true"/>, если доставка возвращена в "Ожидает".</returns>
-    public bool StatusFromInProgressToWaiting(DateTime now)
-    {
-        if (DeliveryStatus != DeliveryStatus.InProgress)
-            return false;
-        if (LockExpiresAt is null || LockExpiresAt > now)
-            return false;
-
-        ReleaseUnsentCapture(now);
-        return true;
-    }
-
-    /// <summary>Освобождает ещё не отправленную доставку при паузе кампании, не дожидаясь истечения закрепления.</summary>
-    public void ReleaseUnsentCapture(DateTime now)
-    {
-        EnsureTransition(DeliveryStatus.Waiting);
-        DeliveryStatus = DeliveryStatus.Waiting;
-        WorkerId = null;
-        LockExpiresAt = null;
-        UpdatedAt = now;
     }
 
     private void Complete(DateTime now)

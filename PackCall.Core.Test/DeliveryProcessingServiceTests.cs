@@ -48,7 +48,7 @@ public class DeliveryProcessingServiceTests
         var campaign = Campaign.Create("Кампания", "Текст");
         await _campaignRepository.Create(campaign, CancellationToken.None);
         var delivery = AddWaitingDelivery(campaign);
-        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
+        delivery.SetCapturedForTest("worker-1", DateTime.UtcNow.AddMinutes(2));
 
         await Assert.ThrowsAsync<DomainException>(() => _service.ProcessAsync(delivery, CancellationToken.None));
 
@@ -61,7 +61,7 @@ public class DeliveryProcessingServiceTests
     {
         var campaign = CreateStartedCampaign();
         var delivery = AddWaitingDelivery(campaign);
-        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
+        delivery.SetCapturedForTest("worker-1", DateTime.UtcNow.AddMinutes(2));
 
         var requestReceived = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var acknowledgement = new TaskCompletionSource<SendResult>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -93,7 +93,7 @@ public class DeliveryProcessingServiceTests
         var campaign = CreateStartedCampaign();
         var delivery = AddWaitingDelivery(campaign);
         var expiresAt = DateTime.UtcNow.AddMinutes(2);
-        delivery.StatusFromWaitingToInProgress("worker-1", expiresAt);
+        delivery.SetCapturedForTest("worker-1", expiresAt);
         _sender.Handler = _ => throw new InvalidOperationException("Ответ оператора неизвестен");
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.ProcessAsync(delivery, CancellationToken.None));
@@ -111,8 +111,8 @@ public class DeliveryProcessingServiceTests
         var expired = AddWaitingDelivery(campaign);
         var active = AddWaitingDelivery(campaign);
         var now = DateTime.UtcNow;
-        expired.StatusFromWaitingToInProgress("worker-dead", now.AddSeconds(-5), now);
-        active.StatusFromWaitingToInProgress("worker-alive", now.AddMinutes(5), now);
+        expired.SetCapturedForTest("worker-dead", now.AddSeconds(-5), now);
+        active.SetCapturedForTest("worker-alive", now.AddMinutes(5), now);
 
         var released = await _service.ReleaseExpiredLocksAsync(CancellationToken.None);
 

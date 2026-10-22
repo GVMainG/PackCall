@@ -89,7 +89,7 @@ public class CampaignWorkflowTests
         Assert.Equal(campaign.CompletedAt, campaign.UpdatedAt);
         Assert.All(batch, delivery =>
         {
-            Assert.True(DeliveryStatusTransitions.IsTerminal(delivery.DeliveryStatus));
+            Assert.Contains(delivery.DeliveryStatus, new[] { DeliveryStatus.Sent, DeliveryStatus.Failed });
             Assert.Null(delivery.WorkerId);
             Assert.Null(delivery.LockExpiresAt);
         });
