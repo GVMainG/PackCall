@@ -1,7 +1,6 @@
 using PackCall.Core.Entities;
 using PackCall.Core.Exceptions;
 using PackCall.Core.Journaling;
-using PackCall.Core.Metrics;
 using PackCall.Core.Repositorys;
 using PackCall.Core.Sending;
 
@@ -18,20 +17,17 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     private readonly ICampaingRepository _campaignRepository;
     private readonly IMessageSender _messageSender;
     private readonly IDeliveryStatusJournal _journal;
-    private readonly IDeliveryMetrics _metrics;
 
     public DeliveryProcessingService(
         IDeliveryRepository deliveryRepository,
         ICampaingRepository campaignRepository,
         IMessageSender messageSender,
-        IDeliveryStatusJournal journal,
-        IDeliveryMetrics metrics)
+        IDeliveryStatusJournal journal)
     {
         _deliveryRepository = deliveryRepository;
         _campaignRepository = campaignRepository;
         _messageSender = messageSender;
         _journal = journal;
-        _metrics = metrics;
     }
 
     /// <summary>
@@ -56,8 +52,6 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
 
         foreach (var delivery in captured)
         {
-            _metrics.RecordStatusChange(DeliveryStatus.Waiting, DeliveryStatus.InProgress);
-
             await _journal.AppendAsync(new StatusChangeEntry(
                 delivery.CampaignId,
                 delivery.Id,
@@ -68,7 +62,6 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
                 OperatorResult: null), ct);
         }
 
-        _metrics.RecordCaptured(captured.Count);
         return captured;
     }
 
@@ -97,7 +90,6 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
                     delivery.Id, workerId, expiresAt, releasedAt, ct);
                 if (released is not null)
                 {
-                    _metrics.RecordStatusChange(DeliveryStatus.InProgress, DeliveryStatus.Waiting);
                     await _journal.AppendAsync(new StatusChangeEntry(
                         delivery.CampaignId, delivery.Id, DeliveryStatus.InProgress, DeliveryStatus.Waiting,
                         workerId, releasedAt, OperatorResult: null), ct);
@@ -129,12 +121,6 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
 
         ct.ThrowIfCancellationRequested();
 
-        _metrics.RecordStatusChange(previousStatus, delivery.DeliveryStatus);
-        _metrics.RecordProcessed();
-        if (result.IsSuccess)
-            _metrics.RecordOperatorSuccess();
-        else
-            _metrics.RecordOperatorError();
         await _journal.AppendAsync(new StatusChangeEntry(
             delivery.CampaignId,
             delivery.Id,
@@ -162,8 +148,6 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
 
         foreach (var delivery in released)
         {
-            _metrics.RecordStatusChange(DeliveryStatus.InProgress, DeliveryStatus.Waiting);
-
             await _journal.AppendAsync(new StatusChangeEntry(
                 delivery.CampaignId,
                 delivery.Id,
@@ -174,7 +158,6 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
                 OperatorResult: null), ct);
         }
 
-        _metrics.RecordExpiredLockReturned(released.Count);
         return released.Count;
     }
 

@@ -1,7 +1,6 @@
 using PackCall.Core.Entities;
 using PackCall.Core.Exceptions;
 using PackCall.Core.Journaling;
-using PackCall.Core.Metrics;
 using PackCall.Core.Repositorys;
 using PackCall.Core.Sending;
 using System.Linq.Expressions;
@@ -215,18 +214,4 @@ internal sealed class FakeMessageSender : IMessageSender
 internal sealed class FakeJournal : IDeliveryStatusJournal
 {
     public Task AppendAsync(StatusChangeEntry entry, CancellationToken ct) => Task.CompletedTask;
-}
-
-internal sealed class FakeMetrics : IDeliveryMetrics
-{
-    public void RecordCaptured(int count) { }
-    public void RecordProcessed() { }
-
-    public void RecordStatusChange(DeliveryStatus previous, DeliveryStatus current)
-    {
-    }
-
-    public void RecordExpiredLockReturned(int count) { }
-    public void RecordOperatorSuccess() { }
-    public void RecordOperatorError() { }
 }

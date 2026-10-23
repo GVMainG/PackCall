@@ -14,7 +14,7 @@ public class DeliveryProcessingServiceTests
 
     public DeliveryProcessingServiceTests() =>
         _service = new DeliveryProcessingService(
-            _deliveryRepository, _campaignRepository, _sender, new FakeJournal(), new FakeMetrics());
+            _deliveryRepository, _campaignRepository, _sender, new FakeJournal());
 
     private Campaign CreateStartedCampaign()
     {

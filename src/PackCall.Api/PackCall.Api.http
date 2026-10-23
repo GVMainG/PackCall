@@ -15,9 +15,6 @@ Content-Type: application/json
 ### Проверить добавленного получателя
 GET {{baseUrl}}/api/recipients/{{createRecipient.response.body.$.id}}
 
-### Метрики для Prometheus
-GET {{baseUrl}}/metrics
-
 ### Список кампаний
 GET {{baseUrl}}/api/campaigns?pageNumber=1&pageSize=20
 
