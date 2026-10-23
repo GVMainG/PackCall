@@ -25,9 +25,10 @@ public interface IDeliveryProcessingService
     /// Повторная обработка конечной доставки запрещена.
     /// При исключении отправителя доставка остаётся закреплённой до восстановления по сроку.
     /// Вызывающий обработчик передаёт только доставку, захваченную им, до истечения закрепления.
+    /// При паузе кампании не начинает отправку и освобождает доставку для последующего возобновления.
     /// </remarks>
     /// <exception cref="ArgumentNullException">Доставка равна null.</exception>
-    /// <exception cref="DomainException">Доставка не в обработке или кампания не запущена.</exception>
+    /// <exception cref="DomainException">Доставка не в обработке или кампания не запущена и не приостановлена.</exception>
     /// <exception cref="KeyNotFoundException">Кампания доставки не найдена.</exception>
     Task ProcessAsync(Delivery delivery, CancellationToken ct);
 

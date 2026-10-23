@@ -88,6 +88,23 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
         var previousStatus = delivery.DeliveryStatus;
         var workerId = delivery.WorkerId;
         var campaign = await GetCampaignAsync(delivery.CampaignId, ct);
+        if (campaign.Status == CampaignStatus.Paused)
+        {
+            if (workerId is not null && delivery.LockExpiresAt is { } expiresAt)
+            {
+                var releasedAt = DateTime.UtcNow;
+                var released = await _deliveryRepository.ReleaseCapturedAsync(
+                    delivery.Id, workerId, expiresAt, releasedAt, ct);
+                if (released is not null)
+                {
+                    _metrics.RecordStatusChange(DeliveryStatus.InProgress, DeliveryStatus.Waiting);
+                    await _journal.AppendAsync(new StatusChangeEntry(
+                        delivery.CampaignId, delivery.Id, DeliveryStatus.InProgress, DeliveryStatus.Waiting,
+                        workerId, releasedAt, OperatorResult: null), ct);
+                }
+            }
+            return;
+        }
         if (campaign.Status != CampaignStatus.InProgress)
             throw new DomainException("Обрабатывать доставки можно только у запущенной кампании.");
 
@@ -182,8 +199,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
         ct.ThrowIfCancellationRequested();
 
         campaign.StatusFromInProgressToCompleted(DateTime.UtcNow);
-        await _campaignRepository.Update(campaign, ct);
-        return true;
+        return await _campaignRepository.TryUpdateStatusAsync(campaign, CampaignStatus.InProgress, ct);
     }
 
     private async Task<Campaign> GetCampaignAsync(Guid campaignId, CancellationToken ct)

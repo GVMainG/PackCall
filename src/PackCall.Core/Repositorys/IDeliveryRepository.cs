@@ -34,6 +34,11 @@ namespace PackCall.Core.Repositorys
         /// </summary>
         Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(DateTime now, CancellationToken ct);
 
+        /// <summary>Возвращает неотправленную доставку в Waiting только при совпадении владельца и срока закрепления.</summary>
+        /// <returns>Освобождённая доставка или null, если закрепление уже изменилось.</returns>
+        Task<Delivery?> ReleaseCapturedAsync(
+            Guid deliveryId, string workerId, DateTime lockExpiresAt, DateTime now, CancellationToken ct);
+
         /// <summary>
         /// Сохраняет изменения доставки (смену статуса и служебных полей).
         /// </summary>

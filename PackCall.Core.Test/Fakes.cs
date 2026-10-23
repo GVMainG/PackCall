@@ -11,6 +11,7 @@ namespace PackCall.Core.Test;
 internal sealed class FakeCampaignRepository : ICampaingRepository
 {
     private readonly Dictionary<Guid, Campaign> _store = new();
+    private readonly Dictionary<Guid, CampaignStatus> _statuses = new();
     private readonly FakeDeliveryRepository? _deliveries;
 
     public FakeCampaignRepository(FakeDeliveryRepository? deliveries = null)
@@ -42,6 +43,7 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
     public Task<Campaign> Create(Campaign campaign, CancellationToken ct)
     {
         _store[campaign.Id] = campaign;
+        _statuses[campaign.Id] = campaign.Status;
         foreach (var delivery in campaign.Deliveries)
             _deliveries?.Add(delivery);
         CreateCount++;
@@ -53,14 +55,24 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         if (!_store.ContainsKey(campaign.Id))
             throw new KeyNotFoundException($"Кампания {campaign.Id} не найдена.");
         _store[campaign.Id] = campaign;
+        _statuses[campaign.Id] = campaign.Status;
         UpdateCount++;
         return Task.FromResult(campaign);
+    }
+
+    public async Task<bool> TryUpdateStatusAsync(Campaign campaign, CampaignStatus expectedStatus, CancellationToken ct)
+    {
+        if (!_statuses.TryGetValue(campaign.Id, out var status) || status != expectedStatus)
+            return false;
+        await Update(campaign, ct);
+        return true;
     }
 
     public Task<bool> Delete(Guid id, CancellationToken ct)
     {
         if (!_store.Remove(id))
             return Task.FromResult(false);
+        _statuses.Remove(id);
         _deliveries?.RemoveByCampaign(id);
         return Task.FromResult(true);
     }
@@ -167,6 +179,15 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
     {
         var released = _store.Where(d => d.StatusFromInProgressToWaiting(now)).ToList();
         return Task.FromResult<IReadOnlyList<Delivery>>(released);
+    }
+
+    public Task<Delivery?> ReleaseCapturedAsync(
+        Guid deliveryId, string workerId, DateTime lockExpiresAt, DateTime now, CancellationToken ct)
+    {
+        var delivery = _store.SingleOrDefault(row => row.Id == deliveryId &&
+            row.DeliveryStatus == DeliveryStatus.InProgress && row.WorkerId == workerId && row.LockExpiresAt == lockExpiresAt);
+        delivery?.ReleaseUnsentCapture(now);
+        return Task.FromResult(delivery);
     }
 
     public Task SaveAsync(Delivery delivery, CancellationToken ct) => Task.CompletedTask;

@@ -7,6 +7,42 @@ namespace PackCall.Core.Test;
 
 public class CampaignWorkflowTests
 {
+    [Fact]
+    public async Task PauseDuringLastSend_AllowsAcknowledgementAndResumeCompletesCampaign()
+    {
+        var deliveries = new FakeDeliveryRepository();
+        var campaigns = new FakeCampaignRepository(deliveries);
+        var recipients = new FakeRecipientRepository();
+        recipients.Items.Add(new Recipient { Id = Guid.NewGuid(), Email = "user@example.com" });
+        var service = new CampaignService(campaigns, deliveries, recipients);
+        var sender = new FakeMessageSender();
+        var processing = new DeliveryProcessingService(deliveries, campaigns, sender, new FakeJournal(), new FakeMetrics());
+        var id = await service.CreateCampaignAsync("Рассылка", "Сообщение", CancellationToken.None);
+        await service.StartCampaignAsync(id, CancellationToken.None);
+        var batch = await processing.CaptureBatchAsync(10, "worker-1", TimeSpan.FromSeconds(90), CancellationToken.None);
+        var sending = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var acknowledgement = new TaskCompletionSource<SendResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        sender.AsyncHandler = (_, _) =>
+        {
+            sending.SetResult();
+            return acknowledgement.Task;
+        };
+
+        var inFlight = processing.ProcessAsync(Assert.Single(batch), CancellationToken.None);
+        await sending.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        await service.PauseCampaignAsync(id, CancellationToken.None);
+        acknowledgement.SetResult(SendResult.Success());
+        await inFlight.WaitAsync(TimeSpan.FromSeconds(5));
+
+        Assert.Equal(DeliveryStatus.Sent, batch[0].DeliveryStatus);
+        Assert.Equal(CampaignStatus.Paused, (await service.GetCampaignAsync(id, CancellationToken.None))!.Status);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.DeleteCampaignAsync(id, CancellationToken.None));
+
+        await service.ResumeCampaignAsync(id, CancellationToken.None);
+        Assert.Equal(CampaignStatus.Completed, (await service.GetCampaignAsync(id, CancellationToken.None))!.Status);
+        Assert.Single(sender.Requests);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

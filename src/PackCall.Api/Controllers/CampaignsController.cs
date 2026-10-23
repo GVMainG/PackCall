@@ -4,7 +4,7 @@ using PackCall.Core.Services;
 
 namespace PackCall.Api.Controllers;
 
-/// <summary>Создание, запуск и чтение кампаний.</summary>
+/// <summary>Создание, запуск, приостановка, возобновление и чтение кампаний.</summary>
 [ApiController]
 [Route("api/campaigns")]
 public sealed class CampaignsController(ICampaignService campaigns) : ControllerBase
@@ -81,7 +81,33 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
         return Ok(campaign.ToResponse());
     }
 
-    /// <summary>Удаляет кампанию, если она не обрабатывается.</summary>
+    /// <summary>Приостанавливает запущенную кампанию; начатые отправки могут завершиться. Повторный запрос безопасен.</summary>
+    [HttpPost("{id:guid}/pause")]
+    [ProducesResponseType(typeof(CampaignResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<CampaignResponse>> PauseCampaign(Guid id, CancellationToken ct)
+    {
+        await campaigns.PauseCampaignAsync(id, ct);
+        var campaign = await campaigns.GetCampaignAsync(id, ct)
+            ?? throw new KeyNotFoundException("Кампания не найдена.");
+        return Ok(campaign.ToResponse());
+    }
+
+    /// <summary>Возобновляет приостановленную кампанию. Повторный запрос для запущенной кампании безопасен.</summary>
+    [HttpPost("{id:guid}/resume")]
+    [ProducesResponseType(typeof(CampaignResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<CampaignResponse>> ResumeCampaign(Guid id, CancellationToken ct)
+    {
+        await campaigns.ResumeCampaignAsync(id, ct);
+        var campaign = await campaigns.GetCampaignAsync(id, ct)
+            ?? throw new KeyNotFoundException("Кампания не найдена.");
+        return Ok(campaign.ToResponse());
+    }
+
+    /// <summary>Удаляет кампанию, если она не обрабатывается и не приостановлена.</summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
