@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using PackCall.Core.Entities;
 using PackCall.Core.Services;
-using Serilog;
+using ILogger = Serilog.ILogger;
 
 namespace PackCall.Api.Background;
 
@@ -10,13 +10,13 @@ public sealed class DeliveryWorker : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly DeliveryWorkerOptions _options;
-    private readonly Serilog.ILogger _logger;
+    private readonly ILogger _logger;
     private readonly string _workerId;
 
     public DeliveryWorker(
         IServiceScopeFactory scopeFactory,
         IOptions<DeliveryWorkerOptions> options,
-        Serilog.ILogger logger)
+        ILogger logger)
     {
         _scopeFactory = scopeFactory;
         _options = options.Value;
