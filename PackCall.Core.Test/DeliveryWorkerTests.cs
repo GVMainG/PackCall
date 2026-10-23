@@ -128,7 +128,7 @@ public class DeliveryWorkerTests
             for (var i = 0; i < count; i++)
             {
                 var delivery = Delivery.Create(Guid.NewGuid(), Guid.NewGuid(), "user@example.com", now);
-                delivery.StatusFromWaitingToInProgress(workerId, now + lockDuration, now);
+                delivery.SetCapturedForTest(workerId, now + lockDuration, now);
                 deliveries.Add(delivery);
                 Captured.Add(delivery);
             }
@@ -180,7 +180,7 @@ public class DeliveryWorkerTests
 
             var now = DateTime.UtcNow;
             var delivery = Delivery.Create(Guid.NewGuid(), Guid.NewGuid(), "user@example.com", now);
-            delivery.StatusFromWaitingToInProgress(workerId, now + lockDuration, now);
+            delivery.SetCapturedForTest(workerId, now + lockDuration, now);
             return Task.FromResult<IReadOnlyList<Delivery>>([delivery]);
         }
 

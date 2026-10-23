@@ -162,6 +162,8 @@ public class CampaignPausePostgresTests : IAsyncLifetime
         var repository = scope.ServiceProvider.GetRequiredService<IDeliveryRepository>();
         var now = DateTime.UtcNow;
         var previous = Assert.Single(await repository.CaptureBatchAsync(1, "worker-1", TimeSpan.FromSeconds(10), now, CancellationToken.None));
+        Assert.Empty(await repository.CaptureBatchAsync(1, "worker-2", TimeSpan.FromSeconds(10), now, CancellationToken.None));
+        Assert.Empty(await repository.ReleaseExpiredLocksAsync(now.AddSeconds(9), CancellationToken.None));
         var later = now.AddSeconds(11);
         Assert.Single(await repository.ReleaseExpiredLocksAsync(later, CancellationToken.None));
         var current = Assert.Single(await repository.CaptureBatchAsync(1, "worker-1", TimeSpan.FromSeconds(90), later, CancellationToken.None));

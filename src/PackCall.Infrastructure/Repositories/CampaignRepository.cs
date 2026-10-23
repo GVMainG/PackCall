@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using PackCall.Core;
 using PackCall.Core.Entities;
 using PackCall.Core.Repositorys;
-using System.Linq.Expressions;
 
 namespace PackCall.Infrastructure.Repositories;
 
@@ -12,13 +11,6 @@ public sealed class CampaignRepository(AppDbContext dbContext) : ICampaingReposi
         await dbContext.Campaigns
             .AsNoTracking()
             .Where(campaign => campaign.Id == id)
-            .ToListAsync(ct);
-
-    public async Task<IEnumerable<Campaign>> Get(
-        Expression<Func<Campaign, bool>> predicate,
-        CancellationToken ct) =>
-        await dbContext.Campaigns
-            .Where(predicate)
             .ToListAsync(ct);
 
     public async Task<PageResult<Campaign>> GetPage(

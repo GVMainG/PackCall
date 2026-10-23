@@ -29,7 +29,4 @@ public static class CampaignStatusTransitions
 
     public static IReadOnlySet<CampaignStatus> GetAllowedTargets(CampaignStatus from) =>
         Allowed.TryGetValue(from, out var targets) ? targets : new HashSet<CampaignStatus>();
-
-    public static bool IsTerminal(CampaignStatus status) =>
-        status is CampaignStatus.Completed or CampaignStatus.Failed;
 }
