@@ -11,7 +11,7 @@ namespace PackCall.Core.Services;
 /// </remarks>
 public interface IDeliveryProcessingService
 {
-    /// <summary>Атомарно захватывает ожидающие доставки запущенных кампаний и фиксирует захват в журнале и метриках.</summary>
+    /// <summary>Атомарно захватывает ожидающие доставки запущенных кампаний и фиксирует захват в журнале.</summary>
     /// <returns>Не более batchSize доставок, закреплённых за указанным воркером.</returns>
     /// <remarks>Повторный вызов захватывает следующий доступный пакет, не ранее захваченные доставки.</remarks>
     /// <exception cref="ArgumentOutOfRangeException">Размер пакета или срок закрепления не положителен.</exception>
@@ -32,7 +32,7 @@ public interface IDeliveryProcessingService
     /// <exception cref="KeyNotFoundException">Кампания доставки не найдена.</exception>
     Task ProcessAsync(Delivery delivery, CancellationToken ct);
 
-    /// <summary>Возвращает доставки с истёкшим закреплением в Waiting, фиксирует возврат в журнале и метриках.</summary>
+    /// <summary>Возвращает доставки с истёкшим закреплением в Waiting, фиксирует возврат в журнале.</summary>
     /// <returns>Количество возвращённых доставок; повторный вызов не затрагивает уже возвращённые доставки.</returns>
     Task<int> ReleaseExpiredLocksAsync(CancellationToken ct);
 
