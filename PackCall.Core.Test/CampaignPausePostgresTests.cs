@@ -197,12 +197,14 @@ public partial class CampaignPausePostgresTests : IAsyncLifetime
         await using var scope = _provider!.CreateAsyncScope();
         var repository = scope.ServiceProvider.GetRequiredService<IDeliveryRepository>();
         var now = DateTime.UtcNow;
-        var previous = Assert.Single(await repository.CaptureBatchAsync(1, "worker-1", TimeSpan.FromSeconds(10), now, CancellationToken.None));
-        Assert.Empty(await repository.CaptureBatchAsync(1, "worker-2", TimeSpan.FromSeconds(10), now, CancellationToken.None));
-        Assert.Empty(await repository.ReleaseExpiredLocksAsync(now.AddSeconds(9), CancellationToken.None));
+        var previous = Assert.Single(await repository.CaptureBatchAsync(1, "worker-1", TimeSpan.FromSeconds(10), CancellationToken.None));
+        Assert.Empty(await repository.CaptureBatchAsync(1, "worker-2", TimeSpan.FromSeconds(10), CancellationToken.None));
+        Assert.Empty(await repository.ReleaseExpiredLocksAsync(CancellationToken.None));
         var later = now.AddSeconds(11);
-        Assert.Single(await repository.ReleaseExpiredLocksAsync(later, CancellationToken.None));
-        var current = Assert.Single(await repository.CaptureBatchAsync(1, "worker-1", TimeSpan.FromSeconds(90), later, CancellationToken.None));
+        await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.ExecuteSqlRawAsync(
+            "UPDATE deliveries SET lock_expires_at = clock_timestamp() - interval '1 second'");
+        Assert.Single(await repository.ReleaseExpiredLocksAsync(CancellationToken.None));
+        var current = Assert.Single(await repository.CaptureBatchAsync(1, "worker-1", TimeSpan.FromSeconds(90), CancellationToken.None));
 
         Assert.Null(await repository.ReleaseCapturedAsync(previous.Id, "worker-1", previous.LockExpiresAt!.Value, later, CancellationToken.None));
         var stored = Assert.Single(await repository.Get(current.Id, CancellationToken.None));

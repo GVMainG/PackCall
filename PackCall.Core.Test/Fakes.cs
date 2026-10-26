@@ -152,8 +152,9 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
     }
 
     public Task<IReadOnlyList<Delivery>> CaptureBatchAsync(
-        int batchSize, string workerId, TimeSpan lockDuration, DateTime now, CancellationToken ct)
+        int batchSize, string workerId, TimeSpan lockDuration, CancellationToken ct)
     {
+        var now = DateTime.UtcNow;
         var captured = new List<Delivery>();
         foreach (var delivery in _store)
         {
@@ -171,8 +172,9 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
         return Task.FromResult<IReadOnlyList<Delivery>>(captured);
     }
 
-    public Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(DateTime now, CancellationToken ct)
+    public Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(CancellationToken ct)
     {
+        var now = DateTime.UtcNow;
         var released = _store.Where(d => d.DeliveryStatus == DeliveryStatus.InProgress &&
             d.LockExpiresAt is not null && d.LockExpiresAt <= now).ToList();
         foreach (var delivery in released)

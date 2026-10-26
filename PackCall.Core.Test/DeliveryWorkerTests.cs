@@ -3,7 +3,8 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using PackCall.Api.Background;
+using PackCall.Worker.Background;
+using PackCall.Core;
 using PackCall.Core.Entities;
 using PackCall.Core.Services;
 using Serilog;
@@ -16,7 +17,7 @@ public class DeliveryWorkerTests
     public async Task Worker_CapturesProcessesAndRecoversWithAnAssignedId()
     {
         var processor = new RecordingProcessor();
-        using var provider = new ServiceCollection()
+        using var provider = new ServiceCollection().AddSingleton<ILeaseClock, TestClock>()
             .AddSingleton(processor)
             .AddScoped<IDeliveryProcessingService>(services => services.GetRequiredService<RecordingProcessor>())
             .BuildServiceProvider();
@@ -61,7 +62,7 @@ public class DeliveryWorkerTests
         using var configuration = new ConfigurationManager();
         configuration.AddJsonStream(json);
         var processor = new BatchProcessor(parallelism, batchSize);
-        using var provider = new ServiceCollection()
+        using var provider = new ServiceCollection().AddSingleton<ILeaseClock, TestClock>()
             .Configure<DeliveryWorkerOptions>(configuration.GetSection(DeliveryWorkerOptions.SectionName))
             .AddSingleton<IDeliveryProcessingService>(processor)
             .BuildServiceProvider();
@@ -94,7 +95,7 @@ public class DeliveryWorkerTests
     [InlineData(-1)]
     public void Worker_RejectsNonPositiveBatchSize(int batchSize)
     {
-        using var provider = new ServiceCollection().BuildServiceProvider();
+        using var provider = new ServiceCollection().AddSingleton<ILeaseClock, TestClock>().BuildServiceProvider();
         using var logger = new LoggerConfiguration().CreateLogger();
 
         Assert.Throws<OptionsValidationException>(() => new DeliveryWorker(
@@ -199,5 +200,9 @@ public class DeliveryWorkerTests
 
         public Task<bool> CompleteCampaignIfFinishedAsync(Guid campaignId, CancellationToken ct) =>
             Task.FromResult(false);
+    }
+    private sealed class TestClock : ILeaseClock
+    {
+        public Task<DateTime> GetUtcNowAsync(CancellationToken ct) => Task.FromResult(DateTime.UtcNow);
     }
 }

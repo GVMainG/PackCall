@@ -45,8 +45,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
 
         ct.ThrowIfCancellationRequested();
 
-        var now = DateTime.UtcNow;
-        var captured = await _deliveryRepository.CaptureBatchAsync(batchSize, workerId, lockDuration, now, ct);
+        var captured = await _deliveryRepository.CaptureBatchAsync(batchSize, workerId, lockDuration, ct);
 
         ct.ThrowIfCancellationRequested();
 
@@ -58,7 +57,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
                 DeliveryStatus.Waiting,
                 DeliveryStatus.InProgress,
                 workerId,
-                now,
+                delivery.UpdatedAt,
                 OperatorResult: null), ct);
         }
 
@@ -108,6 +107,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
             delivery.RecipientEmail,
             campaign.MessageText);
 
+        ct.ThrowIfCancellationRequested();
         var result = await _messageSender.SendAsync(request, ct);
 
         ct.ThrowIfCancellationRequested();
@@ -143,8 +143,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     {
         ct.ThrowIfCancellationRequested();
 
-        var now = DateTime.UtcNow;
-        var released = await _deliveryRepository.ReleaseExpiredLocksAsync(now, ct);
+        var released = await _deliveryRepository.ReleaseExpiredLocksAsync(ct);
 
         ct.ThrowIfCancellationRequested();
 
@@ -156,7 +155,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
                 DeliveryStatus.InProgress,
                 DeliveryStatus.Waiting,
                 delivery.WorkerId,
-                now,
+                delivery.UpdatedAt,
                 OperatorResult: null), ct);
         }
 

@@ -21,4 +21,5 @@
     <ProjectReference Include="..\PackCall.Infrastructure\PackCall.Infrastructure.csproj" />
   </ItemGroup>
 
+<ItemGroup><Content Include="../../config/appsettings.packcall.json" Link="appsettings.packcall.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" /></ItemGroup>
 </Project>

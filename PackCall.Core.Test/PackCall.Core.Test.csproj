@@ -19,6 +19,7 @@
     <ProjectReference Include="..\src\PackCall.Api\PackCall.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup><ProjectReference Include="../src/PackCall.Worker/PackCall.Worker.csproj" /></ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>

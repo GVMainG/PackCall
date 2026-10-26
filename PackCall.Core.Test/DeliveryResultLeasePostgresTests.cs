@@ -81,8 +81,7 @@ public partial class CampaignPausePostgresTests
         var oldRepository = oldScope.ServiceProvider.GetRequiredService<IDeliveryRepository>();
         var oldService = oldScope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
         var now = DateTime.UtcNow;
-        var old = Assert.Single(await oldRepository.CaptureBatchAsync(1, "worker-A", TimeSpan.FromSeconds(30),
-            state == "expired" ? now.AddMinutes(-1) : now, CancellationToken.None));
+        var old = Assert.Single(await oldRepository.CaptureBatchAsync(1, "worker-A", TimeSpan.FromSeconds(state == "expired" ? 0.05 : 30), CancellationToken.None));
         // Проверяем отслеживаемый снимок и последующий SaveChanges того же контекста.
         old = Assert.Single(await oldRepository.Get(old.Id, CancellationToken.None));
         var sending = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -104,10 +103,12 @@ public partial class CampaignPausePostgresTests
         }
         else if (state != "expired")
         {
-            Assert.Single(await nextRepository.ReleaseExpiredLocksAsync(now.AddSeconds(31), CancellationToken.None));
+            await nextScope.ServiceProvider.GetRequiredService<AppDbContext>().Database
+                .ExecuteSqlInterpolatedAsync($"UPDATE deliveries SET lock_expires_at = clock_timestamp() - interval '1 second' WHERE id = {old.Id}");
+            Assert.Single(await nextRepository.ReleaseExpiredLocksAsync(CancellationToken.None));
             if (state != "waiting")
             {
-                next = Assert.Single(await nextRepository.CaptureBatchAsync(1, sameWorker ? "worker-A" : "worker-B", TimeSpan.FromMinutes(2), now.AddSeconds(31), CancellationToken.None));
+                next = Assert.Single(await nextRepository.CaptureBatchAsync(1, sameWorker ? "worker-A" : "worker-B", TimeSpan.FromMinutes(2), CancellationToken.None));
                 Assert.NotEqual(old.LockExpiresAt, next.LockExpiresAt);
                 if (state is "sent" or "failed")
                 {
@@ -117,6 +118,8 @@ public partial class CampaignPausePostgresTests
                 }
             }
         }
+        if (state == "expired")
+            await Task.Delay(100);
         var before = Snapshot(await ReadDelivery(old.Id));
         var history = await Journal(old.Id);
         release.SetResult(Result(success));
@@ -148,7 +151,7 @@ public partial class CampaignPausePostgresTests
         await blocker.OpenAsync();
         await using var observer = new NpgsqlConnection(_connectionString);
         await observer.OpenAsync();
-        var captured = Assert.Single(await repository.CaptureBatchAsync(1, "worker-A", TimeSpan.FromMinutes(2), await DatabaseNow(observer), CancellationToken.None));
+        var captured = Assert.Single(await repository.CaptureBatchAsync(1, "worker-A", TimeSpan.FromMinutes(2), CancellationToken.None));
         var tracked = Assert.Single(await repository.Get(captured.Id, CancellationToken.None));
         Assert.Equal(EntityState.Unchanged, context.Entry(tracked).State);
         var before = Snapshot(tracked);
@@ -202,7 +205,7 @@ public partial class CampaignPausePostgresTests
         await recoveryContext.Database.OpenConnectionAsync();
         await using var observer = new NpgsqlConnection(_connectionString);
         await observer.OpenAsync();
-        var delivery = Assert.Single(await completeRepository.CaptureBatchAsync(1, "worker-A", TimeSpan.FromSeconds(3), await DatabaseNow(observer), CancellationToken.None));
+        var delivery = Assert.Single(await completeRepository.CaptureBatchAsync(1, "worker-A", TimeSpan.FromSeconds(3), CancellationToken.None));
         var expiry = delivery.LockExpiresAt!.Value;
         var recoveryPid = ((NpgsqlConnection)recoveryContext.Database.GetDbConnection()).ProcessID;
         await using var transaction = await completeContext.Database.BeginTransactionAsync();
@@ -213,12 +216,12 @@ public partial class CampaignPausePostgresTests
             await wait.ExecuteNonQueryAsync();
         }
         var recovery = recovering.ServiceProvider.GetRequiredService<IDeliveryRepository>()
-            .ReleaseExpiredLocksAsync(await DatabaseNow(observer), CancellationToken.None);
+            .ReleaseExpiredLocksAsync(CancellationToken.None);
         await WaitBlocked(recoveryPid, observer);
         await transaction.CommitAsync();
         Assert.Empty(await recovery.WaitAsync(Timeout));
         await AssertTerminal(delivery, true);
-        Assert.Empty(await completeRepository.CaptureBatchAsync(1, "worker-B", TimeSpan.FromMinutes(1), DateTime.UtcNow, CancellationToken.None));
+        Assert.Empty(await completeRepository.CaptureBatchAsync(1, "worker-B", TimeSpan.FromMinutes(1), CancellationToken.None));
     }
 
     private async Task<DateTime> DatabaseNow(NpgsqlConnection? observer = null)
@@ -268,7 +271,7 @@ public partial class CampaignPausePostgresTests
         await blocker.OpenAsync();
         await using var observer = new NpgsqlConnection(_connectionString);
         await observer.OpenAsync();
-        var original = Assert.Single(await ra.CaptureBatchAsync(1, "worker-A", TimeSpan.FromSeconds(mode == "double" ? 60 : 4), await DatabaseNow(observer), CancellationToken.None));
+        var original = Assert.Single(await ra.CaptureBatchAsync(1, "worker-A", TimeSpan.FromSeconds(mode == "double" ? 60 : 4), CancellationToken.None));
         var second = Assert.Single(await rb.Get(original.Id, CancellationToken.None));
         var before = Snapshot(original);
         var history = await Journal(original.Id, observer);
@@ -298,7 +301,7 @@ public partial class CampaignPausePostgresTests
             await wait.ExecuteNonQueryAsync();
             if (mode == "recovery")
             {
-                concurrent = rb.ReleaseExpiredLocksAsync(await DatabaseNow(observer), CancellationToken.None);
+                concurrent = rb.ReleaseExpiredLocksAsync(CancellationToken.None);
                 await WaitBlocked(pidB, observer);
             }
         }
@@ -319,7 +322,7 @@ public partial class CampaignPausePostgresTests
         {
             Assert.Equal(DeliveryStatus.Waiting, (await ReadDelivery(original.Id)).DeliveryStatus);
             Assert.Equal(history, await Journal(original.Id));
-            var next = Assert.Single(await rb.CaptureBatchAsync(1, "worker-B", TimeSpan.FromMinutes(2), DateTime.UtcNow, CancellationToken.None));
+            var next = Assert.Single(await rb.CaptureBatchAsync(1, "worker-B", TimeSpan.FromMinutes(2), CancellationToken.None));
             _sender.Handler = _ => SendResult.Success();
             await sb.ProcessAsync(next, CancellationToken.None);
             Assert.Equal(DeliveryStatus.Sent, (await ReadDelivery(original.Id)).DeliveryStatus);

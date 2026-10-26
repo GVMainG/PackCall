@@ -1,4 +1,4 @@
-namespace PackCall.Api.Background;
+namespace PackCall.Worker.Background;
 
 /// <summary>Настройки фоновой обработки доставок.</summary>
 public sealed class DeliveryWorkerOptions
