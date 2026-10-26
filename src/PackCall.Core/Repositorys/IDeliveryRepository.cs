@@ -40,9 +40,10 @@ namespace PackCall.Core.Repositorys
             Guid deliveryId, string workerId, DateTime lockExpiresAt, DateTime now, CancellationToken ct);
 
         /// <summary>
-        /// Сохраняет изменения доставки (смену статуса и служебных полей).
+        /// Сохраняет конечный результат только для исходного, ещё действующего закрепления.
+        /// Возвращает false при отклонении; ошибки хранения и отмена распространяются вызывающему коду.
         /// </summary>
-        Task SaveAsync(Delivery delivery, CancellationToken ct);
+        Task<bool> TryCompleteAsync(Delivery delivery, string? workerId, DateTime? lockExpiresAt, CancellationToken ct);
 
         /// <summary>
         /// Проверяет, есть ли у кампании доставки в статусах "Ожидает" или "Отправляется".
