@@ -371,3 +371,5 @@ FodyWeavers.xsd
 /_bmad-output
 /.agents
 /agents.md
+
+/tests
