@@ -11,7 +11,7 @@ var builder = Host.CreateApplicationBuilder(args);
 PackCallHosting.LoadConfiguration(builder.Configuration, builder.Environment.EnvironmentName, args);
 builder.Services.AddPackCallLogging(builder.Configuration, "Worker.Probe");
 builder.Services.AddStorage(PackCallHosting.ConnectionString(builder.Configuration));
-builder.Services.AddDeliveryProcessing();
+builder.Services.AddDeliveryProcessing(PackCall.Infrastructure.Hosting.TestOperatorSettings.Parse(builder.Configuration));
 builder.Services.AddSchemaGate();
 builder.Services.Configure<HostOptions>(o => o.ShutdownTimeout = TimeSpan.FromSeconds(30));
 builder.Services.Configure<DeliveryWorkerOptions>(o => { o.Parallelism = 1; o.BatchSize = 1; });
@@ -32,7 +32,7 @@ sealed class BarrierClock : ILeaseClock
 }
 sealed class UncooperativeSender : IMessageSender
 {
-    public async Task<SendResult> SendAsync(SendRequest request, CancellationToken ct)
+    public async Task<SendResult> SendAsync(SendRequest request, bool simulateErrors, CancellationToken ct)
     {
         File.WriteAllText("/tmp/packcall-probe-entered", "sender ignoring cancellation");
         await Task.Delay(Timeout.InfiniteTimeSpan);

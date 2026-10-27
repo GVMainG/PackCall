@@ -5,6 +5,11 @@ services:
       context: .
       dockerfile: src/PackCall.Api/Dockerfile
     environment: &packcall-environment
+      PACKCALL_ENVIRONMENT: ${PACKCALL_ENVIRONMENT:?PACKCALL_ENVIRONMENT must be set}
+      TEST_SENDER_MODE: ${TEST_SENDER_MODE:?TEST_SENDER_MODE must be set}
+      TEST_SIMULATE_ERRORS: ${TEST_SIMULATE_ERRORS:-false}
+      TEST_OPERATOR_URL: ${TEST_OPERATOR_URL-}
+      TEST_OPERATOR_TIMEOUT_SECONDS: ${TEST_OPERATOR_TIMEOUT_SECONDS:-5}
       ConnectionStrings__Postgres: Host=packcall.db;Port=5432;Database=${POSTGRES_DB:-packcall};Username=${POSTGRES_USER:-packcall};Password=${POSTGRES_PASSWORD:-packcall}
     depends_on:
       packcall.migrator:

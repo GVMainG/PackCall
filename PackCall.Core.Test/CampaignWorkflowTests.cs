@@ -16,7 +16,7 @@ public class CampaignWorkflowTests
         recipients.Items.Add(new Recipient { Id = Guid.NewGuid(), Email = "user@example.com" });
         var service = new CampaignService(campaigns, deliveries, recipients);
         var sender = new FakeMessageSender();
-        var processing = new DeliveryProcessingService(deliveries, campaigns, sender, new FakeJournal());
+        var processing = new DeliveryProcessingService(deliveries, campaigns, sender, new FakeJournal(), new SendPolicy(false));
         var id = await service.CreateCampaignAsync("Рассылка", "Сообщение", CancellationToken.None);
         await service.StartCampaignAsync(id, CancellationToken.None);
         var batch = await processing.CaptureBatchAsync(10, "worker-1", TimeSpan.FromSeconds(90), CancellationToken.None);
@@ -56,7 +56,7 @@ public class CampaignWorkflowTests
         ICampaignService campaignService = new CampaignService(campaigns, deliveries, recipients);
         var sender = new FakeMessageSender();
         var journal = new FakeJournal();
-        IDeliveryProcessingService processing = new DeliveryProcessingService(deliveries, campaigns, sender, journal);
+        IDeliveryProcessingService processing = new DeliveryProcessingService(deliveries, campaigns, sender, journal, new SendPolicy(false));
 
         var id = await campaignService.CreateCampaignAsync("Рассылка", "Сообщение", CancellationToken.None);
         var campaign = (await campaignService.GetCampaignAsync(id, CancellationToken.None))!;

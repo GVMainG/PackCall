@@ -8,6 +8,7 @@ try
 {
     var builder = Host.CreateApplicationBuilder(args);
     PackCallHosting.LoadConfiguration(builder.Configuration, builder.Environment.EnvironmentName, args);
+    var operatorSettings = TestOperatorSettings.Parse(builder.Configuration);
     builder.Services.AddPackCallLogging(builder.Configuration, "PackCall.Migrator");
     builder.Services.AddStorage(PackCallHosting.ConnectionString(builder.Configuration));
     using var host = builder.Build();
@@ -22,6 +23,11 @@ try
         return 0;
     }
     finally { await host.StopAsync(); }
+}
+catch (PackCallConfigurationException exception)
+{
+    Console.Error.WriteLine(exception.Message);
+    return 1;
 }
 catch (Exception exception)
 {

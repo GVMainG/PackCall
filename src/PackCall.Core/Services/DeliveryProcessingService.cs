@@ -17,17 +17,20 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     private readonly ICampaingRepository _campaignRepository;
     private readonly IMessageSender _messageSender;
     private readonly IDeliveryStatusJournal _journal;
+    private readonly SendPolicy _policy;
 
     public DeliveryProcessingService(
         IDeliveryRepository deliveryRepository,
         ICampaingRepository campaignRepository,
         IMessageSender messageSender,
-        IDeliveryStatusJournal journal)
+        IDeliveryStatusJournal journal,
+        SendPolicy policy)
     {
         _deliveryRepository = deliveryRepository;
         _campaignRepository = campaignRepository;
         _messageSender = messageSender;
         _journal = journal;
+        _policy = policy;
     }
 
     /// <summary>
@@ -108,7 +111,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
             campaign.MessageText);
 
         ct.ThrowIfCancellationRequested();
-        var result = await _messageSender.SendAsync(request, ct);
+        var result = await _messageSender.SendAsync(request, _policy.SimulateErrors, ct);
 
         ct.ThrowIfCancellationRequested();
 

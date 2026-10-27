@@ -1,7 +1,7 @@
 namespace PackCall.Core.Sending;
 
 /// <summary>
-/// Канал отправки сообщений получателям. В MVP единственная реализация — mock-email.
+/// Канал отправки сообщений получателям. Тестовый оператор выбирается при регистрации приложения.
 /// </summary>
 public interface IMessageSender
 {
@@ -10,6 +10,7 @@ public interface IMessageSender
     /// Успешный ответ не подтверждает доставку сообщения получателю.
     /// </summary>
     /// <param name="request">Данные отправки.</param>
+    /// <param name="simulateErrors">Включить независимые случайные отказы оператора.</param>
     /// <param name="ct">Токен отмены.</param>
-    Task<SendResult> SendAsync(SendRequest request, CancellationToken ct);
+    Task<SendResult> SendAsync(SendRequest request, bool simulateErrors, CancellationToken ct);
 }
