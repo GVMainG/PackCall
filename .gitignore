@@ -372,4 +372,14 @@ FodyWeavers.xsd
 /.agents
 /agents.md
 
-/tests
+/tests/*
+!/tests/PackCall.Worker.Probe/
+!/tests/PackCall.Workers.Acceptance/
+!/tests/acceptance/
+/tests/acceptance/*
+!/tests/acceptance/story-2-2-workers/
+!/tests/acceptance/story-11-1-test-email-operator/
+# Acceptance outputs remain local
+/tests/**/__pycache__/
+/tests/**/control/
+/tests/**/run-*/
