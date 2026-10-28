@@ -19,8 +19,10 @@
     <ProjectReference Include="..\src\PackCall.Api\PackCall.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup><ProjectReference Include="../src/PackCall.Worker/PackCall.Worker.csproj" /></ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
+<ItemGroup><Content Include="../tests/acceptance/story-11-1-test-email-operator/email-fixtures.json" Link="email-fixtures.json" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
 </Project>

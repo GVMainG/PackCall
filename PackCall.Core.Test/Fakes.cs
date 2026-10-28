@@ -1,7 +1,6 @@
 using PackCall.Core.Entities;
 using PackCall.Core.Exceptions;
 using PackCall.Core.Journaling;
-using PackCall.Core.Metrics;
 using PackCall.Core.Repositorys;
 using PackCall.Core.Sending;
 using System.Linq.Expressions;
@@ -11,6 +10,7 @@ namespace PackCall.Core.Test;
 internal sealed class FakeCampaignRepository : ICampaingRepository
 {
     private readonly Dictionary<Guid, Campaign> _store = new();
+    private readonly Dictionary<Guid, CampaignStatus> _statuses = new();
     private readonly FakeDeliveryRepository? _deliveries;
 
     public FakeCampaignRepository(FakeDeliveryRepository? deliveries = null)
@@ -26,9 +26,6 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
             ? new[] { campaign }.AsEnumerable()
             : Enumerable.Empty<Campaign>());
 
-    public Task<IEnumerable<Campaign>> Get(Expression<Func<Campaign, bool>> predicate, CancellationToken ct) =>
-        Task.FromResult(_store.Values.AsQueryable().Where(predicate).ToList().AsEnumerable());
-
     public Task<PageResult<Campaign>> GetPage(int pageNumber, int pageSize, CancellationToken ct)
     {
         var items = _store.Values
@@ -42,6 +39,7 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
     public Task<Campaign> Create(Campaign campaign, CancellationToken ct)
     {
         _store[campaign.Id] = campaign;
+        _statuses[campaign.Id] = campaign.Status;
         foreach (var delivery in campaign.Deliveries)
             _deliveries?.Add(delivery);
         CreateCount++;
@@ -53,14 +51,24 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         if (!_store.ContainsKey(campaign.Id))
             throw new KeyNotFoundException($"Кампания {campaign.Id} не найдена.");
         _store[campaign.Id] = campaign;
+        _statuses[campaign.Id] = campaign.Status;
         UpdateCount++;
         return Task.FromResult(campaign);
+    }
+
+    public async Task<bool> TryUpdateStatusAsync(Campaign campaign, CampaignStatus expectedStatus, CancellationToken ct)
+    {
+        if (!_statuses.TryGetValue(campaign.Id, out var status) || status != expectedStatus)
+            return false;
+        await Update(campaign, ct);
+        return true;
     }
 
     public Task<bool> Delete(Guid id, CancellationToken ct)
     {
         if (!_store.Remove(id))
             return Task.FromResult(false);
+        _statuses.Remove(id);
         _deliveries?.RemoveByCampaign(id);
         return Task.FromResult(true);
     }
@@ -144,8 +152,9 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
     }
 
     public Task<IReadOnlyList<Delivery>> CaptureBatchAsync(
-        int batchSize, string workerId, TimeSpan lockDuration, DateTime now, CancellationToken ct)
+        int batchSize, string workerId, TimeSpan lockDuration, CancellationToken ct)
     {
+        var now = DateTime.UtcNow;
         var captured = new List<Delivery>();
         foreach (var delivery in _store)
         {
@@ -156,24 +165,44 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
             if (delivery.Campaign is not null && delivery.Campaign.Status != CampaignStatus.InProgress)
                 continue;
 
-            delivery.StatusFromWaitingToInProgress(workerId, now + lockDuration, now);
+            delivery.SetCapturedForTest(workerId, now + lockDuration, now);
             captured.Add(delivery);
         }
 
         return Task.FromResult<IReadOnlyList<Delivery>>(captured);
     }
 
-    public Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(DateTime now, CancellationToken ct)
+    public Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(CancellationToken ct)
     {
-        var released = _store.Where(d => d.StatusFromInProgressToWaiting(now)).ToList();
+        var now = DateTime.UtcNow;
+        var released = _store.Where(d => d.DeliveryStatus == DeliveryStatus.InProgress &&
+            d.LockExpiresAt is not null && d.LockExpiresAt <= now).ToList();
+        foreach (var delivery in released)
+            delivery.SetWaitingForTest(now);
         return Task.FromResult<IReadOnlyList<Delivery>>(released);
     }
 
-    public Task SaveAsync(Delivery delivery, CancellationToken ct) => Task.CompletedTask;
+    public Task<Delivery?> ReleaseCapturedAsync(
+        Guid deliveryId, string workerId, DateTime lockExpiresAt, DateTime now, CancellationToken ct)
+    {
+        var delivery = _store.SingleOrDefault(row => row.Id == deliveryId &&
+            row.DeliveryStatus == DeliveryStatus.InProgress && row.WorkerId == workerId && row.LockExpiresAt == lockExpiresAt);
+        delivery?.SetWaitingForTest(now);
+        return Task.FromResult(delivery);
+    }
 
-    public Task<bool> HasPendingDeliveriesAsync(Guid campaignId, CancellationToken ct) =>
-        Task.FromResult(_store.Any(d => d.CampaignId == campaignId &&
+    public Func<Task<bool>>? CompleteHandler { get; set; }
+    public int PendingChecks { get; private set; }
+    public Task<bool> TryCompleteAsync(Delivery delivery, string? workerId, DateTime? lockExpiresAt, CancellationToken ct) =>
+        CompleteHandler?.Invoke() ?? Task.FromResult(workerId is not null && lockExpiresAt > DateTime.UtcNow);
+
+
+    public Task<bool> HasPendingDeliveriesAsync(Guid campaignId, CancellationToken ct)
+    {
+        PendingChecks++;
+        return Task.FromResult(_store.Any(d => d.CampaignId == campaignId &&
             d.DeliveryStatus is DeliveryStatus.Waiting or DeliveryStatus.InProgress));
+    }
 }
 
 internal sealed class FakeMessageSender : IMessageSender
@@ -182,10 +211,12 @@ internal sealed class FakeMessageSender : IMessageSender
     public Func<SendRequest, CancellationToken, Task<SendResult>>? AsyncHandler { get; set; }
 
     public List<SendRequest> Requests { get; } = new();
+    public List<bool> SimulateErrors { get; } = new();
 
-    public Task<SendResult> SendAsync(SendRequest request, CancellationToken ct)
+    public Task<SendResult> SendAsync(SendRequest request, bool simulateErrors, CancellationToken ct)
     {
         Requests.Add(request);
+        SimulateErrors.Add(simulateErrors);
         return AsyncHandler?.Invoke(request, ct) ??
             Task.FromResult(Handler?.Invoke(request) ?? SendResult.Success());
     }
@@ -193,19 +224,10 @@ internal sealed class FakeMessageSender : IMessageSender
 
 internal sealed class FakeJournal : IDeliveryStatusJournal
 {
-    public Task AppendAsync(StatusChangeEntry entry, CancellationToken ct) => Task.CompletedTask;
-}
-
-internal sealed class FakeMetrics : IDeliveryMetrics
-{
-    public void RecordCaptured(int count) { }
-    public void RecordProcessed() { }
-
-    public void RecordStatusChange(DeliveryStatus previous, DeliveryStatus current)
+    public List<StatusChangeEntry> Entries { get; } = new();
+    public Task AppendAsync(StatusChangeEntry entry, CancellationToken ct)
     {
+        Entries.Add(entry);
+        return Task.CompletedTask;
     }
-
-    public void RecordExpiredLockReturned(int count) { }
-    public void RecordOperatorSuccess() { }
-    public void RecordOperatorError() { }
 }

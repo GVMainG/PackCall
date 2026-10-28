@@ -5,7 +5,7 @@ public enum DeliveryStatus
     Failed = -1,
     Waiting = 0,
     InProgress = 1,
-    /// <summary>Провайдер подтвердил приём сообщения; доставка адресату неизвестна.</summary>
+    /// <summary>Провайдер подтвердил приём сообщения.</summary>
     Sent = 2
 }
 
@@ -33,7 +33,4 @@ public static class DeliveryStatusTransitions
 
     public static IReadOnlySet<DeliveryStatus> GetAllowedTargets(DeliveryStatus from) =>
         Allowed.TryGetValue(from, out var targets) ? targets : new HashSet<DeliveryStatus>();
-
-    public static bool IsTerminal(DeliveryStatus status) =>
-        status is DeliveryStatus.Sent or DeliveryStatus.Failed;
 }

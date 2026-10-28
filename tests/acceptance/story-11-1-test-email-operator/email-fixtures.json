@@ -1,0 +1,970 @@
+[
+  {
+    "value": "user@example.test",
+    "valid": true
+  },
+  {
+    "value": "user+tag@sub.example.test",
+    "valid": true
+  },
+  {
+    "value": "\u044e\u0437\u0435\u0440@\u043f\u0440\u0438\u043c\u0435\u0440.\u0440\u0444",
+    "valid": true
+  },
+  {
+    "value": "a@localhost",
+    "valid": true
+  },
+  {
+    "value": "\"a b\"@example.test",
+    "valid": true
+  },
+  {
+    "value": "\"a..b\"@example.test",
+    "valid": true
+  },
+  {
+    "value": "a..b@example.test",
+    "valid": false
+  },
+  {
+    "value": ".a@example.test",
+    "valid": false
+  },
+  {
+    "value": "a.@example.test",
+    "valid": true
+  },
+  {
+    "value": "a@example.test.",
+    "valid": true
+  },
+  {
+    "value": "Name <a@example.test>",
+    "valid": false
+  },
+  {
+    "value": "a\r\n@example.test",
+    "valid": false
+  },
+  {
+    "value": "bad",
+    "valid": false
+  },
+  {
+    "value": "a@[127.0.0.1]",
+    "valid": true
+  },
+  {
+    "value": "a(comment)@example.test",
+    "valid": false
+  },
+  {
+    "value": " a@example.test",
+    "valid": false
+  },
+  {
+    "value": "a@example.test ",
+    "valid": false
+  },
+  {
+    "value": "a@-example.test",
+    "valid": true
+  },
+  {
+    "value": "a@ex_ample.test",
+    "valid": true
+  },
+  {
+    "value": "a@.example.test",
+    "valid": false
+  },
+  {
+    "value": "\"\"@example.test",
+    "valid": true
+  },
+  {
+    "value": "a@ex..test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u0000b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0000b\"@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0000ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0000",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0001b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0001b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0001ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0001",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0002b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0002b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0002ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0002",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0003b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0003b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0003ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0003",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0004b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0004b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0004ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0004",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0005b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0005b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0005ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0005",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0006b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0006b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0006ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0006",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0007b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0007b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0007ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0007",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\bb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\bb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\bample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\b",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\tb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\tb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\tample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\t",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\nb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\nb\"@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\nample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\n",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u000bb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u000bb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u000bample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u000b",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\fb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\fb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\fample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\f",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\rb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\rb\"@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\rample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\r",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u000eb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u000eb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u000eample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u000e",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u000fb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u000fb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u000fample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u000f",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0010b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0010b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0010ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0010",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0011b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0011b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0011ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0011",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0012b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0012b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0012ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0012",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0013b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0013b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0013ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0013",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0014b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0014b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0014ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0014",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0015b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0015b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0015ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0015",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0016b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0016b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0016ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0016",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0017b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0017b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0017ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0017",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0018b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0018b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0018ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0018",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0019b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0019b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0019ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u0019",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u001ab@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u001ab\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u001aample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u001a",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u001bb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u001bb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u001bample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u001b",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u001cb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u001cb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u001cample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u001c",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u001db@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u001db\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u001dample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u001d",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u001eb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u001eb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u001eample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u001e",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u001fb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u001fb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u001fample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u001f",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": " ",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u007fb@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u007fb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u007fample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u007f",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "a\u0085b@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "\"a\u0085b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u0085ample.test",
+    "valid": true
+  },
+  {
+    "field": "message",
+    "value": "\u0085",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u00a0b@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "\"a\u00a0b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u00a0ample.test",
+    "valid": true
+  },
+  {
+    "field": "message",
+    "value": "\u00a0",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u1680b@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "\"a\u1680b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u1680ample.test",
+    "valid": true
+  },
+  {
+    "field": "message",
+    "value": "\u1680",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u2000b@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "\"a\u2000b\"@example.test",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u2000ample.test",
+    "valid": false
+  },
+  {
+    "field": "message",
+    "value": "\u2000",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u2007b@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "\"a\u2007b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u2007ample.test",
+    "valid": true
+  },
+  {
+    "field": "message",
+    "value": "\u2007",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u2028b@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "\"a\u2028b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u2028ample.test",
+    "valid": true
+  },
+  {
+    "field": "message",
+    "value": "\u2028",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u2029b@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "\"a\u2029b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u2029ample.test",
+    "valid": true
+  },
+  {
+    "field": "message",
+    "value": "\u2029",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u202fb@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "\"a\u202fb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u202fample.test",
+    "valid": true
+  },
+  {
+    "field": "message",
+    "value": "\u202f",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u205fb@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "\"a\u205fb\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u205fample.test",
+    "valid": true
+  },
+  {
+    "field": "message",
+    "value": "\u205f",
+    "valid": false
+  },
+  {
+    "field": "email",
+    "value": "a\u3000b@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "\"a\u3000b\"@example.test",
+    "valid": true
+  },
+  {
+    "field": "email",
+    "value": "ab@ex\u3000ample.test",
+    "valid": true
+  },
+  {
+    "field": "message",
+    "value": "\u3000",
+    "valid": false
+  }
+]

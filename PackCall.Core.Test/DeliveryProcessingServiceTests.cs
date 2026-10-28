@@ -10,11 +10,23 @@ public class DeliveryProcessingServiceTests
     private readonly FakeCampaignRepository _campaignRepository = new();
     private readonly FakeDeliveryRepository _deliveryRepository = new();
     private readonly FakeMessageSender _sender = new();
+    private readonly FakeJournal _journal = new();
     private readonly IDeliveryProcessingService _service;
 
     public DeliveryProcessingServiceTests() =>
         _service = new DeliveryProcessingService(
-            _deliveryRepository, _campaignRepository, _sender, new FakeJournal(), new FakeMetrics());
+            _deliveryRepository, _campaignRepository, _sender, _journal, new SendPolicy(false));
+
+    [Theory]
+    [InlineData(false)] [InlineData(true)]
+    public async Task PolicyExplicitlyReachesEverySenderCall(bool simulate)
+    {
+        var campaign=CreateStartedCampaign(); AddWaitingDelivery(campaign); AddWaitingDelivery(campaign);
+        var service=new DeliveryProcessingService(_deliveryRepository,_campaignRepository,_sender,_journal,new SendPolicy(simulate));
+        var batch=await service.CaptureBatchAsync(2,"worker",TimeSpan.FromSeconds(90),default);
+        foreach(var delivery in batch) await service.ProcessAsync(delivery,default);
+        Assert.Equal(new[]{simulate,simulate},_sender.SimulateErrors);
+    }
 
     private Campaign CreateStartedCampaign()
     {
@@ -48,7 +60,7 @@ public class DeliveryProcessingServiceTests
         var campaign = Campaign.Create("Кампания", "Текст");
         await _campaignRepository.Create(campaign, CancellationToken.None);
         var delivery = AddWaitingDelivery(campaign);
-        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
+        delivery.SetCapturedForTest("worker-1", DateTime.UtcNow.AddMinutes(2));
 
         await Assert.ThrowsAsync<DomainException>(() => _service.ProcessAsync(delivery, CancellationToken.None));
 
@@ -61,7 +73,7 @@ public class DeliveryProcessingServiceTests
     {
         var campaign = CreateStartedCampaign();
         var delivery = AddWaitingDelivery(campaign);
-        delivery.StatusFromWaitingToInProgress("worker-1", DateTime.UtcNow.AddMinutes(2));
+        delivery.SetCapturedForTest("worker-1", DateTime.UtcNow.AddMinutes(2));
 
         var requestReceived = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var acknowledgement = new TaskCompletionSource<SendResult>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -93,7 +105,7 @@ public class DeliveryProcessingServiceTests
         var campaign = CreateStartedCampaign();
         var delivery = AddWaitingDelivery(campaign);
         var expiresAt = DateTime.UtcNow.AddMinutes(2);
-        delivery.StatusFromWaitingToInProgress("worker-1", expiresAt);
+        delivery.SetCapturedForTest("worker-1", expiresAt);
         _sender.Handler = _ => throw new InvalidOperationException("Ответ оператора неизвестен");
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.ProcessAsync(delivery, CancellationToken.None));
@@ -111,13 +123,50 @@ public class DeliveryProcessingServiceTests
         var expired = AddWaitingDelivery(campaign);
         var active = AddWaitingDelivery(campaign);
         var now = DateTime.UtcNow;
-        expired.StatusFromWaitingToInProgress("worker-dead", now.AddSeconds(-5), now);
-        active.StatusFromWaitingToInProgress("worker-alive", now.AddMinutes(5), now);
+        expired.SetCapturedForTest("worker-dead", now.AddSeconds(-5), now);
+        active.SetCapturedForTest("worker-alive", now.AddMinutes(5), now);
 
         var released = await _service.ReleaseExpiredLocksAsync(CancellationToken.None);
 
         Assert.Equal(1, released);
         Assert.Equal(DeliveryStatus.Waiting, expired.DeliveryStatus);
         Assert.Equal(DeliveryStatus.InProgress, active.DeliveryStatus);
+    }
+
+    [Theory]
+    [InlineData("rejected")]
+    [InlineData("error")]
+    [InlineData("cancelled")]
+    public async Task Process_UnappliedStorage_DoesNotJournalOrCheckCompletion(string outcome)
+    {
+        var campaign = CreateStartedCampaign();
+        var delivery = AddWaitingDelivery(campaign);
+        delivery.SetCapturedForTest("worker-1", DateTime.UtcNow.AddMinutes(2));
+        _deliveryRepository.CompleteHandler = () => outcome switch
+        {
+            "error" => throw new InvalidOperationException("storage failure"),
+            "cancelled" => throw new OperationCanceledException(),
+            _ => Task.FromResult(false)
+        };
+        var operation = () => _service.ProcessAsync(delivery, CancellationToken.None);
+        if (outcome == "error") await Assert.ThrowsAsync<InvalidOperationException>(operation);
+        else if (outcome == "cancelled") await Assert.ThrowsAsync<OperationCanceledException>(operation);
+        else await operation();
+        Assert.Empty(_journal.Entries);
+        Assert.Equal(0, _deliveryRepository.PendingChecks);
+        Assert.Equal(CampaignStatus.InProgress, campaign.Status);
+    }
+
+    [Fact]
+    public async Task Process_OperatorCancellation_DoesNotBecomeFailure()
+    {
+        var delivery = AddWaitingDelivery(CreateStartedCampaign());
+        delivery.SetCapturedForTest("worker-1", DateTime.UtcNow.AddMinutes(2));
+        _sender.AsyncHandler = (_, _) => throw new OperationCanceledException();
+        await Assert.ThrowsAsync<OperationCanceledException>(() => _service.ProcessAsync(delivery, CancellationToken.None));
+        Assert.Equal(DeliveryStatus.InProgress, delivery.DeliveryStatus);
+        Assert.Null(delivery.CompletedAt);
+        Assert.Empty(_journal.Entries);
+        Assert.Equal(0, _deliveryRepository.PendingChecks);
     }
 }

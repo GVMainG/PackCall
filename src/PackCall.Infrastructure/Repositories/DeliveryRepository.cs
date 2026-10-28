@@ -76,7 +76,6 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         int batchSize,
         string workerId,
         TimeSpan lockDuration,
-        DateTime now,
         CancellationToken ct)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(batchSize, 1);
@@ -84,14 +83,13 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         if (lockDuration <= TimeSpan.Zero)
             throw new ArgumentOutOfRangeException(nameof(lockDuration));
 
-        var lockExpiresAt = now + lockDuration;
         var waiting = (int)DeliveryStatus.Waiting;
         var inProgress = (int)DeliveryStatus.InProgress;
         var campaignInProgress = (int)CampaignStatus.InProgress;
 
         return await dbContext.Deliveries
             .FromSqlInterpolated($$"""
-                WITH candidates AS (
+                WITH candidates AS MATERIALIZED (
                     SELECT delivery.id
                     FROM deliveries AS delivery
                     INNER JOIN campaigns AS campaign ON campaign.id = delivery.campaign_id
@@ -101,13 +99,16 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
                     LIMIT {{batchSize}}
                     FOR UPDATE OF delivery SKIP LOCKED
                 ),
+                lease_time AS MATERIALIZED (
+                    SELECT clock_timestamp() AS now FROM (SELECT count(*) FROM candidates) AS locked_batch
+                ),
                 updated AS (
                     UPDATE deliveries AS delivery
                     SET delivery_status = {{inProgress}},
                         worker_id = {{workerId}},
-                        lock_expires_at = {{lockExpiresAt}},
-                        updated_at = {{now}}
-                    FROM candidates
+                        lock_expires_at = lease_time.now + {{lockDuration}},
+                        updated_at = lease_time.now
+                    FROM candidates CROSS JOIN lease_time
                     WHERE delivery.id = candidates.id
                     RETURNING delivery.*
                 )
@@ -119,7 +120,6 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
     }
 
     public async Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(
-        DateTime now,
         CancellationToken ct)
     {
         var waiting = (int)DeliveryStatus.Waiting;
@@ -127,14 +127,20 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
 
         return await dbContext.Deliveries
             .FromSqlInterpolated($$"""
-                WITH updated AS (
+                WITH locked AS MATERIALIZED (
+                    SELECT id, delivery_status, lock_expires_at FROM deliveries
+                    WHERE delivery_status = {{inProgress}} AND lock_expires_at <= clock_timestamp()
+                    ORDER BY id FOR UPDATE
+                ),
+                updated AS (
                     UPDATE deliveries AS delivery
                     SET delivery_status = {{waiting}},
                         worker_id = NULL,
                         lock_expires_at = NULL,
-                        updated_at = {{now}}
-                    WHERE delivery.delivery_status = {{inProgress}}
-                      AND delivery.lock_expires_at <= {{now}}
+                        updated_at = clock_timestamp()
+                    FROM locked
+                    WHERE delivery.id = locked.id AND locked.delivery_status = {{inProgress}}
+                      AND locked.lock_expires_at <= clock_timestamp()
                     RETURNING delivery.*
                 )
                 SELECT * FROM updated
@@ -144,14 +150,55 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
             .ToListAsync(ct);
     }
 
-    public async Task SaveAsync(Delivery delivery, CancellationToken ct)
+    public async Task<Delivery?> ReleaseCapturedAsync(
+        Guid deliveryId, string workerId, DateTime lockExpiresAt, DateTime now, CancellationToken ct)
+    {
+        var waiting = (int)DeliveryStatus.Waiting;
+        var inProgress = (int)DeliveryStatus.InProgress;
+        var released = await dbContext.Deliveries
+            .FromSqlInterpolated($$"""
+                UPDATE deliveries
+                SET delivery_status = {{waiting}}, worker_id = NULL, lock_expires_at = NULL, updated_at = {{now}}
+                WHERE id = {{deliveryId}} AND delivery_status = {{inProgress}}
+                  AND worker_id = {{workerId}} AND lock_expires_at = {{lockExpiresAt}}
+                RETURNING *
+                """)
+            .AsNoTracking()
+            .ToListAsync(ct);
+        return released.SingleOrDefault();
+    }
+
+    public async Task<bool> TryCompleteAsync(
+        Delivery delivery, string? workerId, DateTime? lockExpiresAt, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(delivery);
+        // Снимок Get() может отслеживаться EF. Отсоединяем до проверок и SQL, чтобы
+        // после ошибки или отмены SaveChanges не сохранил отклонённый результат.
+        dbContext.Entry(delivery).State = EntityState.Detached;
+        ct.ThrowIfCancellationRequested();
+        if (delivery.DeliveryStatus is not (DeliveryStatus.Sent or DeliveryStatus.Failed))
+            throw new ArgumentException("Ожидается конечный результат доставки.", nameof(delivery));
+        if (string.IsNullOrWhiteSpace(workerId) || lockExpiresAt is null)
+            return false;
 
-        if (dbContext.Entry(delivery).State == EntityState.Detached)
-            dbContext.Deliveries.Update(delivery);
-
-        await dbContext.SaveChangesAsync(ct);
+        var inProgress = (int)DeliveryStatus.InProgress;
+        var terminal = (int)delivery.DeliveryStatus;
+        // Срок читается из locked после FOR UPDATE; поле целевой таблицы позволило бы
+        // проверить условие до блокировки. clock_timestamp(), в отличие от now(),
+        // учитывает время ожидания блокировки.
+        var affected = await dbContext.Database.ExecuteSqlInterpolatedAsync($$"""
+            WITH locked AS MATERIALIZED (
+                SELECT id, lock_expires_at FROM deliveries WHERE id = {{delivery.Id}} FOR UPDATE
+            )
+            UPDATE deliveries AS delivery
+            SET delivery_status = {{terminal}}, updated_at = {{delivery.UpdatedAt}},
+                completed_at = {{delivery.CompletedAt}}, worker_id = NULL, lock_expires_at = NULL
+            FROM locked
+            WHERE delivery.id = locked.id AND delivery.delivery_status = {{inProgress}}
+              AND delivery.worker_id = {{workerId}} AND delivery.lock_expires_at = {{lockExpiresAt}}
+              AND locked.lock_expires_at > clock_timestamp()
+            """, ct);
+        return affected == 1;
     }
 
     public Task<bool> HasPendingDeliveriesAsync(Guid campaignId, CancellationToken ct) =>

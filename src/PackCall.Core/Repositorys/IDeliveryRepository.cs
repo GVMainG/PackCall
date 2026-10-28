@@ -25,19 +25,25 @@ namespace PackCall.Core.Repositorys
         /// и возвращает только успешно захваченные доставки.
         /// </summary>
         Task<IReadOnlyList<Delivery>> CaptureBatchAsync(
-            int batchSize, string workerId, TimeSpan lockDuration, DateTime now, CancellationToken ct);
+            int batchSize, string workerId, TimeSpan lockDuration, CancellationToken ct);
 
         /// <summary>
         /// Атомарно возвращает доставки со статусом "Отправляется" и истёкшим сроком закрепления
         /// в статус "Ожидает", очищая идентификатор воркера и срок закрепления.
         /// Возвращает возвращённые доставки.
         /// </summary>
-        Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(DateTime now, CancellationToken ct);
+        Task<IReadOnlyList<Delivery>> ReleaseExpiredLocksAsync(CancellationToken ct);
+
+        /// <summary>Возвращает неотправленную доставку в Waiting только при совпадении владельца и срока закрепления.</summary>
+        /// <returns>Освобождённая доставка или null, если закрепление уже изменилось.</returns>
+        Task<Delivery?> ReleaseCapturedAsync(
+            Guid deliveryId, string workerId, DateTime lockExpiresAt, DateTime now, CancellationToken ct);
 
         /// <summary>
-        /// Сохраняет изменения доставки (смену статуса и служебных полей).
+        /// Сохраняет конечный результат только для исходного, ещё действующего закрепления.
+        /// Возвращает false при отклонении; ошибки хранения и отмена распространяются вызывающему коду.
         /// </summary>
-        Task SaveAsync(Delivery delivery, CancellationToken ct);
+        Task<bool> TryCompleteAsync(Delivery delivery, string? workerId, DateTime? lockExpiresAt, CancellationToken ct);
 
         /// <summary>
         /// Проверяет, есть ли у кампании доставки в статусах "Ожидает" или "Отправляется".

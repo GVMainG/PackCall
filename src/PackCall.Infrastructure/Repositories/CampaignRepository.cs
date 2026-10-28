@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using PackCall.Core;
 using PackCall.Core.Entities;
 using PackCall.Core.Repositorys;
-using System.Linq.Expressions;
 
 namespace PackCall.Infrastructure.Repositories;
 
@@ -10,14 +9,8 @@ public sealed class CampaignRepository(AppDbContext dbContext) : ICampaingReposi
 {
     public async Task<IEnumerable<Campaign>> Get(Guid id, CancellationToken ct) =>
         await dbContext.Campaigns
+            .AsNoTracking()
             .Where(campaign => campaign.Id == id)
-            .ToListAsync(ct);
-
-    public async Task<IEnumerable<Campaign>> Get(
-        Expression<Func<Campaign, bool>> predicate,
-        CancellationToken ct) =>
-        await dbContext.Campaigns
-            .Where(predicate)
             .ToListAsync(ct);
 
     public async Task<PageResult<Campaign>> GetPage(
@@ -51,6 +44,18 @@ public sealed class CampaignRepository(AppDbContext dbContext) : ICampaingReposi
 
         await dbContext.SaveChangesAsync(ct);
         return campaign;
+    }
+
+    public async Task<bool> TryUpdateStatusAsync(Campaign campaign, CampaignStatus expectedStatus, CancellationToken ct)
+    {
+        var updated = await dbContext.Campaigns
+            .Where(row => row.Id == campaign.Id && row.Status == expectedStatus)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(row => row.Status, campaign.Status)
+                .SetProperty(row => row.UpdatedAt, campaign.UpdatedAt)
+                .SetProperty(row => row.StartedAt, campaign.StartedAt)
+                .SetProperty(row => row.CompletedAt, campaign.CompletedAt), ct);
+        return updated == 1;
     }
 
     public async Task<bool> Delete(Guid id, CancellationToken ct)

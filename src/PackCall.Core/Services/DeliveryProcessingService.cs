@@ -1,7 +1,6 @@
 using PackCall.Core.Entities;
 using PackCall.Core.Exceptions;
 using PackCall.Core.Journaling;
-using PackCall.Core.Metrics;
 using PackCall.Core.Repositorys;
 using PackCall.Core.Sending;
 
@@ -18,20 +17,20 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     private readonly ICampaingRepository _campaignRepository;
     private readonly IMessageSender _messageSender;
     private readonly IDeliveryStatusJournal _journal;
-    private readonly IDeliveryMetrics _metrics;
+    private readonly SendPolicy _policy;
 
     public DeliveryProcessingService(
         IDeliveryRepository deliveryRepository,
         ICampaingRepository campaignRepository,
         IMessageSender messageSender,
         IDeliveryStatusJournal journal,
-        IDeliveryMetrics metrics)
+        SendPolicy policy)
     {
         _deliveryRepository = deliveryRepository;
         _campaignRepository = campaignRepository;
         _messageSender = messageSender;
         _journal = journal;
-        _metrics = metrics;
+        _policy = policy;
     }
 
     /// <summary>
@@ -49,26 +48,22 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
 
         ct.ThrowIfCancellationRequested();
 
-        var now = DateTime.UtcNow;
-        var captured = await _deliveryRepository.CaptureBatchAsync(batchSize, workerId, lockDuration, now, ct);
+        var captured = await _deliveryRepository.CaptureBatchAsync(batchSize, workerId, lockDuration, ct);
 
         ct.ThrowIfCancellationRequested();
 
         foreach (var delivery in captured)
         {
-            _metrics.RecordStatusChange(DeliveryStatus.Waiting, DeliveryStatus.InProgress);
-
             await _journal.AppendAsync(new StatusChangeEntry(
                 delivery.CampaignId,
                 delivery.Id,
                 DeliveryStatus.Waiting,
                 DeliveryStatus.InProgress,
                 workerId,
-                now,
+                delivery.UpdatedAt,
                 OperatorResult: null), ct);
         }
 
-        _metrics.RecordCaptured(captured.Count);
         return captured;
     }
 
@@ -87,7 +82,24 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
 
         var previousStatus = delivery.DeliveryStatus;
         var workerId = delivery.WorkerId;
+        var lockExpiresAt = delivery.LockExpiresAt;
         var campaign = await GetCampaignAsync(delivery.CampaignId, ct);
+        if (campaign.Status == CampaignStatus.Paused)
+        {
+            if (workerId is not null && delivery.LockExpiresAt is { } expiresAt)
+            {
+                var releasedAt = DateTime.UtcNow;
+                var released = await _deliveryRepository.ReleaseCapturedAsync(
+                    delivery.Id, workerId, expiresAt, releasedAt, ct);
+                if (released is not null)
+                {
+                    await _journal.AppendAsync(new StatusChangeEntry(
+                        delivery.CampaignId, delivery.Id, DeliveryStatus.InProgress, DeliveryStatus.Waiting,
+                        workerId, releasedAt, OperatorResult: null), ct);
+                }
+            }
+            return;
+        }
         if (campaign.Status != CampaignStatus.InProgress)
             throw new DomainException("Обрабатывать доставки можно только у запущенной кампании.");
 
@@ -98,7 +110,8 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
             delivery.RecipientEmail,
             campaign.MessageText);
 
-        var result = await _messageSender.SendAsync(request, ct);
+        ct.ThrowIfCancellationRequested();
+        var result = await _messageSender.SendAsync(request, _policy.SimulateErrors, ct);
 
         ct.ThrowIfCancellationRequested();
 
@@ -108,16 +121,11 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
         else
             delivery.StatusFromInProgressToFailed(now);
 
-        await _deliveryRepository.SaveAsync(delivery, ct);
+        if (!await _deliveryRepository.TryCompleteAsync(delivery, workerId, lockExpiresAt, ct))
+            return;
 
         ct.ThrowIfCancellationRequested();
 
-        _metrics.RecordStatusChange(previousStatus, delivery.DeliveryStatus);
-        _metrics.RecordProcessed();
-        if (result.IsSuccess)
-            _metrics.RecordOperatorSuccess();
-        else
-            _metrics.RecordOperatorError();
         await _journal.AppendAsync(new StatusChangeEntry(
             delivery.CampaignId,
             delivery.Id,
@@ -138,26 +146,22 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     {
         ct.ThrowIfCancellationRequested();
 
-        var now = DateTime.UtcNow;
-        var released = await _deliveryRepository.ReleaseExpiredLocksAsync(now, ct);
+        var released = await _deliveryRepository.ReleaseExpiredLocksAsync(ct);
 
         ct.ThrowIfCancellationRequested();
 
         foreach (var delivery in released)
         {
-            _metrics.RecordStatusChange(DeliveryStatus.InProgress, DeliveryStatus.Waiting);
-
             await _journal.AppendAsync(new StatusChangeEntry(
                 delivery.CampaignId,
                 delivery.Id,
                 DeliveryStatus.InProgress,
                 DeliveryStatus.Waiting,
                 delivery.WorkerId,
-                now,
+                delivery.UpdatedAt,
                 OperatorResult: null), ct);
         }
 
-        _metrics.RecordExpiredLockReturned(released.Count);
         return released.Count;
     }
 
@@ -182,8 +186,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
         ct.ThrowIfCancellationRequested();
 
         campaign.StatusFromInProgressToCompleted(DateTime.UtcNow);
-        await _campaignRepository.Update(campaign, ct);
-        return true;
+        return await _campaignRepository.TryUpdateStatusAsync(campaign, CampaignStatus.InProgress, ct);
     }
 
     private async Task<Campaign> GetCampaignAsync(Guid campaignId, CancellationToken ct)
