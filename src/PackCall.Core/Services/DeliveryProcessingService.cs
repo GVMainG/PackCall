@@ -80,6 +80,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
 
         var previousStatus = delivery.DeliveryStatus;
         var workerId = delivery.WorkerId;
+        var lockExpiresAt = delivery.LockExpiresAt;
         var campaign = await GetCampaignAsync(delivery.CampaignId, ct);
         if (campaign.Status == CampaignStatus.Paused)
         {
@@ -117,7 +118,8 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
         else
             delivery.StatusFromInProgressToFailed(now);
 
-        await _deliveryRepository.SaveAsync(delivery, ct);
+        if (!await _deliveryRepository.TryCompleteAsync(delivery, workerId, lockExpiresAt, ct))
+            return;
 
         ct.ThrowIfCancellationRequested();
 

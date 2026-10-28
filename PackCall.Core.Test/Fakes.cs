@@ -189,11 +189,18 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
         return Task.FromResult(delivery);
     }
 
-    public Task SaveAsync(Delivery delivery, CancellationToken ct) => Task.CompletedTask;
+    public Func<Task<bool>>? CompleteHandler { get; set; }
+    public int PendingChecks { get; private set; }
+    public Task<bool> TryCompleteAsync(Delivery delivery, string? workerId, DateTime? lockExpiresAt, CancellationToken ct) =>
+        CompleteHandler?.Invoke() ?? Task.FromResult(workerId is not null && lockExpiresAt > DateTime.UtcNow);
 
-    public Task<bool> HasPendingDeliveriesAsync(Guid campaignId, CancellationToken ct) =>
-        Task.FromResult(_store.Any(d => d.CampaignId == campaignId &&
+
+    public Task<bool> HasPendingDeliveriesAsync(Guid campaignId, CancellationToken ct)
+    {
+        PendingChecks++;
+        return Task.FromResult(_store.Any(d => d.CampaignId == campaignId &&
             d.DeliveryStatus is DeliveryStatus.Waiting or DeliveryStatus.InProgress));
+    }
 }
 
 internal sealed class FakeMessageSender : IMessageSender
@@ -213,5 +220,10 @@ internal sealed class FakeMessageSender : IMessageSender
 
 internal sealed class FakeJournal : IDeliveryStatusJournal
 {
-    public Task AppendAsync(StatusChangeEntry entry, CancellationToken ct) => Task.CompletedTask;
+    public List<StatusChangeEntry> Entries { get; } = new();
+    public Task AppendAsync(StatusChangeEntry entry, CancellationToken ct)
+    {
+        Entries.Add(entry);
+        return Task.CompletedTask;
+    }
 }

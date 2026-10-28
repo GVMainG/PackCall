@@ -162,14 +162,37 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         return released.SingleOrDefault();
     }
 
-    public async Task SaveAsync(Delivery delivery, CancellationToken ct)
+    public async Task<bool> TryCompleteAsync(
+        Delivery delivery, string? workerId, DateTime? lockExpiresAt, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(delivery);
+        // Снимок Get() может отслеживаться EF. Отсоединяем до проверок и SQL, чтобы
+        // после ошибки или отмены SaveChanges не сохранил отклонённый результат.
+        dbContext.Entry(delivery).State = EntityState.Detached;
+        ct.ThrowIfCancellationRequested();
+        if (delivery.DeliveryStatus is not (DeliveryStatus.Sent or DeliveryStatus.Failed))
+            throw new ArgumentException("Ожидается конечный результат доставки.", nameof(delivery));
+        if (string.IsNullOrWhiteSpace(workerId) || lockExpiresAt is null)
+            return false;
 
-        if (dbContext.Entry(delivery).State == EntityState.Detached)
-            dbContext.Deliveries.Update(delivery);
-
-        await dbContext.SaveChangesAsync(ct);
+        var inProgress = (int)DeliveryStatus.InProgress;
+        var terminal = (int)delivery.DeliveryStatus;
+        // Срок читается из locked после FOR UPDATE; поле целевой таблицы позволило бы
+        // проверить условие до блокировки. clock_timestamp(), в отличие от now(),
+        // учитывает время ожидания блокировки.
+        var affected = await dbContext.Database.ExecuteSqlInterpolatedAsync($$"""
+            WITH locked AS MATERIALIZED (
+                SELECT id, lock_expires_at FROM deliveries WHERE id = {{delivery.Id}} FOR UPDATE
+            )
+            UPDATE deliveries AS delivery
+            SET delivery_status = {{terminal}}, updated_at = {{delivery.UpdatedAt}},
+                completed_at = {{delivery.CompletedAt}}, worker_id = NULL, lock_expires_at = NULL
+            FROM locked
+            WHERE delivery.id = locked.id AND delivery.delivery_status = {{inProgress}}
+              AND delivery.worker_id = {{workerId}} AND delivery.lock_expires_at = {{lockExpiresAt}}
+              AND locked.lock_expires_at > clock_timestamp()
+            """, ct);
+        return affected == 1;
     }
 
     public Task<bool> HasPendingDeliveriesAsync(Guid campaignId, CancellationToken ct) =>

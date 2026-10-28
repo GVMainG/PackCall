@@ -23,7 +23,7 @@ namespace PackCall.Core.Test;
 
 // Set PACKCALL_TEST_POSTGRES to a test PostgreSQL connection string.
 // Every test creates and removes its own schema; existing tables are never modified.
-public class CampaignPausePostgresTests : IAsyncLifetime
+public partial class CampaignPausePostgresTests : IAsyncLifetime
 {
     private readonly string _schema = "packcall_pause_test_" + Guid.NewGuid().ToString("N");
     private readonly FakeMessageSender _sender = new();
@@ -107,6 +107,13 @@ public class CampaignPausePostgresTests : IAsyncLifetime
         foreach (var delivery in batch.Skip(1))
             await processing.ProcessAsync(delivery, CancellationToken.None);
 
+        foreach (var tail in batch.Skip(1))
+        {
+            var stored = await ReadDelivery(tail.Id);
+            Assert.Equal(DeliveryStatus.Waiting, stored.DeliveryStatus);
+            Assert.Null(stored.WorkerId);
+            Assert.Null(stored.LockExpiresAt);
+        }
         Assert.Single(_sender.Requests);
         Assert.Equal(CampaignStatus.Paused, (await campaigns.GetCampaignAsync(id, CancellationToken.None))!.Status);
         var counts = await campaigns.GetDeliveryStatusCountsAsync(id, CancellationToken.None);
@@ -128,6 +135,35 @@ public class CampaignPausePostgresTests : IAsyncLifetime
         Assert.Equal(startedAt, completed.StartedAt);
         Assert.Equal(4, _sender.Requests.Count);
         Assert.Equal(4, _sender.Requests.Select(request => request.DeliveryId).Distinct().Count());
+    }
+
+    [PostgresFact]
+    public async Task PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain()
+    {
+        var id = await CreateStartedCampaignAsync();
+        await using var scope = _provider!.CreateAsyncScope();
+        var processing = scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
+        var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
+        var startedAt = (await campaigns.GetCampaignAsync(id, CancellationToken.None))!.StartedAt;
+        var delivery = Assert.Single(await processing.CaptureBatchAsync(1, "worker-A", TimeSpan.FromMinutes(2), CancellationToken.None));
+        var sending = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource<SendResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _sender.AsyncHandler = (_, _) => { sending.TrySetResult(); return release.Task; };
+        var operation = processing.ProcessAsync(delivery, CancellationToken.None);
+        await sending.Task.WaitAsync(Timeout);
+        await using var other = _provider!.CreateAsyncScope();
+        var control = other.ServiceProvider.GetRequiredService<ICampaignService>();
+        await control.PauseCampaignAsync(id, CancellationToken.None);
+        release.SetResult(SendResult.Success());
+        await operation.WaitAsync(Timeout);
+        Assert.Equal(CampaignStatus.Paused, (await control.GetCampaignAsync(id, CancellationToken.None))!.Status);
+        Assert.Equal(DeliveryStatus.Sent, (await ReadDelivery(delivery.Id)).DeliveryStatus);
+        await control.ResumeCampaignAsync(id, CancellationToken.None);
+        var final = (await control.GetCampaignAsync(id, CancellationToken.None))!;
+        Assert.Equal(CampaignStatus.Completed, final.Status);
+        Assert.Equal(startedAt, final.StartedAt);
+        Assert.Single(_sender.Requests);
+        Assert.Empty(await processing.CaptureBatchAsync(1, "worker-B", TimeSpan.FromMinutes(2), CancellationToken.None));
     }
 
     [PostgresFact]
