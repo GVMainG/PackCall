@@ -365,12 +365,6 @@ FodyWeavers.xsd
 # Project-local Codex configuration and skills
 .codex/
 
-# BMAD personal settings
-/_bmad/config.user.toml
-/_bmad
-/_bmad-output
-/.agents
-/agents.md
 
 /tests/*
 !/tests/PackCall.Worker.Probe/
