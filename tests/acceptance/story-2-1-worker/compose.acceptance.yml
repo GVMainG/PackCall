@@ -1,0 +1,4 @@
+services:
+  packcall.api:
+    ports:
+      - "127.0.0.1::8080"

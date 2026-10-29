@@ -1,41 +1,38 @@
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
-using PackCall.Api.Background;
 using PackCall.Api.Middleware;
 using PackCall.Core.Services;
 using PackCall.Infrastructure;
-using Serilog;
+using PackCall.Infrastructure.Hosting;
 
-var builder = WebApplication.CreateBuilder(args);
-
-using var logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .CreateLogger();
-builder.Services.AddSerilog(logger);
-builder.Services.AddSingleton<Serilog.ILogger>(logger);
-
-RegisterServices(builder);
-
-var app = builder.Build();
-
-await using (var dbContext = await app.Services
-    .GetRequiredService<IDbContextFactory<AppDbContext>>()
-    .CreateDbContextAsync())
+try
 {
-    await dbContext.Database.MigrateAsync();
-}
+    var builder = WebApplication.CreateBuilder(args);
 
-app.UseExceptionHandler();
-app.UseStatusCodePages();
-if (app.Environment.IsDevelopment())
+    PackCallHosting.LoadConfiguration(builder.Configuration, builder.Environment.EnvironmentName, args);
+    builder.Services.AddPackCallLogging(builder.Configuration, "PackCall.Api");
+
+    RegisterServices(builder);
+
+    var app = builder.Build();
+
+    app.UseExceptionHandler();
+    app.UseStatusCodePages();
+    if (app.Environment.IsDevelopment())
+    {
+        app.MapOpenApi();
+        app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "PackCall API v1"));
+    }
+
+    app.MapControllers();
+
+    app.Run();
+    return 0;
+}
+catch (Exception exception)
 {
-    app.MapOpenApi();
-    app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "PackCall API v1"));
+    Console.Error.WriteLine($"PackCall.Api startup/run failed ({exception.GetType().Name}).");
+    return 1;
 }
-
-app.MapControllers();
-
-app.Run();
 
 # region Методы
 
@@ -48,19 +45,9 @@ static void RegisterServices(WebApplicationBuilder builder)
     builder.Services.AddProblemDetails();
     builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 
-    var connectionString = builder.Configuration.GetConnectionString("Postgres")
-        ?? throw new InvalidOperationException("Не задана строка подключения ConnectionStrings:Postgres.");
-
-    builder.Services.AddInfrastructure(connectionString);
-
-    builder.Services.AddScoped<ICampaignService, CampaignService>();
-    builder.Services.AddScoped<IDeliveryProcessingService, DeliveryProcessingService>();
-    builder.Services.AddOptions<DeliveryWorkerOptions>()
-        .Bind(builder.Configuration.GetSection(DeliveryWorkerOptions.SectionName))
-        .Validate(options => options.IsValid(), "Некорректные параметры DeliveryWorker.")
-        .ValidateOnStart();
-
-    builder.Services.AddHostedService<DeliveryWorker>();
+    builder.Services.AddStorage(PackCallHosting.ConnectionString(builder.Configuration));
+    builder.Services.AddCampaignManagement();
+    builder.Services.AddSchemaGate();
 }
 
 #endregion Методы

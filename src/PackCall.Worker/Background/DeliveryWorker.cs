@@ -1,9 +1,13 @@
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using PackCall.Core;
+using System.Diagnostics;
 using PackCall.Core.Entities;
 using PackCall.Core.Services;
 using ILogger = Serilog.ILogger;
 
-namespace PackCall.Api.Background;
+namespace PackCall.Worker.Background;
 
 /// <summary>Захватывает и обрабатывает доставки, отдельно возвращая просроченные закрепления.</summary>
 public sealed class DeliveryWorker : BackgroundService
@@ -12,11 +16,12 @@ public sealed class DeliveryWorker : BackgroundService
     private readonly DeliveryWorkerOptions _options;
     private readonly ILogger _logger;
     private readonly string _workerId;
+    private readonly TimeProvider _timeProvider;
 
     public DeliveryWorker(
         IServiceScopeFactory scopeFactory,
         IOptions<DeliveryWorkerOptions> options,
-        ILogger logger)
+        ILogger logger, WorkerIdentity? identity = null, TimeProvider? timeProvider = null)
     {
         _scopeFactory = scopeFactory;
         _options = options.Value;
@@ -29,7 +34,8 @@ public sealed class DeliveryWorker : BackgroundService
                  "все интервалы положительны, LockDuration + RecoveryInterval не более 2 минут."]);
 
         var host = Environment.MachineName;
-        _workerId = $"{host[..Math.Min(host.Length, 200)]}-{Guid.NewGuid():N}";
+        _workerId = identity?.Id ?? $"{host[..Math.Min(host.Length, 200)]}-{Guid.NewGuid():N}";
+        _timeProvider = timeProvider ?? TimeProvider.System;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -59,7 +65,10 @@ public sealed class DeliveryWorker : BackgroundService
                 }
 
                 foreach (var delivery in captured)
-                    await ProcessCapturedAsync(processor, delivery, ct);
+                {
+                    ct.ThrowIfCancellationRequested();
+                    await ProcessCapturedAsync(processor, scope.ServiceProvider.GetRequiredService<ILeaseClock>(), delivery, ct);
+                }
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested)
             {
@@ -75,8 +84,9 @@ public sealed class DeliveryWorker : BackgroundService
     }
 
     private async Task ProcessCapturedAsync(
-        IDeliveryProcessingService processor, Delivery delivery, CancellationToken ct)
+        IDeliveryProcessingService processor, ILeaseClock clock, Delivery delivery, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
         if (delivery.WorkerId != _workerId || delivery.LockExpiresAt is not { } expiresAt)
         {
             _logger.Warning("Захваченная доставка {DeliveryId} не закреплена за воркером {WorkerId}",
@@ -86,7 +96,10 @@ public sealed class DeliveryWorker : BackgroundService
 
         var safetyMargin = TimeSpan.FromTicks(Math.Min(TimeSpan.FromSeconds(5).Ticks,
             _options.LockDuration.Ticks / 10));
-        var remaining = expiresAt - DateTime.UtcNow - safetyMargin;
+        var started = _timeProvider.GetTimestamp();
+        var dbNow = await clock.GetUtcNowAsync(ct);
+        ct.ThrowIfCancellationRequested();
+        var remaining = expiresAt - dbNow - _timeProvider.GetElapsedTime(started) - safetyMargin;
         if (remaining <= TimeSpan.Zero)
         {
             _logger.Warning("Закрепление доставки {DeliveryId} истекает до начала обработки", delivery.Id);

@@ -1,0 +1,4 @@
+services:
+  packcall.migrator:
+    environment:
+      ConnectionStrings__Postgres: Host=127.0.0.1;Port=1;Database=unused;Username=unused;Password=unused;Timeout=1
