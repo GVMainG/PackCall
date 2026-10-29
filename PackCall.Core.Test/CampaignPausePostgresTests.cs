@@ -23,6 +23,7 @@ namespace PackCall.Core.Test;
 
 // Set PACKCALL_TEST_POSTGRES to a test PostgreSQL connection string.
 // Every test creates and removes its own schema; existing tables are never modified.
+[Collection("Measurement")]
 public partial class CampaignPausePostgresTests : IAsyncLifetime
 {
     private readonly string _schema = "packcall_pause_test_" + Guid.NewGuid().ToString("N");

@@ -20,11 +20,16 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
 
     public int CreateCount { get; private set; }
     public int UpdateCount { get; private set; }
+    public Action? OnGet { get; set; }
+    public Action? OnTryUpdateStatus { get; set; }
 
-    public Task<IEnumerable<Campaign>> Get(Guid id, CancellationToken ct) =>
-        Task.FromResult(_store.TryGetValue(id, out var campaign)
+    public Task<IEnumerable<Campaign>> Get(Guid id, CancellationToken ct)
+    {
+        OnGet?.Invoke();
+        return Task.FromResult(_store.TryGetValue(id, out var campaign)
             ? new[] { campaign }.AsEnumerable()
             : Enumerable.Empty<Campaign>());
+    }
 
     public Task<PageResult<Campaign>> GetPage(int pageNumber, int pageSize, CancellationToken ct)
     {
@@ -58,6 +63,7 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
 
     public async Task<bool> TryUpdateStatusAsync(Campaign campaign, CampaignStatus expectedStatus, CancellationToken ct)
     {
+        OnTryUpdateStatus?.Invoke();
         if (!_statuses.TryGetValue(campaign.Id, out var status) || status != expectedStatus)
             return false;
         await Update(campaign, ct);
