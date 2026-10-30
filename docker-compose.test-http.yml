@@ -4,7 +4,7 @@ services:
       packcall.test-email-operator:
         condition: service_healthy
   packcall.test-email-operator:
-    image: ${DOCKER_REGISTRY-}packcalltestemailoperator
+    image: ${DOCKER_REGISTRY?DOCKER_REGISTRY must be set (empty allowed)}packcalltestemailoperator
     build:
       context: ./src/PackCall.TestEmailOperator
     read_only: true

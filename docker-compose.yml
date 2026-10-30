@@ -1,23 +1,23 @@
 services:
   packcall.api:
-    image: ${DOCKER_REGISTRY-}packcallapi
+    image: ${DOCKER_REGISTRY?DOCKER_REGISTRY must be set (empty allowed)}packcallapi
     build:
       context: .
       dockerfile: src/PackCall.Api/Dockerfile
     environment: &packcall-environment
       PACKCALL_ENVIRONMENT: ${PACKCALL_ENVIRONMENT:?PACKCALL_ENVIRONMENT must be set}
       TEST_SENDER_MODE: ${TEST_SENDER_MODE:?TEST_SENDER_MODE must be set}
-      TEST_SIMULATE_ERRORS: ${TEST_SIMULATE_ERRORS:-false}
-      TEST_OPERATOR_URL: ${TEST_OPERATOR_URL-}
-      TEST_OPERATOR_TIMEOUT_SECONDS: ${TEST_OPERATOR_TIMEOUT_SECONDS:-5}
-      ConnectionStrings__Postgres: Host=packcall.db;Port=5432;Database=${POSTGRES_DB:-packcall};Username=${POSTGRES_USER:-packcall};Password=${POSTGRES_PASSWORD:-packcall}
+      TEST_SIMULATE_ERRORS: ${TEST_SIMULATE_ERRORS:?TEST_SIMULATE_ERRORS must be set}
+      TEST_OPERATOR_URL: ${TEST_OPERATOR_URL?TEST_OPERATOR_URL must be set (empty allowed for inprocess)}
+      TEST_OPERATOR_TIMEOUT_SECONDS: ${TEST_OPERATOR_TIMEOUT_SECONDS:?TEST_OPERATOR_TIMEOUT_SECONDS must be set}
+      ConnectionStrings__Postgres: Host=packcall.db;Port=5432;Database=${POSTGRES_DB:?POSTGRES_DB must be set};Username=${POSTGRES_USER:?POSTGRES_USER must be set};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
     depends_on:
       packcall.migrator:
         condition: service_completed_successfully
     stop_grace_period: 40s
 
   packcall.worker:
-    image: ${DOCKER_REGISTRY-}packcallworker
+    image: ${DOCKER_REGISTRY?DOCKER_REGISTRY must be set (empty allowed)}packcallworker
     build:
       context: .
       dockerfile: src/PackCall.Worker/Dockerfile
@@ -30,7 +30,7 @@ services:
     stop_grace_period: 40s
 
   packcall.migrator:
-    image: ${DOCKER_REGISTRY-}packcallmigrator
+    image: ${DOCKER_REGISTRY?DOCKER_REGISTRY must be set (empty allowed)}packcallmigrator
     build:
       context: .
       dockerfile: src/PackCall.Migrator/Dockerfile
@@ -44,9 +44,9 @@ services:
   packcall.db:
     image: postgres:18.6-alpine3.24
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-packcall}
-      POSTGRES_USER: ${POSTGRES_USER:-packcall}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-packcall}
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB must be set}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
       interval: 5s
