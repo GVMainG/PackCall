@@ -211,10 +211,12 @@ internal sealed class FakeMessageSender : IMessageSender
     public Func<SendRequest, CancellationToken, Task<SendResult>>? AsyncHandler { get; set; }
 
     public List<SendRequest> Requests { get; } = new();
+    public List<bool> SimulateErrors { get; } = new();
 
-    public Task<SendResult> SendAsync(SendRequest request, CancellationToken ct)
+    public Task<SendResult> SendAsync(SendRequest request, bool simulateErrors, CancellationToken ct)
     {
         Requests.Add(request);
+        SimulateErrors.Add(simulateErrors);
         return AsyncHandler?.Invoke(request, ct) ??
             Task.FromResult(Handler?.Invoke(request) ?? SendResult.Success());
     }

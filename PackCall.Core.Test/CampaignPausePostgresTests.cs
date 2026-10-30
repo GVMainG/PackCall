@@ -63,7 +63,7 @@ public partial class CampaignPausePostgresTests : IAsyncLifetime
 
     private void AddServices(IServiceCollection services)
     {
-        services.AddInfrastructure(_connectionString);
+        services.AddInfrastructure(_connectionString, new PackCall.Infrastructure.Hosting.TestOperatorSettings(PackCall.Infrastructure.Hosting.TestSenderMode.Inprocess, false));
         services.AddSingleton<IMessageSender>(_sender);
         services.AddScoped<ICampaignService, CampaignService>();
         services.AddScoped<IDeliveryProcessingService, DeliveryProcessingService>();

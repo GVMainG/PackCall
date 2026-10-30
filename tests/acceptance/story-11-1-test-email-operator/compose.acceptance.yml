@@ -1,0 +1,7 @@
+services:
+  packcall.api:
+    environment:
+      ASPNETCORE_HTTP_PORTS: 8080
+    ports: ["127.0.0.1::8080"]
+  packcall.db:
+    ports: ["127.0.0.1::5432"]

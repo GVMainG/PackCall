@@ -1,45 +1,33 @@
 using System.Net.Mail;
-using Microsoft.Extensions.Options;
 using PackCall.Core.Sending;
 
 namespace PackCall.Infrastructure.Sending;
 
-/// <summary>
-/// Имитирует ответ провайдера на отправленное сообщение.
-/// Успех означает подтверждение приёма сообщения, а не доставку адресату.
-/// </summary>
-public sealed class MockEmailSender : IMessageSender
+public interface IOperatorRandom { double NextDouble(); }
+public sealed class OperatorRandom : IOperatorRandom
 {
-    private readonly MockEmailOptions _options;
+    public double NextDouble() => Random.Shared.NextDouble();
+}
 
-    public MockEmailSender(IOptions<MockEmailOptions> options)
+public sealed class MockEmailSender(IOperatorRandom random) : IMessageSender
+{
+    public Task<SendResult> SendAsync(SendRequest request, bool simulateErrors, CancellationToken ct)
     {
-        _options = options.Value;
-
-        if (_options.Delay < TimeSpan.Zero)
-            throw new ArgumentOutOfRangeException(nameof(options), "Задержка mock-email не может быть отрицательной.");
-        if (string.IsNullOrWhiteSpace(_options.FailureMessage))
-            throw new ArgumentException("Текст ошибки mock-email не может быть пустым.", nameof(options));
-    }
-
-    public async Task<SendResult> SendAsync(SendRequest request, CancellationToken ct)
-    {
-        ArgumentNullException.ThrowIfNull(request);
         ct.ThrowIfCancellationRequested();
-
-        if (_options.Delay > TimeSpan.Zero)
-            await Task.Delay(_options.Delay, ct);
-
-        return BuildResult(request);
+        Validate(request);
+        var result = simulateErrors && random.NextDouble() < 0.01
+            ? SendResult.Failure("SimulatedOperatorRejected") : SendResult.Success();
+        ct.ThrowIfCancellationRequested();
+        return Task.FromResult(result);
     }
 
-    private SendResult BuildResult(SendRequest request)
+    internal static void Validate(SendRequest request)
     {
-        if (!MailAddress.TryCreate(request.RecipientEmail, out _))
-            return SendResult.Failure("Mock-email отклонил некорректный адрес получателя.");
-
-        return _options.FailedRecipients.Contains(request.RecipientEmail)
-            ? SendResult.Failure(_options.FailureMessage)
-            : SendResult.Success();
+        if (request is null || request.DeliveryId == Guid.Empty || request.CampaignId == Guid.Empty
+            || request.RecipientId == Guid.Empty || string.IsNullOrWhiteSpace(request.MessageText)
+            || string.IsNullOrEmpty(request.RecipientEmail) || request.RecipientEmail.Length > 255
+            || request.RecipientEmail.Contains('\r') || request.RecipientEmail.Contains('\n')
+            || !MailAddress.TryCreate(request.RecipientEmail, out var address) || address.Address != request.RecipientEmail)
+            throw new TestOperatorValidationException();
     }
 }
