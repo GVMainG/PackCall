@@ -1,3 +1,4 @@
+using PackCall.Core.Diagnostics;
 using PackCall.Core.Entities;
 using PackCall.Core.Exceptions;
 using PackCall.Core.Journaling;
@@ -18,19 +19,21 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     private readonly IMessageSender _messageSender;
     private readonly IDeliveryStatusJournal _journal;
     private readonly SendPolicy _policy;
+    private readonly TimeProvider _time;
 
     public DeliveryProcessingService(
         IDeliveryRepository deliveryRepository,
         ICampaingRepository campaignRepository,
         IMessageSender messageSender,
         IDeliveryStatusJournal journal,
-        SendPolicy policy)
+        SendPolicy policy, TimeProvider? timeProvider = null)
     {
         _deliveryRepository = deliveryRepository;
         _campaignRepository = campaignRepository;
         _messageSender = messageSender;
         _journal = journal;
         _policy = policy;
+        _time = timeProvider ?? TimeProvider.System;
     }
 
     /// <summary>
@@ -38,7 +41,15 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     /// "Ожидает" и закрепляет их за воркером на <paramref name="lockDuration"/>.
     /// </summary>
     /// <returns>Только успешно захваченные доставки.</returns>
-    public async Task<IReadOnlyList<Delivery>> CaptureBatchAsync(
+    public Task<IReadOnlyList<Delivery>> CaptureBatchAsync(
+        int batchSize, string workerId, TimeSpan lockDuration, CancellationToken ct)
+    {
+        PerformanceMetrics.Count(Event.CaptureCalls);
+        return MeasuredOperation.Run(Operation.CaptureTotal,
+            () => CaptureCoreAsync(batchSize, workerId, lockDuration, ct), time: _time);
+    }
+
+    private async Task<IReadOnlyList<Delivery>> CaptureCoreAsync(
         int batchSize, string workerId, TimeSpan lockDuration, CancellationToken ct)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(batchSize, 1);
@@ -48,20 +59,24 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
 
         ct.ThrowIfCancellationRequested();
 
-        var captured = await _deliveryRepository.CaptureBatchAsync(batchSize, workerId, lockDuration, ct);
+        var captured = await MeasuredOperation.Run(Operation.CaptureStorage,
+            () => _deliveryRepository.CaptureBatchAsync(batchSize, workerId, lockDuration, ct), time: _time);
+        CaptureTiming.Record(captured, _time);
+        PerformanceMetrics.Count(Event.CaptureRows, value: captured.Count);
+        if (captured.Count == 0) PerformanceMetrics.Count(Event.CaptureEmpty);
 
         ct.ThrowIfCancellationRequested();
 
         foreach (var delivery in captured)
         {
-            await _journal.AppendAsync(new StatusChangeEntry(
+            await AppendMeasuredAsync(new StatusChangeEntry(
                 delivery.CampaignId,
                 delivery.Id,
                 DeliveryStatus.Waiting,
                 DeliveryStatus.InProgress,
                 workerId,
                 delivery.UpdatedAt,
-                OperatorResult: null), ct);
+                OperatorResult: null), ct, Purpose.Capture);
         }
 
         return captured;
@@ -72,6 +87,32 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     /// фиксирует ответ и проверяет завершение кампании.
     /// </summary>
     public async Task ProcessAsync(Delivery delivery, CancellationToken ct)
+    {
+        var attempt = new Attempt();
+        PerformanceMetrics.Count(Event.ServiceStarted);
+        try
+        {
+            await ProcessCoreAsync(delivery, ct, attempt);
+            if (ProcessingObservation.Current is { } observation) observation.Outcome = attempt.Outcome;
+            PerformanceMetrics.Count(Event.ProcessingFinished, attempt.Outcome);
+        }
+        catch (Exception exception)
+        {
+            var outcome = exception is OperationCanceledException ? Outcome.Cancelled : Outcome.Error;
+            if (ProcessingObservation.Current is { } observation) observation.Outcome = outcome;
+            PerformanceMetrics.Count(Event.ProcessingFinished, outcome);
+            if (attempt.Applied) PerformanceMetrics.Count(Event.AfterTerminalApplied, outcome);
+            throw;
+        }
+    }
+
+    private sealed class Attempt
+    {
+        public bool Applied;
+        public Outcome Outcome = Outcome.TerminalPathComplete;
+    }
+
+    private async Task ProcessCoreAsync(Delivery delivery, CancellationToken ct, Attempt attempt)
     {
         ArgumentNullException.ThrowIfNull(delivery);
         if (delivery.DeliveryStatus != DeliveryStatus.InProgress)
@@ -86,6 +127,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
         var campaign = await GetCampaignAsync(delivery.CampaignId, ct);
         if (campaign.Status == CampaignStatus.Paused)
         {
+            attempt.Outcome = Outcome.PausedNoRelease;
             if (workerId is not null && delivery.LockExpiresAt is { } expiresAt)
             {
                 var releasedAt = DateTime.UtcNow;
@@ -93,9 +135,10 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
                     delivery.Id, workerId, expiresAt, releasedAt, ct);
                 if (released is not null)
                 {
-                    await _journal.AppendAsync(new StatusChangeEntry(
+                    attempt.Outcome = Outcome.PausedRelease;
+                    await AppendMeasuredAsync(new StatusChangeEntry(
                         delivery.CampaignId, delivery.Id, DeliveryStatus.InProgress, DeliveryStatus.Waiting,
-                        workerId, releasedAt, OperatorResult: null), ct);
+                        workerId, releasedAt, OperatorResult: null), ct, Purpose.Pause);
                 }
             }
             return;
@@ -111,7 +154,9 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
             campaign.MessageText);
 
         ct.ThrowIfCancellationRequested();
-        var result = await _messageSender.SendAsync(request, _policy.SimulateErrors, ct);
+        var result = await MeasuredOperation.Run(Operation.OperatorCall,
+            () => _messageSender.SendAsync(request, _policy.SimulateErrors, ct),
+            value => value.IsSuccess ? Outcome.Accepted : Outcome.Rejected, Event.OperatorFinished, time: _time);
 
         ct.ThrowIfCancellationRequested();
 
@@ -121,19 +166,27 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
         else
             delivery.StatusFromInProgressToFailed(now);
 
-        if (!await _deliveryRepository.TryCompleteAsync(delivery, workerId, lockExpiresAt, ct))
+        if (!await MeasuredOperation.Run(Operation.ResultPersist,
+            () => _deliveryRepository.TryCompleteAsync(delivery, workerId, lockExpiresAt, ct),
+            value => value ? Outcome.Applied : Outcome.NotApplied, Event.ResultFinished, time: _time))
+        {
+            attempt.Outcome = Outcome.StaleResult;
             return;
+        }
+        attempt.Applied = true;
+        PerformanceMetrics.Count(Event.TerminalApplied,
+            delivery.DeliveryStatus == DeliveryStatus.Sent ? Outcome.Sent : Outcome.Failed);
 
         ct.ThrowIfCancellationRequested();
 
-        await _journal.AppendAsync(new StatusChangeEntry(
+        await AppendMeasuredAsync(new StatusChangeEntry(
             delivery.CampaignId,
             delivery.Id,
             previousStatus,
             delivery.DeliveryStatus,
             workerId,
             now,
-            OperatorResult: result.Error ?? "AcceptedByProvider"), ct);
+            OperatorResult: result.Error ?? "AcceptedByProvider"), ct, Purpose.Terminal);
 
         await CompleteCampaignIfFinishedAsync(delivery.CampaignId, ct);
     }
@@ -142,24 +195,32 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     /// Возвращает доставки с истёкшим сроком закрепления из "Отправляется" в "Ожидает".
     /// </summary>
     /// <returns>Количество возвращённых доставок.</returns>
-    public async Task<int> ReleaseExpiredLocksAsync(CancellationToken ct)
+    public Task<int> ReleaseExpiredLocksAsync(CancellationToken ct)
+    {
+        PerformanceMetrics.Count(Event.RecoveryCalls);
+        return MeasuredOperation.Run(Operation.RecoveryTotal, () => ReleaseExpiredCoreAsync(ct), time: _time);
+    }
+
+    private async Task<int> ReleaseExpiredCoreAsync(CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        var released = await _deliveryRepository.ReleaseExpiredLocksAsync(ct);
+        var released = await MeasuredOperation.Run(Operation.RecoveryStorage,
+            () => _deliveryRepository.ReleaseExpiredLocksAsync(ct), time: _time);
+        PerformanceMetrics.Count(Event.RecoveryRows, value: released.Count);
 
         ct.ThrowIfCancellationRequested();
 
         foreach (var delivery in released)
         {
-            await _journal.AppendAsync(new StatusChangeEntry(
+            await AppendMeasuredAsync(new StatusChangeEntry(
                 delivery.CampaignId,
                 delivery.Id,
                 DeliveryStatus.InProgress,
                 DeliveryStatus.Waiting,
                 delivery.WorkerId,
                 delivery.UpdatedAt,
-                OperatorResult: null), ct);
+                OperatorResult: null), ct, Purpose.Recovery);
         }
 
         return released.Count;
@@ -169,7 +230,13 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     /// Переводит кампанию в "Завершена", если все её доставки получили конечный статус.
     /// </summary>
     /// <returns><see langword="true"/>, если кампания завершена этим вызовом.</returns>
-    public async Task<bool> CompleteCampaignIfFinishedAsync(Guid campaignId, CancellationToken ct)
+    public Task<bool> CompleteCampaignIfFinishedAsync(Guid campaignId, CancellationToken ct)
+    {
+        PerformanceMetrics.Count(Event.CampaignChecks);
+        return MeasuredOperation.Run(Operation.CampaignCheck, () => CompleteCampaignCoreAsync(campaignId, ct), time: _time);
+    }
+
+    private async Task<bool> CompleteCampaignCoreAsync(Guid campaignId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
@@ -186,8 +253,16 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
         ct.ThrowIfCancellationRequested();
 
         campaign.StatusFromInProgressToCompleted(DateTime.UtcNow);
-        return await _campaignRepository.TryUpdateStatusAsync(campaign, CampaignStatus.InProgress, ct);
+        var applied = await MeasuredOperation.Run(Operation.CampaignPersist,
+            () => _campaignRepository.TryUpdateStatusAsync(campaign, CampaignStatus.InProgress, ct),
+            value => value ? Outcome.Applied : Outcome.NotApplied, time: _time);
+        if (applied) PerformanceMetrics.Count(Event.CampaignCompleted);
+        return applied;
     }
+
+    private Task AppendMeasuredAsync(StatusChangeEntry entry, CancellationToken ct, Purpose purpose) =>
+        MeasuredOperation.Run(Operation.JournalAppend, () => _journal.AppendAsync(entry, ct),
+            Event.JournalFinished, purpose, _time);
 
     private async Task<Campaign> GetCampaignAsync(Guid campaignId, CancellationToken ct)
     {

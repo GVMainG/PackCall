@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "session_id": "00000000-0000-4000-8000-000000000001",
+  "profile": "small-http",
+  "commit": "0000000000000000000000000000000000000000",
+  "dirty": false,
+  "source_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "settings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "image_digests": {},
+  "tool_versions": {
+    "python": "3.11.15"
+  },
+  "effective_settings": {
+    "parallelism": 4,
+    "batch_size": 10,
+    "lock_duration_s": 90,
+    "recovery_interval_s": 15,
+    "idle_delay_s": 0.25,
+    "error_delay_s": 5,
+    "http_timeout_s": 5,
+    "simulate_errors": false,
+    "operator_mode": "http",
+    "environment": "test",
+    "interval_s": 10,
+    "process_sample_s": 5,
+    "queue_sample_s": 30
+  },
+  "environment": {
+    "backend": "unknown",
+    "os": "windows",
+    "resources": {}
+  },
+  "campaign_id": "00000000-0000-4000-8000-000000000001",
+  "load": {
+    "deliveries": 3,
+    "message_bytes": 64,
+    "email_bytes": 32,
+    "replenishment": false
+  },
+  "planned_roles": [
+    "worker"
+  ],
+  "participants": [
+    {
+      "instance_id": "00000000-0000-4000-8000-000000000002",
+      "role": "worker",
+      "worker_id": "synthetic-worker",
+      "boot_utc": "2026-10-31T17:00:00Z"
+    }
+  ],
+  "start_utc": "2026-10-31T17:00:00Z",
+  "stop_utc": null,
+  "stop_reason": null,
+  "workload_status": "preparing",
+  "telemetry_status": "collecting"
+}

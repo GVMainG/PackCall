@@ -54,6 +54,7 @@ static void RegisterServices(WebApplicationBuilder builder)
     builder.Services.AddStorage(PackCallHosting.ConnectionString(builder.Configuration));
     builder.Services.AddCampaignManagement();
     builder.Services.AddSchemaGate();
+    builder.Services.AddPerformanceMeasurement(builder.Configuration, "api");
 }
 
 #endregion Методы

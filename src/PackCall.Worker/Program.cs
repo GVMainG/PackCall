@@ -16,6 +16,7 @@ try
     builder.Services.AddStorage(PackCallHosting.ConnectionString(builder.Configuration));
     builder.Services.AddDeliveryProcessing(operatorSettings);
     builder.Services.AddSchemaGate();
+    builder.Services.AddPerformanceMeasurement(builder.Configuration, "worker", workerId);
     builder.Services.Configure<HostOptions>(options => options.ShutdownTimeout = TimeSpan.FromSeconds(30));
     builder.Services.AddOptions<DeliveryWorkerOptions>()
         .Bind(builder.Configuration.GetSection(DeliveryWorkerOptions.SectionName))

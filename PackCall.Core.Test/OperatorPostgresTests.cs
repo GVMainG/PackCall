@@ -8,6 +8,7 @@ using PackCall.Core.Services;
 using PackCall.Infrastructure;
 using PackCall.Infrastructure.Sending;
 using Microsoft.AspNetCore.Http;
+using PackCall.Core.Diagnostics;
 
 namespace PackCall.Core.Test;
 
@@ -27,6 +28,7 @@ public partial class CampaignPausePostgresTests
     [InlineData("timeout",false)] [InlineData("timeout",true)]
     public async Task OperatorErrorsPreserveLeaseWithoutTerminalJournal(string failure, bool simulate)
     {
+        using var measurements = new MeasurementCollector(new() { Enabled = true, SessionId = Guid.NewGuid(), OutputDirectory = "unused" });
         await CreateStartedCampaignAsync();
         await using var server = await OperatorServer.Start(async c => {
             if(failure=="disconnect") { c.Abort(); return; }
@@ -46,6 +48,11 @@ public partial class CampaignPausePostgresTests
         Assert.IsType(expected,error);
         Assert.Equal(before,Snapshot(await ReadDelivery(delivery.Id))); Assert.Equal(journal,await Journal(delivery.Id));
         Assert.False(await service.CompleteCampaignIfFinishedAsync(delivery.CampaignId,default));
+        var window = measurements.Close()!;
+        var category = failure switch { "422" => Outcome.Validation, "500" => Outcome.Service,
+            "timeout" => Outcome.Timeout, "disconnect" or "refused" => Outcome.Transport, _ => Outcome.Protocol };
+        Assert.Equal(1, window.Counters[new((int)Event.OperatorFinished, category, Purpose.None)].Delta);
+        Assert.All(window.Counters.Where(pair => pair.Key.Metric == (int)Event.TerminalApplied), pair => Assert.Equal(0, pair.Value.Delta));
     }
 
     [PostgresTheory]
