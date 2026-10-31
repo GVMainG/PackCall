@@ -383,3 +383,6 @@ FodyWeavers.xsd
 /tests/**/__pycache__/
 /tests/**/control/
 /tests/**/run-*/
+
+# TokenEconomizer — локальный клон плагина экономии токенов для coding-агентов (не в git)
+/TokenEconomizer/
