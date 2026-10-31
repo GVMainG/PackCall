@@ -74,7 +74,9 @@ def run(args, fault=None):
         atomic(compose, compose_profile(sid, output, args.workers))
         def dc(*arguments, timeout=180):
             result = subprocess.run(["docker","compose","-p",project,"-f",str(compose),*arguments], env=environment, capture_output=True, text=True, timeout=timeout)
-            if result.returncode: raise CollectionError("compose_command_failed")
+            if result.returncode:
+                detail = (result.stderr or "") + "\n" + (result.stdout or "")
+                raise CollectionError("compose_command_failed: docker compose " + " ".join(arguments) + "\n" + detail[-3000:])
             return result.stdout
         def sql(text, **variables):
             argv=["docker","exec","-i",state["containers"]["db"],"psql","-U","postgres","-d","performance","-qAt","-v","ON_ERROR_STOP=1"]
