@@ -380,3 +380,5 @@ FodyWeavers.xsd
 
 # TokenEconomizer — локальный клон плагина экономии токенов для coding-агентов (не в git)
 /TokenEconomizer/
+/.agents
+/_bmad*
