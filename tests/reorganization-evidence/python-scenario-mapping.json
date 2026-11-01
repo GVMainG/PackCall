@@ -1,0 +1,1130 @@
+[
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/alternate.py",
+    "new": "tests/acceptance/operators/fixtures/alternate.py",
+    "function": "do_POST",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/alternate.py",
+    "new": "tests/acceptance/operators/fixtures/alternate.py",
+    "function": "log_message",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], vararg=arg(arg='args'), kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/config_matrix.py",
+    "new": "tests/acceptance/operators/config_matrix.py",
+    "function": "run",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args'), arg(arg='env')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/delayed.py",
+    "new": "tests/acceptance/operators/fixtures/delayed.py",
+    "function": "do_POST",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/delayed.py",
+    "new": "tests/acceptance/operators/fixtures/delayed.py",
+    "function": "log_message",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], vararg=arg(arg='args'), kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/late_http.py",
+    "new": "tests/acceptance/operators/late_http.py",
+    "function": "cmd",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args'), arg(arg='check')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=True)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/late_http.py",
+    "new": "tests/acceptance/operators/late_http.py",
+    "function": "sql",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='q')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/late_http.py",
+    "new": "tests/acceptance/operators/late_http.py",
+    "function": "wait",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='fn'), arg(arg='seconds')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=35)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/late_http.py",
+    "new": "tests/acceptance/operators/late_http.py",
+    "function": "snapshot",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/late_http.py",
+    "new": "tests/acceptance/operators/late_http.py",
+    "function": "worker",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='name'), arg(arg='url')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/operator_contract.py",
+    "new": "tests/acceptance/operators/operator_contract.py",
+    "function": "setUp",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/operator_contract.py",
+    "new": "tests/acceptance/operators/operator_contract.py",
+    "function": "test_independent_boundaries",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/operator_contract.py",
+    "new": "tests/acceptance/operators/operator_contract.py",
+    "function": "test_http_validation",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/operator_contract.py",
+    "new": "tests/acceptance/operators/operator_contract.py",
+    "function": "test_safe_exception",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/operator_contract.py",
+    "new": "tests/acceptance/operators/operator_contract.py",
+    "function": "test_email_parity",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/operator_contract.py",
+    "new": "tests/acceptance/operators/operator_contract.py",
+    "function": "test_health_and_repeat",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/preflight.py",
+    "new": "tests/acceptance/operators/preflight.py",
+    "function": "validate",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='services')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/preflight.py",
+    "new": "tests/acceptance/operators/preflight.py",
+    "function": "main",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/prod_compose.py",
+    "new": "tests/acceptance/operators/prod_compose.py",
+    "function": "cmd",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args'), arg(arg='check')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=True)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/prod_compose.py",
+    "new": "tests/acceptance/operators/prod_compose.py",
+    "function": "sql",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='q')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/retention.py",
+    "new": "tests/acceptance/operators/retention.py",
+    "function": "cmd",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], vararg=arg(arg='args'), kwonlyargs=[arg(arg='input'), arg(arg='capture')], kw_defaults=[Constant(value=None), Constant(value=False)], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/run.py",
+    "new": "tests/acceptance/operators/run.py",
+    "function": "cmd",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args'), arg(arg='env'), arg(arg='check'), arg(arg='timeout')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=None), Constant(value=True), Constant(value=180)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/run.py",
+    "new": "tests/acceptance/operators/run.py",
+    "function": "wait",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='fn'), arg(arg='seconds')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=35)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/run.py",
+    "new": "tests/acceptance/operators/run.py",
+    "function": "dc",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], vararg=arg(arg='args'), kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/run.py",
+    "new": "tests/acceptance/operators/run.py",
+    "function": "sql",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='query')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/run.py",
+    "new": "tests/acceptance/operators/run.py",
+    "function": "api",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='path'), arg(arg='body')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=None)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/shutdown.py",
+    "new": "tests/acceptance/operators/shutdown.py",
+    "function": "cmd",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args'), arg(arg='check'), arg(arg='timeout')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=True), Constant(value=100)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/shutdown.py",
+    "new": "tests/acceptance/operators/shutdown.py",
+    "function": "sql",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='q')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/shutdown.py",
+    "new": "tests/acceptance/operators/shutdown.py",
+    "function": "wait",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='fn'), arg(arg='seconds')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=15)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/test_harness_fixes.py",
+    "new": "tests/tools/operators/test_harness_fixes.py",
+    "function": "test_preflight_applicable_configuration",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/test_harness_fixes.py",
+    "new": "tests/tools/operators/test_harness_fixes.py",
+    "function": "test_failed_attempt_replaces_latest_and_persists_error",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/test_harness_fixes.py",
+    "new": "tests/tools/operators/test_harness_fixes.py",
+    "function": "test_retention_rejects_failed_run_and_stderr_payload",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/test_harness_fixes.py",
+    "new": "tests/tools/operators/test_harness_fixes.py",
+    "function": "test_verify_restores_only_saved_db_state_on_gate_failure",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/test_harness_fixes.py",
+    "new": "tests/tools/operators/test_harness_fixes.py",
+    "function": "process",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args')], kwonlyargs=[], kw_defaults=[], kwarg=arg(arg='kwargs'), defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/test_harness_fixes.py",
+    "new": "tests/tools/operators/test_harness_fixes.py",
+    "function": "process",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args')], kwonlyargs=[], kw_defaults=[], kwarg=arg(arg='kwargs'), defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/configuration.py",
+    "new": "tests/acceptance/workers/lifecycle/configuration.py",
+    "function": "run",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args'), arg(arg='environment')], kwonlyargs=[], kw_defaults=[], defaults=[Tuple(elts=[], ctx=Load()), Name(id='env', ctx=Load())])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/lifecycle.py",
+    "new": "tests/acceptance/workers/lifecycle/lifecycle.py",
+    "function": "docker",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], vararg=arg(arg='a'), kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/lifecycle.py",
+    "new": "tests/acceptance/workers/lifecycle/lifecycle.py",
+    "function": "sql",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='q')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/lifecycle.py",
+    "new": "tests/acceptance/workers/lifecycle/lifecycle.py",
+    "function": "wait",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='check'), arg(arg='seconds')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=15)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/lifecycle.py",
+    "new": "tests/acceptance/workers/lifecycle/lifecycle.py",
+    "function": "http",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='path'), arg(arg='body')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=None)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/lifecycle.py",
+    "new": "tests/acceptance/workers/lifecycle/lifecycle.py",
+    "function": "ready",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/lifecycle.py",
+    "new": "tests/acceptance/workers/lifecycle/lifecycle.py",
+    "function": "owner",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/shutdown-probes.py",
+    "new": "tests/acceptance/workers/lifecycle/shutdown-probes.py",
+    "function": "docker",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], vararg=arg(arg='a'), kwonlyargs=[arg(arg='check')], kw_defaults=[Constant(value=True)], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/shutdown-probes.py",
+    "new": "tests/acceptance/workers/lifecycle/shutdown-probes.py",
+    "function": "sql",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='q')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/startup.py",
+    "new": "tests/acceptance/workers/lifecycle/startup.py",
+    "function": "docker",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], vararg=arg(arg='a'), kwonlyargs=[arg(arg='check')], kw_defaults=[Constant(value=True)], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/startup.py",
+    "new": "tests/acceptance/workers/lifecycle/startup.py",
+    "function": "sql",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='q')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/startup.py",
+    "new": "tests/acceptance/workers/lifecycle/startup.py",
+    "function": "wait",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='check'), arg(arg='seconds')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=15)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/startup.py",
+    "new": "tests/acceptance/workers/lifecycle/startup.py",
+    "function": "start",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='name'), arg(arg='app'), arg(arg='database'), arg(arg='extra')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value='packcall'), Tuple(elts=[], ctx=Load())])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/startup.py",
+    "new": "tests/acceptance/workers/lifecycle/startup.py",
+    "function": "exitcode",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='name')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "command",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args'), arg(arg='timeout')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=120)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "compose",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], vararg=arg(arg='args'), kwonlyargs=[], kw_defaults=[], kwarg=arg(arg='kwargs'), defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "sql",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='query')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "save",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='name'), arg(arg='data')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "wait",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='fn'), arg(arg='seconds')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=35)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "data",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "seed",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='count')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "launch",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='identity'), arg(arg='offset')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=0)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "snapshots",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='identity')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "release",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='identity')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "stop_all",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "terminal",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='count')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "http",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "api_ready",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "inspect",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='name')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "action",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='verb')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "stale_result",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='label'), arg(arg='offset')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=0)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "function": "decoded",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='value')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/verify.py",
+    "new": "tests/acceptance/workers/coordination/verify.py",
+    "function": "execute",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args'), arg(arg='timeout')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=1200)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/verify.py",
+    "new": "tests/acceptance/workers/coordination/verify.py",
+    "function": "decoded",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='value')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/analysis_math.py",
+    "new": "scripts/performance/analysis_math.py",
+    "function": "percentile",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='histogram'), arg(arg='quantile')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/analysis_math.py",
+    "new": "scripts/performance/analysis_math.py",
+    "function": "merge_histograms",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='histograms')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/analysis_math.py",
+    "new": "scripts/performance/analysis_math.py",
+    "function": "rate",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='count'), arg(arg='duration'), arg(arg='quality')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value='complete')])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/analysis_math.py",
+    "new": "scripts/performance/analysis_math.py",
+    "function": "compatible_union",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='windows'), arg(arg='expected_instances'), arg(arg='tolerance')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=1)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/analysis_math.py",
+    "new": "scripts/performance/analysis_math.py",
+    "function": "detect",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='windows'), arg(arg='warmup'), arg(arg='threshold')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=60), Constant(value=0.1)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/analyze.py",
+    "new": "scripts/performance/analyze.py",
+    "function": "timestamp",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='value')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/analyze.py",
+    "new": "scripts/performance/analyze.py",
+    "function": "axes",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='max_x'), arg(arg='max_y')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/analyze.py",
+    "new": "scripts/performance/analyze.py",
+    "function": "analyze",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='directory')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/build_contract.py",
+    "new": "scripts/performance/build_contract.py",
+    "function": "obj",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='properties'), arg(arg='optional')], kwonlyargs=[], kw_defaults=[], defaults=[Tuple(elts=[], ctx=Load())])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/build_contract.py",
+    "new": "scripts/performance/build_contract.py",
+    "function": "enum",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], vararg=arg(arg='values'), kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "command",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args')], kwonlyargs=[arg(arg='input'), arg(arg='timeout')], kw_defaults=[Constant(value=None), Constant(value=10)], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "scalar",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='value'), arg(arg='unit'), arg(arg='kind'), arg(arg='reason')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value='events'), Constant(value='gauge'), Constant(value=None)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "utc",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "sql_snapshot",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='container'), arg(arg='database'), arg(arg='script'), arg(arg='campaign'), arg(arg='user'), arg(arg='timeout_ms')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=None), Constant(value='postgres'), Constant(value=500)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "queue_snapshot",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='container'), arg(arg='database'), arg(arg='campaign'), arg(arg='user')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value='postgres')])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "postgres_snapshot",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='container'), arg(arg='database'), arg(arg='user'), arg(arg='tables')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value='postgres'), Constant(value=False)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "parse_bytes",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='text')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "docker_inventory",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='containers')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "container_snapshot",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='containers')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "host_snapshot",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "collector_rss",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "__init__",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self'), arg(arg='session'), arg(arg='source'), arg(arg='period'), arg(arg='collect'), arg(arg='epoch'), arg(arg='clock')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=None), Attribute(value=Name(id='time', ctx=Load()), attr='monotonic', ctx=Load())])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "function": "tick",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/contract.py",
+    "new": "scripts/performance/contract.py",
+    "function": "bounds",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/contract.py",
+    "new": "scripts/performance/contract.py",
+    "function": "validate",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='kind'), arg(arg='document')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/contract.py",
+    "new": "scripts/performance/contract.py",
+    "function": "read",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='kind'), arg(arg='path')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/contract.py",
+    "new": "scripts/performance/contract.py",
+    "function": "finite",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='value')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/crash_smoke.py",
+    "new": "tests/acceptance/measurements/crash_smoke.py",
+    "function": "run",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/crash_smoke.py",
+    "new": "tests/acceptance/measurements/crash_smoke.py",
+    "function": "docker",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], vararg=arg(arg='args'), kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/reader.py",
+    "new": "scripts/performance/reader.py",
+    "function": "read_prefix",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='paths'), arg(arg='kind')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value='interval')])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/reader.py",
+    "new": "scripts/performance/reader.py",
+    "function": "read_session",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='directory')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/resource_smoke.py",
+    "new": "tests/acceptance/measurements/resource_smoke.py",
+    "function": "run",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/resource_smoke.py",
+    "new": "tests/acceptance/measurements/resource_smoke.py",
+    "function": "docker",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], vararg=arg(arg='args'), kwonlyargs=[arg(arg='input')], kw_defaults=[Constant(value=None)], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/run.py",
+    "new": "scripts/performance/run.py",
+    "function": "run",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='args'), arg(arg='fault')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=None)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/run.py",
+    "new": "scripts/performance/run.py",
+    "function": "lifecycle",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='event')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/run.py",
+    "new": "scripts/performance/run.py",
+    "function": "collect",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/run.py",
+    "new": "scripts/performance/run.py",
+    "function": "dc",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], vararg=arg(arg='arguments'), kwonlyargs=[arg(arg='timeout')], kw_defaults=[Constant(value=180)], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/run.py",
+    "new": "scripts/performance/run.py",
+    "function": "sql",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='text')], kwonlyargs=[], kw_defaults=[], kwarg=arg(arg='variables'), defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/run.py",
+    "new": "scripts/performance/run.py",
+    "function": "snapshot",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/run.py",
+    "new": "scripts/performance/run.py",
+    "function": "clock_probe",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='stage')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/run.py",
+    "new": "scripts/performance/run.py",
+    "function": "remember",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/run.py",
+    "new": "scripts/performance/run.py",
+    "function": "api",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='path'), arg(arg='payload')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=None)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/session.py",
+    "new": "scripts/performance/session.py",
+    "function": "atomic",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='path'), arg(arg='document')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/session.py",
+    "new": "scripts/performance/session.py",
+    "function": "digest",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='document')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/session.py",
+    "new": "scripts/performance/session.py",
+    "function": "finalize_artifacts",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='directory')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/session.py",
+    "new": "scripts/performance/session.py",
+    "function": "load_owned",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='directory')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/session.py",
+    "new": "scripts/performance/session.py",
+    "function": "stop_owned",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='directory')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/session.py",
+    "new": "scripts/performance/session.py",
+    "function": "cleanup_owned",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='directory')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/session.py",
+    "new": "scripts/performance/session.py",
+    "function": "compose_profile",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='session_id'), arg(arg='output'), arg(arg='workers'), arg(arg='enabled')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=1), Constant(value=True)])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_analysis_math.py",
+    "new": "tests/tools/performance/test_analysis_math.py",
+    "function": "test_weighted_union_not_average_of_percentiles",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_analysis_math.py",
+    "new": "tests/tools/performance/test_analysis_math.py",
+    "function": "test_missing_partial_and_reset",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_analysis_math.py",
+    "new": "tests/tools/performance/test_analysis_math.py",
+    "function": "test_detection",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_analysis_math.py",
+    "new": "tests/tools/performance/test_analysis_math.py",
+    "function": "test_operator_delay_is_association_not_cause",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_analyze.py",
+    "new": "tests/tools/performance/test_analyze.py",
+    "function": "test_repeatable_without_network_and_source_is_immutable",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_collectors.py",
+    "new": "tests/tools/performance/test_collectors.py",
+    "function": "test_units",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_collectors.py",
+    "new": "tests/tools/performance/test_collectors.py",
+    "function": "test_slow_sample_records_cost_and_never_catches_up",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_collectors.py",
+    "new": "tests/tools/performance/test_collectors.py",
+    "function": "test_missing_is_not_zero",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_collectors.py",
+    "new": "tests/tools/performance/test_collectors.py",
+    "function": "test_reset_token_change_is_explicit_without_resetting_database",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_collectors.py",
+    "new": "tests/tools/performance/test_collectors.py",
+    "function": "sample",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_contract.py",
+    "new": "tests/tools/performance/test_contract.py",
+    "function": "test_examples",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_contract.py",
+    "new": "tests/tools/performance/test_contract.py",
+    "function": "test_every_required_field_and_schema_version",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_contract.py",
+    "new": "tests/tools/performance/test_contract.py",
+    "function": "test_units_and_safe_errors",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_contract.py",
+    "new": "tests/tools/performance/test_contract.py",
+    "function": "test_histogram_relationships",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_contract.py",
+    "new": "tests/tools/performance/test_contract.py",
+    "function": "test_unknown_fields_missing_and_monotonic_bounds",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_postgres_repeat.py",
+    "new": "tests/acceptance/measurements/postgres_repeat.py",
+    "function": "run",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_postgres_repeat.py",
+    "new": "tests/acceptance/measurements/postgres_repeat.py",
+    "function": "docker",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[], vararg=arg(arg='args'), kwonlyargs=[arg(arg='input')], kw_defaults=[Constant(value=None)], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_reader.py",
+    "new": "tests/tools/performance/test_reader.py",
+    "function": "setUp",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_reader.py",
+    "new": "tests/tools/performance/test_reader.py",
+    "function": "write",
+    "is_test": false,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self'), arg(arg='records'), arg(arg='tail')], kwonlyargs=[], kw_defaults=[], defaults=[Constant(value=b'')])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_reader.py",
+    "new": "tests/tools/performance/test_reader.py",
+    "function": "test_truncated_tail_preserves_prefix_bytes",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_reader.py",
+    "new": "tests/tools/performance/test_reader.py",
+    "function": "test_middle_corruption_rejected",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_reader.py",
+    "new": "tests/tools/performance/test_reader.py",
+    "function": "test_duplicate_conflict_gap_and_reset",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_reader.py",
+    "new": "tests/tools/performance/test_reader.py",
+    "function": "test_checksum_is_for_closed_file_only",
+    "is_test": true,
+    "parameters": "arguments(posonlyargs=[], args=[arg(arg='self')], kwonlyargs=[], kw_defaults=[], defaults=[])",
+    "body_preserved_with_path_updates": true
+  }
+]

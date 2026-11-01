@@ -1,0 +1,6 @@
+Тестовый запуск для C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll (.NETCoreApp,Version=v10.0)
+Общее количество тестовых файлов (1), соответствующих указанному шаблону.
+Внимание! Перезапись файла с результатами: C:\Users\GV\source\repos\PackCall\tests\reorganization-evidence\filters\unit.trx
+Файл результатов: C:\Users\GV\source\repos\PackCall\tests\reorganization-evidence\filters\unit.trx
+
+Пройден!   : не пройдено     0, пройдено   109, пропущено     0, всего   109, длительность 398 ms. - PackCall.Test.dll (net10.0)

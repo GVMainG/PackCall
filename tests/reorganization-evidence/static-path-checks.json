@@ -1,0 +1,29 @@
+{
+  "python_compile": true,
+  "all_moved_python_ast_equal": true,
+  "literal_fixture_and_runner_paths_exist": true,
+  "docker_copy_sources_exist": true,
+  "nonpython_assets_compared": 23,
+  "compose_builds": [
+    {
+      "compose": "tests/acceptance/workers/coordination/compose.yml",
+      "service": "migrator",
+      "context": "."
+    },
+    {
+      "compose": "tests/acceptance/workers/coordination/compose.yml",
+      "service": "api",
+      "context": "."
+    },
+    {
+      "compose": "tests/acceptance/workers/coordination/compose.yml",
+      "service": "probe",
+      "context": "."
+    },
+    {
+      "compose": "tests/acceptance/workers/coordination/compose.yml",
+      "service": "operator",
+      "context": "src/PackCall.TestEmailOperator"
+    }
+  ]
+}

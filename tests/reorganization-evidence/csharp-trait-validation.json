@@ -1,0 +1,116 @@
+[
+  {
+    "source": "PackCall.Test/Integration/Campaigns/CampaignPausePostgresTests.cs",
+    "category": "Integration",
+    "module": "Campaigns",
+    "test_methods": 5
+  },
+  {
+    "source": "PackCall.Test/Integration/Deliveries/DeliveryResultLeasePostgresTests.cs",
+    "category": "Integration",
+    "module": "Deliveries",
+    "test_methods": 5
+  },
+  {
+    "source": "PackCall.Test/Integration/Measurements/MeasurementWriterTests.cs",
+    "category": "Integration",
+    "module": "Measurements",
+    "test_methods": 5
+  },
+  {
+    "source": "PackCall.Test/Integration/Measurements/PerformancePostgresTests.cs",
+    "category": "Integration",
+    "module": "Measurements",
+    "test_methods": 2
+  },
+  {
+    "source": "PackCall.Test/Integration/Operators/OperatorHttpTests.cs",
+    "category": "Integration",
+    "module": "Operators",
+    "test_methods": 5
+  },
+  {
+    "source": "PackCall.Test/Integration/Operators/OperatorPostgresTests.cs",
+    "category": "Integration",
+    "module": "Operators",
+    "test_methods": 3
+  },
+  {
+    "source": "PackCall.Test/Integration/Operators/OperatorRegistrationTests.cs",
+    "category": "Integration",
+    "module": "Operators",
+    "test_methods": 1
+  },
+  {
+    "source": "PackCall.Test/Integration/Workers/WorkerPostgresTests.cs",
+    "category": "Integration",
+    "module": "Workers",
+    "test_methods": 2
+  },
+  {
+    "source": "PackCall.Test/Unit/Api/ApiControllerTests.cs",
+    "category": "Unit",
+    "module": "Api",
+    "test_methods": 3
+  },
+  {
+    "source": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "category": "Unit",
+    "module": "Campaigns",
+    "test_methods": 10
+  },
+  {
+    "source": "PackCall.Test/Unit/Campaigns/CampaignTests.cs",
+    "category": "Unit",
+    "module": "Campaigns",
+    "test_methods": 4
+  },
+  {
+    "source": "PackCall.Test/Unit/Campaigns/CampaignWorkflowTests.cs",
+    "category": "Unit",
+    "module": "Campaigns",
+    "test_methods": 2
+  },
+  {
+    "source": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "category": "Unit",
+    "module": "Deliveries",
+    "test_methods": 7
+  },
+  {
+    "source": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "category": "Unit",
+    "module": "Deliveries",
+    "test_methods": 8
+  },
+  {
+    "source": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "category": "Unit",
+    "module": "Measurements",
+    "test_methods": 6
+  },
+  {
+    "source": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "category": "Unit",
+    "module": "Operators",
+    "test_methods": 11
+  },
+  {
+    "source": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "category": "Unit",
+    "module": "Workers",
+    "test_methods": 3
+  },
+  {
+    "source": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "category": "Unit",
+    "module": "Workers",
+    "test_methods": 2
+  },
+  {
+    "source": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "category": "Unit",
+    "module": "Workers",
+    "test_methods": 3
+  }
+]

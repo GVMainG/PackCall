@@ -1,0 +1,9 @@
+test_failed_attempt_replaces_latest_and_persists_error (test_harness_fixes.HarnessFixes.test_failed_attempt_replaces_latest_and_persists_error) ... ok
+test_preflight_applicable_configuration (test_harness_fixes.HarnessFixes.test_preflight_applicable_configuration) ... ok
+test_retention_rejects_failed_run_and_stderr_payload (test_harness_fixes.HarnessFixes.test_retention_rejects_failed_run_and_stderr_payload) ... ok
+test_verify_restores_only_saved_db_state_on_gate_failure (test_harness_fixes.HarnessFixes.test_verify_restores_only_saved_db_state_on_gate_failure) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.158s
+
+OK

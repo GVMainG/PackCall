@@ -1,0 +1,11 @@
+Тестовый запуск для C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll (.NETCoreApp,Version=v10.0)
+Общее количество тестовых файлов (1), соответствующих указанному шаблону.
+[xUnit.net 00:00:02.64]     PackCall.Core.Test.OperatorPostgresTests.ConfirmedOperatorResultsAreTerminal [SKIP]
+[xUnit.net 00:00:02.64]     PackCall.Core.Test.OperatorPostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner [SKIP]
+[xUnit.net 00:00:02.64]     PackCall.Core.Test.OperatorPostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal [SKIP]
+  Пропущен PackCall.Core.Test.OperatorPostgresTests.ConfirmedOperatorResultsAreTerminal [1 ms]
+  Пропущен PackCall.Core.Test.OperatorPostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner [1 ms]
+  Пропущен PackCall.Core.Test.OperatorPostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal [1 ms]
+Файл результатов: C:\Users\GV\source\repos\PackCall\tests\reorganization-evidence\filters\operators-integration.trx
+
+Пройден!   : не пройдено     0, пройдено    17, пропущено     3, всего    20, длительность 2 s. - PackCall.Test.dll (net10.0)

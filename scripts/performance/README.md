@@ -81,7 +81,7 @@ lifecycle и metric definitions. `examples/` содержит только си�
 
 ```powershell
 python -m pip install -r scripts/performance/requirements.txt
-python -m unittest discover -s scripts/performance -p 'test_*.py' -v
+python -m unittest discover -s tests/tools/performance -p 'test_*.py' -v
 ```
 
 Единицы: длительности операций — ms, интервалы — s, CPU — s/cores,
@@ -142,7 +142,7 @@ SIGKILL может потерять текущее открытое окно, т
 Reader не изменяет исходные файлы и не восстанавливает хвост нулями.
 
 ```powershell
-python scripts/performance/crash_smoke.py
+python tests/acceptance/measurements/crash_smoke.py
 ```
 
 Этот малый smoke собирает Release probe, запускает отдельный контейнер .NET,
@@ -159,7 +159,7 @@ table stats: 60 s. SQL выполняется в read-only transaction, queue ti
 сохраняет missing с причиной. Смена stats_reset/server_start отмечается reset.
 
 ```powershell
-python scripts/performance/resource_smoke.py
+python tests/acceptance/measurements/resource_smoke.py
 ```
 
 Проверено на Docker Desktop WSL2: VM 16 CPU и 22 435 520 512 bytes RAM на момент

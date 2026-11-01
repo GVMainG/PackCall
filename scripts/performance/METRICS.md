@@ -60,7 +60,7 @@ LeaseCheck включает получение времени БД и расчё
 RecoveryRows не означает новую попытку. Прежний владелец recovery не выводится.
 Отсутствие capture entries занижает observed_repeat_captures; результат всегда
 lower_bound с journal_non_atomic=true, без individual DeliveryId/email/payload.
-Малая проверка: `python scripts/performance/test_postgres_repeat.py`.
+Малая проверка: `python tests/acceptance/measurements/postgres_repeat.py`.
 
 ## Ресурсные samples
 

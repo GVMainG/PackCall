@@ -1,0 +1,192 @@
+[
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/compose.acceptance.yml",
+    "new": "tests/acceptance/operators/compose.acceptance.yml",
+    "original_sha256": "cdf1ecda79a465b0e449d3fae7da309c24727da07cb837099b118343bdf4e8be",
+    "final_sha256": "cdf1ecda79a465b0e449d3fae7da309c24727da07cb837099b118343bdf4e8be",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/email-fixtures.json",
+    "new": "tests/acceptance/operators/email-fixtures.json",
+    "original_sha256": "c9d12a08da5ec41941418ddfb8abeb2c7040877b31b84dcbdb25b7442897eae7",
+    "final_sha256": "c9d12a08da5ec41941418ddfb8abeb2c7040877b31b84dcbdb25b7442897eae7",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/compose.acceptance.yml",
+    "new": "tests/acceptance/workers/lifecycle/compose.acceptance.yml",
+    "original_sha256": "094656b965aab84ccf147a0d4294e221d4010a20af5b570997a9473e4e753dfe",
+    "final_sha256": "094656b965aab84ccf147a0d4294e221d4010a20af5b570997a9473e4e753dfe",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/compose.failure.yml",
+    "new": "tests/acceptance/workers/lifecycle/compose.failure.yml",
+    "original_sha256": "98a8a3d84b5f1f8738e94daf3ae9457ba8a4797c36095e9734c06f62e3adff96",
+    "final_sha256": "98a8a3d84b5f1f8738e94daf3ae9457ba8a4797c36095e9734c06f62e3adff96",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/clock.c",
+    "new": "tests/acceptance/workers/coordination/fixtures/clock.c",
+    "original_sha256": "514bedd9c790766b7fac50ee1e45b5a8ec48d019d74a29ab5de99652d5a989ed",
+    "final_sha256": "514bedd9c790766b7fac50ee1e45b5a8ec48d019d74a29ab5de99652d5a989ed",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/compose.yml",
+    "new": "tests/acceptance/workers/coordination/compose.yml",
+    "original_sha256": "99219f30655c86aa32ca791ecd002e4a331194818ef9a281bc4b0663878b6e8a",
+    "final_sha256": "929fcc8038a637b31cc048e8001dff469039b49156708db61e9b5fdea80b642d",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": [
+      "coordination source/Dockerfile relocation",
+      "one additional parent level in coordination Compose build contexts"
+    ]
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/Dockerfile",
+    "new": "tests/acceptance/workers/coordination/Dockerfile",
+    "original_sha256": "8ad4c2eee8fd6b713de4521633a8217ace2c0a6e74c0defed139eb447e5585a9",
+    "final_sha256": "3a1671da89e6ef8f0e6b6fb79db4807578bb2643efc38f74d8b8b215613f13e2",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": [
+      "coordination source/Dockerfile relocation",
+      "one additional parent level in coordination Compose build contexts"
+    ]
+  },
+  {
+    "old": "scripts/performance/examples/interval.json",
+    "new": "scripts/performance/examples/interval.json",
+    "original_sha256": "05682c7bd4e08b3224d5fa0b0aae516dbac9acd60d634f755f0cfa5639594f8f",
+    "final_sha256": "05682c7bd4e08b3224d5fa0b0aae516dbac9acd60d634f755f0cfa5639594f8f",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/examples/lifecycle.json",
+    "new": "scripts/performance/examples/lifecycle.json",
+    "original_sha256": "dc6e0c68234de798df896dd86d9112b37751878b29639f7201f7680e008ff9b3",
+    "final_sha256": "dc6e0c68234de798df896dd86d9112b37751878b29639f7201f7680e008ff9b3",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/examples/manifest.json",
+    "new": "scripts/performance/examples/manifest.json",
+    "original_sha256": "8cd9ae5ffc4fef5dfd40e4049442d71cd0dddc908ff3b476ba265f33007d3fc0",
+    "final_sha256": "8cd9ae5ffc4fef5dfd40e4049442d71cd0dddc908ff3b476ba265f33007d3fc0",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/examples/metric-definitions.json",
+    "new": "scripts/performance/examples/metric-definitions.json",
+    "original_sha256": "80e22c5336d1ec05fd219fa8ec2ab9ef93e880d2704b67245764fbb87675ced1",
+    "final_sha256": "80e22c5336d1ec05fd219fa8ec2ab9ef93e880d2704b67245764fbb87675ced1",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/examples/sample.json",
+    "new": "scripts/performance/examples/sample.json",
+    "original_sha256": "4a5968ffa2e7079fd65789d8eb957df42df6d4fff3756315bd15304b04e05340",
+    "final_sha256": "4a5968ffa2e7079fd65789d8eb957df42df6d4fff3756315bd15304b04e05340",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/probe/bin/Release/net10.0/PerformanceProbe.deps.json",
+    "new": "scripts/performance/probe/bin/Release/net10.0/PerformanceProbe.deps.json",
+    "original_sha256": "3097e8eb128a0e933e829d77500cbebf636100f735f0daee5ac35f7de35893cc",
+    "final_sha256": "3097e8eb128a0e933e829d77500cbebf636100f735f0daee5ac35f7de35893cc",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/probe/bin/Release/net10.0/PerformanceProbe.runtimeconfig.json",
+    "new": "scripts/performance/probe/bin/Release/net10.0/PerformanceProbe.runtimeconfig.json",
+    "original_sha256": "abc33be2cc60bd28ebde8c25ad5c6f0872ccad01512702c8c157f9e130624f13",
+    "final_sha256": "abc33be2cc60bd28ebde8c25ad5c6f0872ccad01512702c8c157f9e130624f13",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/probe/obj/PerformanceProbe.csproj.nuget.dgspec.json",
+    "new": "scripts/performance/probe/obj/PerformanceProbe.csproj.nuget.dgspec.json",
+    "original_sha256": "41d84c2ce0389bcca0522ba9ca6d063b974bedbb2e8290fb04e6ab8b90751403",
+    "final_sha256": "41d84c2ce0389bcca0522ba9ca6d063b974bedbb2e8290fb04e6ab8b90751403",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/probe/obj/project.assets.json",
+    "new": "scripts/performance/probe/obj/project.assets.json",
+    "original_sha256": "3eb4cdc4de4b4ec4babf7643d52bb26a640e44878ca31df9d030cc682e384d0e",
+    "final_sha256": "3eb4cdc4de4b4ec4babf7643d52bb26a640e44878ca31df9d030cc682e384d0e",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/probe/obj/Release/net10.0/PerformanceProbe.sourcelink.json",
+    "new": "scripts/performance/probe/obj/Release/net10.0/PerformanceProbe.sourcelink.json",
+    "original_sha256": "04c66d031efcc7f5af0a0b15e726593ccd07ade8786be052c03e3effdeb8e293",
+    "final_sha256": "04c66d031efcc7f5af0a0b15e726593ccd07ade8786be052c03e3effdeb8e293",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/schemas/interval.v1.json",
+    "new": "scripts/performance/schemas/interval.v1.json",
+    "original_sha256": "e043daa3587f5612091c54b9e52f0881e7172a427b5ec1e236ee85fb979f4cd7",
+    "final_sha256": "e043daa3587f5612091c54b9e52f0881e7172a427b5ec1e236ee85fb979f4cd7",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/schemas/lifecycle.v1.json",
+    "new": "scripts/performance/schemas/lifecycle.v1.json",
+    "original_sha256": "6b04b8b8fe22e833e4c2f93894011610e6b5186610aeb097ffa2bb798cb05440",
+    "final_sha256": "6b04b8b8fe22e833e4c2f93894011610e6b5186610aeb097ffa2bb798cb05440",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/schemas/manifest.v1.json",
+    "new": "scripts/performance/schemas/manifest.v1.json",
+    "original_sha256": "b8fc362242199258a51dfd4ba70ca787ee80582f666ce59fd8b34a0162957c1c",
+    "final_sha256": "b8fc362242199258a51dfd4ba70ca787ee80582f666ce59fd8b34a0162957c1c",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/schemas/metric-definitions.v1.json",
+    "new": "scripts/performance/schemas/metric-definitions.v1.json",
+    "original_sha256": "2d27dd872cde47b27a8ccce4fa2e5735388abb4be9ca4508c01a62afb3d26121",
+    "final_sha256": "2d27dd872cde47b27a8ccce4fa2e5735388abb4be9ca4508c01a62afb3d26121",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "scripts/performance/schemas/sample.v1.json",
+    "new": "scripts/performance/schemas/sample.v1.json",
+    "original_sha256": "948157990b9ffae94d78b02b1340ecd032328040eca4e889e178fbfd0ec02d89",
+    "final_sha256": "948157990b9ffae94d78b02b1340ecd032328040eca4e889e178fbfd0ec02d89",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/requirements.txt",
+    "new": "tests/acceptance/operators/requirements.txt",
+    "original_sha256": "6e46a8ad058656822fc26124a6bb8585c66bd4cd1eb1e8c780b35a6f47615cf5",
+    "final_sha256": "e8616e1f9ca22de197c8ccc545584c9a8fe9260c06f71f257874aeaf58329fb2",
+    "content_equal_after_explicit_relocations": true,
+    "allowed_changes": []
+  }
+]
