@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  utf8-sources:
+    name: Strict UTF-8 sources
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test the UTF-8 gate itself
+        run: python3 -m unittest discover -s tests/tools/ci -p "test_*.py" -v
+      - name: Check tracked C# sources are strict UTF-8
+        run: python3 scripts/ci/check_utf8_sources.py

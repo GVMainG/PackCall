@@ -10,6 +10,7 @@
 | C# с изолированной БД | `tests/PackCall.Test` | `python scripts/performance/postgres_tests.py` | Docker Engine и временный PostgreSQL. Полноту прогона проверьте по числу пропусков в TRX |
 | Offline Python | `tests/tools/performance` | `python -m unittest discover -s tests/tools/performance -p "test_*.py" -v` | 18 тестов инструментов анализа, чтения и сбора |
 | Offline Python | `tests/tools/operators` | `python -m unittest discover -s tests/tools/operators -p "test_*.py" -v` | 4 теста orchestration с mock-процессами |
+| Offline Python | `tests/tools/ci` | `python -m unittest discover -s tests/tools/ci -p "test_*.py" -v` | 6 проверок гейта strict UTF-8: валидный файл, cp1251, U+FFFD, CR-строки, отсутствующий файл, запуск вне git |
 | Contract Python | `tests/acceptance/operators/operator_contract.py` | `python tests/acceptance/operators/operator_contract.py` | 5 тестов ASGI, без Docker |
 | Acceptance | `tests/acceptance/workers/lifecycle` | См. [README](acceptance/workers/lifecycle/README.md) | Docker Engine, Compose, SDK; последовательность подготовки БД обязательна |
 | Acceptance | `tests/acceptance/workers/coordination` | См. [README](acceptance/workers/coordination/README.md) | Docker Engine, Compose, SDK; независимые worker-процессы, recovery и lease fence |

@@ -100,7 +100,7 @@ public sealed class DeliveryWorker : BackgroundService
             if (delivery.WorkerId != _workerId || delivery.LockExpiresAt is not { } expiresAt)
             {
                 outcome = Outcome.InvalidCapture;
-                _logger.Warning("Захваченная доставка {DeliveryId} не закреплена за воркером {WorkerId}", delivery.Id, _workerId);
+                _logger.Warning("Р—Р°С…РІР°С‡РµРЅРЅР°СЏ РґРѕСЃС‚Р°РІРєР° {DeliveryId} РЅРµ Р·Р°РєСЂРµРїР»РµРЅР° Р·Р° РІРѕСЂРєРµСЂРѕРј {WorkerId}", delivery.Id, _workerId);
                 return;
             }
 
@@ -116,7 +116,7 @@ public sealed class DeliveryWorker : BackgroundService
             if (remaining <= TimeSpan.Zero)
             {
                 outcome = Outcome.LeaseSkipped;
-                _logger.Warning("Закрепление доставки {DeliveryId} истекает до начала обработки", delivery.Id);
+                _logger.Warning("Р—Р°РєСЂРµРїР»РµРЅРёРµ РґРѕСЃС‚Р°РІРєРё {DeliveryId} РёСЃС‚РµРєР°РµС‚ РґРѕ РЅР°С‡Р°Р»Р° РѕР±СЂР°Р±РѕС‚РєРё", delivery.Id);
                 return;
             }
 
@@ -132,7 +132,7 @@ public sealed class DeliveryWorker : BackgroundService
             {
                 outcome = Outcome.Cancelled;
                 PerformanceMetrics.Count(Event.Cancellation, Outcome.Lease);
-                _logger.Warning("Время закрепления доставки {DeliveryId} истекает; доставка будет возвращена для повтора", delivery.Id);
+                _logger.Warning("Р’СЂРµРјСЏ Р·Р°РєСЂРµРїР»РµРЅРёСЏ РґРѕСЃС‚Р°РІРєРё {DeliveryId} РёСЃС‚РµРєР°РµС‚; РґРѕСЃС‚Р°РІРєР° Р±СѓРґРµС‚ РІРѕР·РІСЂР°С‰РµРЅР° РґР»СЏ РїРѕРІС‚РѕСЂР°", delivery.Id);
             }
         }
         catch (OperationCanceledException)
