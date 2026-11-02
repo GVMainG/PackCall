@@ -365,6 +365,9 @@ FodyWeavers.xsd
 # Project-local Codex configuration and skills
 .codex/
 
+# Project-local DSH configuration and skills
+/.dsh/
+
 
 # Acceptance outputs remain local
 /tests/**/__pycache__/
@@ -374,6 +377,7 @@ FodyWeavers.xsd
 # TokenEconomizer — локальный клон плагина экономии токенов для coding-агентов (не в git)
 /TokenEconomizer/
 /.agents
-/_bmad*
+/_bmad
+/_bmad-output/
 
 !/tests/reorganization-evidence/**/*.log
