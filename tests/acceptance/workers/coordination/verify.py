@@ -30,7 +30,7 @@ try:
     port_result.check_returncode()
     port=port_result.stdout.strip().split(':')[-1]
     os.environ['PACKCALL_TEST_POSTGRES']=f'Host=127.0.0.1;Port={port};Database=acceptance;Username=acceptance;Password=acceptance'
-    commands=[['dotnet','test','PackCall.Test/PackCall.Test.csproj','--logger','trx;LogFileName=regression.trx','--results-directory',str(run/'test-results')]]
+    commands=[['dotnet','test','tests/PackCall.Test/PackCall.Test.csproj','--logger','trx;LogFileName=regression.trx','--results-directory',str(run/'test-results')]]
     for role in ['Api','Worker','Migrator']:
         path=f'src/PackCall.{role}/PackCall.{role}.csproj'
         commands += [['dotnet','build',path,'-c','Release'], ['dotnet','publish',path,'-c','Release','-o',str(run/'publish'/role),'/p:UseAppHost=false']]

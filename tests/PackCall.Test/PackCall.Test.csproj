@@ -15,14 +15,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\PackCall.Core\PackCall.Core.csproj" />
-    <ProjectReference Include="..\src\PackCall.Api\PackCall.Api.csproj" />
+    <ProjectReference Include="..\..\src\PackCall.Core\PackCall.Core.csproj" />
+    <ProjectReference Include="..\..\src\PackCall.Api\PackCall.Api.csproj" />
   </ItemGroup>
 
-  <ItemGroup><ProjectReference Include="../src/PackCall.Worker/PackCall.Worker.csproj" /></ItemGroup>
+  <ItemGroup><ProjectReference Include="../../src/PackCall.Worker/PackCall.Worker.csproj" /></ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
-<ItemGroup><Content Include="../tests/acceptance/operators/email-fixtures.json" Link="email-fixtures.json" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
+<ItemGroup><Content Include="../acceptance/operators/email-fixtures.json" Link="email-fixtures.json" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
 </Project>

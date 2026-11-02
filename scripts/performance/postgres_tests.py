@@ -18,7 +18,7 @@ if __name__=="__main__":
             except CollectionError:time.sleep(.5)
         port=command(["docker","port",name,"5432"]).strip().rsplit(":",1)[1]
         environment=dict(os.environ,PACKCALL_TEST_POSTGRES=f"Host=127.0.0.1;Port={port};Database=postgres;Username=postgres")
-        result=subprocess.run(["dotnet","test",str(REPO/"PackCall.Test/PackCall.Test.csproj"),"--verbosity","quiet","--logger","trx","--results-directory",str(output)],env=environment,capture_output=True,text=True,timeout=600)
+        result=subprocess.run(["dotnet","test",str(REPO/"tests/PackCall.Test/PackCall.Test.csproj"),"--verbosity","quiet","--logger","trx","--results-directory",str(output)],env=environment,capture_output=True,text=True,timeout=600)
         atomic(output/"test-result.json",{"exit_code":result.returncode,"isolated":True})
         print(result.stdout[-2500:])
         if result.returncode: raise RuntimeError("postgres_test_failure")
