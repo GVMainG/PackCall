@@ -368,6 +368,9 @@ FodyWeavers.xsd
 # Project-local DSH configuration and skills
 /.dsh/
 
+# BMAD planning artifacts are local only; their index history was cleaned in 4238d74
+/_bmad-output/
+
 
 # Acceptance outputs remain local
 /tests/**/__pycache__/
@@ -378,6 +381,18 @@ FodyWeavers.xsd
 /TokenEconomizer/
 /.agents
 /_bmad
-/_bmad-output/
 
 !/tests/reorganization-evidence/**/*.log
+
+# --- Documentation and evidence are versioned proof (Story 1.1) ---
+# docs/** must stay committable: generic rules above (artifacts/, *.log) must not swallow
+# evidence. Planning artifacts stay local; artifacts/ and _bmad-output/ above stay ignored.
+!/docs/**
+
+# Secret-bearing file types must not become committable through the docs/ re-include (NFR-4).
+# Keep this block after !/docs/**: the last matching pattern wins.
+/docs/**/*.pfx
+/docs/**/*.pem
+/docs/**/*.key
+/docs/**/*.p12
+/docs/**/*.snk
