@@ -1,0 +1,23 @@
+{
+  "parser": "Microsoft.CodeAnalysis.CSharp from installed .NET SDK",
+  "source_files": 20,
+  "original_members": 268,
+  "final_members": 268,
+  "test_methods": 87,
+  "expression_bodied_test_methods": 3,
+  "inline_cases": 135,
+  "all_leaf_members_equal": true,
+  "class_container_changes_allowlisted": true,
+  "original_comments_equal": true,
+  "original_usings_retained": true,
+  "permitted_changes": [
+    "four new class identities replacing misleading partial CampaignPausePostgresTests",
+    "Category and Module traits",
+    "Measurement collection on all five derived PostgreSQL scenario classes",
+    "common PostgresTestBase inherits IAsyncLifetime",
+    "private -\u003E private protected only for extracted PostgresTestBase members",
+    "HTTP fixture extracted retaining source",
+    "file paths",
+    "one operator registration scenario extracted into Integration, sharing Config/SequenceRandom through preparation-only OperatorTestBase"
+  ]
+}

@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="5c708ca6-87f8-44e5-b072-3e6685d4f4c5" name="GV@USERHOM-FATLF67 2026-11-02 20:52:04" runUser="USERHOM-FATLF67\GV" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-11-02T20:52:04.5276780+03:00" queuing="2026-11-02T20:52:04.5276781+03:00" start="2026-11-02T20:52:03.8265071+03:00" finish="2026-11-02T20:52:04.5315479+03:00" />
+  <TestSettings name="default" id="a7b74199-8d61-466d-a221-5579aa471b7a">
+    <Deployment runDeploymentRoot="GV_USERHOM-FATLF67_2026-11-02_20_52_04" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="52cfa752-2e3f-44cb-997c-8459c02faaa3" testId="3b7a9588-478c-5efc-218f-3a371ed4d8b3" testName="PackCall.Core.Test.ApiControllerTests.CreateRecipient_ReturnsCreatedResourceAndIncludesItInNewCampaign" computerName="USERHOM-FATLF67" duration="00:00:00.0149619" startTime="2026-11-02T20:52:04.4442266+03:00" endTime="2026-11-02T20:52:04.4518210+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="52cfa752-2e3f-44cb-997c-8459c02faaa3" />
+    <UnitTestResult executionId="a35111df-bf3f-4216-9f5a-885ee90156ba" testId="7565d1f3-04b6-1c60-05bb-7676874e7a99" testName="PackCall.Core.Test.ApiControllerTests.CampaignEndpoints_CreateReadAndPatchPreserveOtherField" computerName="USERHOM-FATLF67" duration="00:00:00.0036779" startTime="2026-11-02T20:52:04.4523895+03:00" endTime="2026-11-02T20:52:04.4555062+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a35111df-bf3f-4216-9f5a-885ee90156ba" />
+    <UnitTestResult executionId="bbe810b3-6c58-4f4f-a4fd-0a96e3308ab5" testId="51e618b8-df0c-8677-8b74-868a37372b70" testName="PackCall.Core.Test.ApiControllerTests.ReadEndpoints_ReportMissingResourcesAndPageTotals" computerName="USERHOM-FATLF67" duration="00:00:00.0153944" startTime="2026-11-02T20:52:04.4158433+03:00" endTime="2026-11-02T20:52:04.4364985+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bbe810b3-6c58-4f4f-a4fd-0a96e3308ab5" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="PackCall.Core.Test.ApiControllerTests.CampaignEndpoints_CreateReadAndPatchPreserveOtherField" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="7565d1f3-04b6-1c60-05bb-7676874e7a99">
+      <Execution id="a35111df-bf3f-4216-9f5a-885ee90156ba" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.ApiControllerTests" name="CampaignEndpoints_CreateReadAndPatchPreserveOtherField" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.ApiControllerTests.ReadEndpoints_ReportMissingResourcesAndPageTotals" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="51e618b8-df0c-8677-8b74-868a37372b70">
+      <Execution id="bbe810b3-6c58-4f4f-a4fd-0a96e3308ab5" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.ApiControllerTests" name="ReadEndpoints_ReportMissingResourcesAndPageTotals" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.ApiControllerTests.CreateRecipient_ReturnsCreatedResourceAndIncludesItInNewCampaign" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="3b7a9588-478c-5efc-218f-3a371ed4d8b3">
+      <Execution id="52cfa752-2e3f-44cb-997c-8459c02faaa3" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.ApiControllerTests" name="CreateRecipient_ReturnsCreatedResourceAndIncludesItInNewCampaign" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="3b7a9588-478c-5efc-218f-3a371ed4d8b3" executionId="52cfa752-2e3f-44cb-997c-8459c02faaa3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7565d1f3-04b6-1c60-05bb-7676874e7a99" executionId="a35111df-bf3f-4216-9f5a-885ee90156ba" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="51e618b8-df0c-8677-8b74-868a37372b70" executionId="bbe810b3-6c58-4f4f-a4fd-0a96e3308ab5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Список результатов" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Все загруженные результаты" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="3" executed="3" passed="3" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.13)&#xD;
+[xUnit.net 00:00:00.08]   Discovering: PackCall.Test&#xD;
+[xUnit.net 00:00:00.15]   Discovered:  PackCall.Test&#xD;
+[xUnit.net 00:00:00.17]   Starting:    PackCall.Test&#xD;
+[xUnit.net 00:00:00.23]   Finished:    PackCall.Test&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

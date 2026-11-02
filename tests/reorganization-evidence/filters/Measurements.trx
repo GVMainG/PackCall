@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="ec6af9a0-b0d0-42f9-bd87-7d07cd3d0863" name="GV@USERHOM-FATLF67 2026-11-02 20:52:13" runUser="USERHOM-FATLF67\GV" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-11-02T20:52:13.4898293+03:00" queuing="2026-11-02T20:52:13.4898297+03:00" start="2026-11-02T20:52:12.8455082+03:00" finish="2026-11-02T20:52:13.5703704+03:00" />
+  <TestSettings name="default" id="8a1fa562-8a69-414c-b5ee-43badb328e0b">
+    <Deployment runDeploymentRoot="GV_USERHOM-FATLF67_2026-11-02_20_52_13" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="36485f58-daf6-41c7-8079-00e6a9969760" testId="e523e44e-8803-394c-d1c1-fed45f8cb222" testName="PackCall.Core.Test.MeasurementCollectorTests.ConcurrentClosingLosesNoEventsOrHistogramSamples" computerName="USERHOM-FATLF67" duration="00:00:00.0590335" startTime="2026-11-02T20:52:13.3725380+03:00" endTime="2026-11-02T20:52:13.4329865+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="36485f58-daf6-41c7-8079-00e6a9969760" />
+    <UnitTestResult executionId="675a447c-3980-4c15-8ce8-8fe0e0dd24c9" testId="76965fb2-a3f0-8370-66dc-465ee7d1381c" testName="PackCall.Core.Test.MeasurementWriterTests.ClosedWindowCanBeReadBeforeFinalization" computerName="USERHOM-FATLF67" duration="00:00:00.0157181" startTime="2026-11-02T20:52:13.4668108+03:00" endTime="2026-11-02T20:52:13.4810239+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="675a447c-3980-4c15-8ce8-8fe0e0dd24c9" />
+    <UnitTestResult executionId="e0e62f4b-2f1c-45f3-9d4c-7fce2cb83465" testId="bb0e837a-793f-fe3a-ac83-f6f5e8eeb88d" testName="PackCall.Core.Test.MeasurementWriterTests.BoundedRetainedTelemetryStateFitsSixteenMiB" computerName="USERHOM-FATLF67" duration="00:00:00.0078609" startTime="2026-11-02T20:52:13.4469831+03:00" endTime="2026-11-02T20:52:13.4476057+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0e62f4b-2f1c-45f3-9d4c-7fce2cb83465" />
+    <UnitTestResult executionId="62955286-5f63-42c8-a107-21386d2c0d51" testId="9222afbf-9579-f3d2-6850-6c089a15ac69" testName="PackCall.Core.Test.MeasurementCollectorTests.ListenerRecordsAndRejectsUnboundedCategories" computerName="USERHOM-FATLF67" duration="00:00:00.0276541" startTime="2026-11-02T20:52:13.3160745+03:00" endTime="2026-11-02T20:52:13.3485840+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="62955286-5f63-42c8-a107-21386d2c0d51" />
+    <UnitTestResult executionId="2ad5ed2d-ca02-44a2-928c-92100edbd867" testId="9afe4851-7017-f2a0-b53e-e155f2cee22d" testName="PackCall.Core.Test.MeasurementWriterTests.DiskErrorAndSessionLimitAreContained" computerName="USERHOM-FATLF67" duration="00:00:00.0059180" startTime="2026-11-02T20:52:13.5315761+03:00" endTime="2026-11-02T20:52:13.5376548+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2ad5ed2d-ca02-44a2-928c-92100edbd867" />
+    <UnitTestResult executionId="616ddc9c-9633-4fda-b556-3e4b7ff0a314" testId="a1750936-56d0-b7f9-6b8e-c548712e0f62" testName="PackCall.Core.Test.MeasurementWriterTests.GracefulStopFlushesPartialAndMapsInstanceWithoutSecrets" computerName="USERHOM-FATLF67" duration="00:00:00.0501321" startTime="2026-11-02T20:52:13.4811447+03:00" endTime="2026-11-02T20:52:13.5314552+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="616ddc9c-9633-4fda-b556-3e4b7ff0a314" />
+    <UnitTestResult executionId="ee118fc5-af40-4b18-a67d-4d029b55c912" testId="be793ffb-f790-f87f-6a2a-4e414e7994a2" testName="PackCall.Core.Test.PerformancePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T20:52:13.4397424+03:00" endTime="2026-11-02T20:52:13.4433975+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ee118fc5-af40-4b18-a67d-4d029b55c912">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f611ab3b-c825-4b12-b940-cbbadbca0813" testId="8d07467b-7d83-079b-c9a0-968f07ecc250" testName="PackCall.Core.Test.MeasurementCollectorTests.ThrowingCallbackCannotChangeBusinessResult" computerName="USERHOM-FATLF67" duration="00:00:00.0003571" startTime="2026-11-02T20:52:13.4356889+03:00" endTime="2026-11-02T20:52:13.4360007+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f611ab3b-c825-4b12-b940-cbbadbca0813" />
+    <UnitTestResult executionId="23388cfd-ce5a-4089-aa25-2b288290ae3b" testId="3ae459c0-5d01-420a-6557-90108f404a88" testName="PackCall.Core.Test.MeasurementWriterTests.QueueIsBoundedAndRotationPreservesEarlyFiles" computerName="USERHOM-FATLF67" duration="00:00:00.0173497" startTime="2026-11-02T20:52:13.4665666+03:00" endTime="2026-11-02T20:52:13.4666262+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="23388cfd-ce5a-4089-aa25-2b288290ae3b" />
+    <UnitTestResult executionId="879725f1-6f64-490d-a05f-c54dff22b01d" testId="19f7d2fc-691c-50e2-fe7d-d79f5461ea66" testName="PackCall.Core.Test.PerformancePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T20:52:13.4449592+03:00" endTime="2026-11-02T20:52:13.4449826+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="879725f1-6f64-490d-a05f-c54dff22b01d">
+      <Output>
+        <ErrorInfo>
+          <Message>Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="382ef9a6-c489-4972-a756-bb616393e3af" testId="3c40db58-7713-486a-95bb-c71c875fd34a" testName="PackCall.Core.Test.MeasurementCollectorTests.EffectiveSettingsSerializationIsAnAllowlist" computerName="USERHOM-FATLF67" duration="00:00:00.0230772" startTime="2026-11-02T20:52:13.3582705+03:00" endTime="2026-11-02T20:52:13.3719572+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="382ef9a6-c489-4972-a756-bb616393e3af" />
+    <UnitTestResult executionId="15a293d5-7dbe-499c-aacf-2469cb5ec8a2" testId="3c65b840-8ce9-bf3a-b24d-12af8232e961" testName="PackCall.Core.Test.MeasurementCollectorTests.MonotonicPartialAndEmptyWindowsPreserveTotalsDespiteWallClockJump" computerName="USERHOM-FATLF67" duration="00:00:00.0020965" startTime="2026-11-02T20:52:13.4360579+03:00" endTime="2026-11-02T20:52:13.4381419+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="15a293d5-7dbe-499c-aacf-2469cb5ec8a2" />
+    <UnitTestResult executionId="599bad80-beff-496e-ba34-e4323b8877bf" testId="8f243caa-1162-abc1-66dd-285c0cfca27d" testName="PackCall.Core.Test.MeasurementCollectorTests.DisabledHasNoListenerFilesOrWindowsAndIdentityIsPerStart" computerName="USERHOM-FATLF67" duration="00:00:00.0016935" startTime="2026-11-02T20:52:13.4339466+03:00" endTime="2026-11-02T20:52:13.4356174+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="599bad80-beff-496e-ba34-e4323b8877bf" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="PackCall.Core.Test.MeasurementWriterTests.ClosedWindowCanBeReadBeforeFinalization" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="76965fb2-a3f0-8370-66dc-465ee7d1381c">
+      <Execution id="675a447c-3980-4c15-8ce8-8fe0e0dd24c9" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementWriterTests" name="ClosedWindowCanBeReadBeforeFinalization" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementWriterTests.GracefulStopFlushesPartialAndMapsInstanceWithoutSecrets" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="a1750936-56d0-b7f9-6b8e-c548712e0f62">
+      <Execution id="616ddc9c-9633-4fda-b556-3e4b7ff0a314" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementWriterTests" name="GracefulStopFlushesPartialAndMapsInstanceWithoutSecrets" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementCollectorTests.ThrowingCallbackCannotChangeBusinessResult" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="8d07467b-7d83-079b-c9a0-968f07ecc250">
+      <Execution id="f611ab3b-c825-4b12-b940-cbbadbca0813" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementCollectorTests" name="ThrowingCallbackCannotChangeBusinessResult" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementCollectorTests.ConcurrentClosingLosesNoEventsOrHistogramSamples" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="e523e44e-8803-394c-d1c1-fed45f8cb222">
+      <Execution id="36485f58-daf6-41c7-8079-00e6a9969760" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementCollectorTests" name="ConcurrentClosingLosesNoEventsOrHistogramSamples" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.PerformancePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="be793ffb-f790-f87f-6a2a-4e414e7994a2">
+      <Execution id="ee118fc5-af40-4b18-a67d-4d029b55c912" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.PerformancePostgresTests" name="MeasurementRecoveryCommitSurvivesJournalFailure" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementWriterTests.DiskErrorAndSessionLimitAreContained" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="9afe4851-7017-f2a0-b53e-e155f2cee22d">
+      <Execution id="2ad5ed2d-ca02-44a2-928c-92100edbd867" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementWriterTests" name="DiskErrorAndSessionLimitAreContained" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.PerformancePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="19f7d2fc-691c-50e2-fe7d-d79f5461ea66">
+      <Execution id="879725f1-6f64-490d-a05f-c54dff22b01d" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.PerformancePostgresTests" name="MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementCollectorTests.MonotonicPartialAndEmptyWindowsPreserveTotalsDespiteWallClockJump" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="3c65b840-8ce9-bf3a-b24d-12af8232e961">
+      <Execution id="15a293d5-7dbe-499c-aacf-2469cb5ec8a2" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementCollectorTests" name="MonotonicPartialAndEmptyWindowsPreserveTotalsDespiteWallClockJump" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementCollectorTests.DisabledHasNoListenerFilesOrWindowsAndIdentityIsPerStart" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="8f243caa-1162-abc1-66dd-285c0cfca27d">
+      <Execution id="599bad80-beff-496e-ba34-e4323b8877bf" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementCollectorTests" name="DisabledHasNoListenerFilesOrWindowsAndIdentityIsPerStart" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementCollectorTests.ListenerRecordsAndRejectsUnboundedCategories" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="9222afbf-9579-f3d2-6850-6c089a15ac69">
+      <Execution id="62955286-5f63-42c8-a107-21386d2c0d51" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementCollectorTests" name="ListenerRecordsAndRejectsUnboundedCategories" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementWriterTests.QueueIsBoundedAndRotationPreservesEarlyFiles" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="3ae459c0-5d01-420a-6557-90108f404a88">
+      <Execution id="23388cfd-ce5a-4089-aa25-2b288290ae3b" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementWriterTests" name="QueueIsBoundedAndRotationPreservesEarlyFiles" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementCollectorTests.EffectiveSettingsSerializationIsAnAllowlist" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="3c40db58-7713-486a-95bb-c71c875fd34a">
+      <Execution id="382ef9a6-c489-4972-a756-bb616393e3af" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementCollectorTests" name="EffectiveSettingsSerializationIsAnAllowlist" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementWriterTests.BoundedRetainedTelemetryStateFitsSixteenMiB" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="bb0e837a-793f-fe3a-ac83-f6f5e8eeb88d">
+      <Execution id="e0e62f4b-2f1c-45f3-9d4c-7fce2cb83465" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementWriterTests" name="BoundedRetainedTelemetryStateFitsSixteenMiB" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="e523e44e-8803-394c-d1c1-fed45f8cb222" executionId="36485f58-daf6-41c7-8079-00e6a9969760" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="76965fb2-a3f0-8370-66dc-465ee7d1381c" executionId="675a447c-3980-4c15-8ce8-8fe0e0dd24c9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bb0e837a-793f-fe3a-ac83-f6f5e8eeb88d" executionId="e0e62f4b-2f1c-45f3-9d4c-7fce2cb83465" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9222afbf-9579-f3d2-6850-6c089a15ac69" executionId="62955286-5f63-42c8-a107-21386d2c0d51" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9afe4851-7017-f2a0-b53e-e155f2cee22d" executionId="2ad5ed2d-ca02-44a2-928c-92100edbd867" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a1750936-56d0-b7f9-6b8e-c548712e0f62" executionId="616ddc9c-9633-4fda-b556-3e4b7ff0a314" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="be793ffb-f790-f87f-6a2a-4e414e7994a2" executionId="ee118fc5-af40-4b18-a67d-4d029b55c912" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8d07467b-7d83-079b-c9a0-968f07ecc250" executionId="f611ab3b-c825-4b12-b940-cbbadbca0813" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3ae459c0-5d01-420a-6557-90108f404a88" executionId="23388cfd-ce5a-4089-aa25-2b288290ae3b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19f7d2fc-691c-50e2-fe7d-d79f5461ea66" executionId="879725f1-6f64-490d-a05f-c54dff22b01d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3c40db58-7713-486a-95bb-c71c875fd34a" executionId="382ef9a6-c489-4972-a756-bb616393e3af" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3c65b840-8ce9-bf3a-b24d-12af8232e961" executionId="15a293d5-7dbe-499c-aacf-2469cb5ec8a2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8f243caa-1162-abc1-66dd-285c0cfca27d" executionId="599bad80-beff-496e-ba34-e4323b8877bf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Список результатов" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Все загруженные результаты" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="13" executed="11" passed="11" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.13)&#xD;
+[xUnit.net 00:00:00.07]   Discovering: PackCall.Test&#xD;
+[xUnit.net 00:00:00.14]   Discovered:  PackCall.Test&#xD;
+[xUnit.net 00:00:00.16]   Starting:    PackCall.Test&#xD;
+[xUnit.net 00:00:00.30]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:00.31]       Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.&#xD;
+Тест "PackCall.Core.Test.PerformancePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.PerformancePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit" пропущен в тестовом запуске.&#xD;
+[xUnit.net 00:00:00.40]   Finished:    PackCall.Test&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T20:52:13.4442772+03:00">
+        <Text>[xUnit.net 00:00:00.30]     PackCall.Core.Test.PerformancePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T20:52:13.4450703+03:00">
+        <Text>[xUnit.net 00:00:00.31]     PackCall.Core.Test.PerformancePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit [SKIP]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

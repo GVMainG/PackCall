@@ -1,0 +1,9 @@
+Тестовый запуск для C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll (.NETCoreApp,Version=v10.0)
+Общее количество тестовых файлов (1), соответствующих указанному шаблону.
+[xUnit.net 00:00:00.30]     PackCall.Core.Test.PerformancePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure [SKIP]
+[xUnit.net 00:00:00.31]     PackCall.Core.Test.PerformancePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit [SKIP]
+  Пропущен PackCall.Core.Test.PerformancePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure [1 ms]
+  Пропущен PackCall.Core.Test.PerformancePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit [1 ms]
+Файл результатов: C:\Users\GV\source\repos\PackCall\tests\reorganization-evidence\filters\Measurements.trx
+
+Пройден!   : не пройдено     0, пройдено    11, пропущено     2, всего    13, длительность 221 ms. - PackCall.Test.dll (net10.0)

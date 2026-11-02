@@ -1,0 +1,2414 @@
+[
+  {
+    "old": "PackCall.Core.Test/ApiControllerTests.cs",
+    "new": "PackCall.Test/Unit/Api/ApiControllerTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_deliveries",
+    "normalized_source_sha256": "e5ad63a3665de6290082f444bcbc9c4eef888f4be609be7cee063f93543118bc",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/ApiControllerTests.cs",
+    "new": "PackCall.Test/Unit/Api/ApiControllerTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_recipients",
+    "normalized_source_sha256": "9177741b6b26c1d8487b2dd8cafa99440a47ab4aa108847dd8b06cfb802a1077",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/ApiControllerTests.cs",
+    "new": "PackCall.Test/Unit/Api/ApiControllerTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_service",
+    "normalized_source_sha256": "a2230902be54e334c107316d0143330ef44b68aca7f90d4b92e8df4ca67fa76b",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/ApiControllerTests.cs",
+    "new": "PackCall.Test/Unit/Api/ApiControllerTests.cs",
+    "kind": "ConstructorDeclaration",
+    "name": "ApiControllerTests",
+    "normalized_source_sha256": "26f7e2ffbf560ad76ed097bbd235ff4b652ce096babbfd893ed8fe029faf4699",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/ApiControllerTests.cs",
+    "new": "PackCall.Test/Unit/Api/ApiControllerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateRecipient_ReturnsCreatedResourceAndIncludesItInNewCampaign",
+    "normalized_source_sha256": "374efae3b9d280d95350b0a7413758acae49dfaf8fb3cc989a230ee5b094573e",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/ApiControllerTests.cs",
+    "new": "PackCall.Test/Unit/Api/ApiControllerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CampaignEndpoints_CreateReadAndPatchPreserveOtherField",
+    "normalized_source_sha256": "87787219851d413d03ddb8355d9230ec60719329ac6ffe41ab1fde1dc060d3a0",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/ApiControllerTests.cs",
+    "new": "PackCall.Test/Unit/Api/ApiControllerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ReadEndpoints_ReportMissingResourcesAndPageTotals",
+    "normalized_source_sha256": "2f7cf9206109c9113a5816c057750f6512b280ca952043e155389c1743bfc36a",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "FieldDeclaration",
+    "name": "_schema",
+    "normalized_source_sha256": "f65c5873cfada3197d29610dbf71e326ad5eb3ab29be5bd116213a7411feb285",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "FieldDeclaration",
+    "name": "_sender",
+    "normalized_source_sha256": "e5eb68384fbd21985f5ae0e334fa5b9283ae059a00300d23c9acfe82d1d86f32",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "FieldDeclaration",
+    "name": "_provider",
+    "normalized_source_sha256": "6681a2efdbebdb47c078eba0d6efd776383c63b3b461e7f1fd6b3b7af4c5847d",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "FieldDeclaration",
+    "name": "_connectionString",
+    "normalized_source_sha256": "1b43cae24cece4397b098ed044f31800f6245b634e7ce3823cc7c5d647c673dc",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "FieldDeclaration",
+    "name": "_schemaCreated",
+    "normalized_source_sha256": "b73562838a21544bc0d458ded4a2929e49aa8e51bfd74e7ab2fa959fa89bde00",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "InitializeAsync",
+    "normalized_source_sha256": "15609cbc0495fa77a10630aa573c981f6775ef327c6353cf3cfce1b9f55715e0",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "DisposeAsync",
+    "normalized_source_sha256": "b9ef2303608385522a8de74b85b7d91dbe6bf36705622da36deac53642b6bb14",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "AddServices",
+    "normalized_source_sha256": "b84d820ba3afdddfc28660b5162730e27679ca008badafdd3dd2487113cf0d70",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateStartedCampaignAsync",
+    "normalized_source_sha256": "063aa70018969f4b9614a68db1cf1646f86cc8b038d5a88637986dd0114375e1",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Campaigns/CampaignPausePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates",
+    "normalized_source_sha256": "3a8ede757bb908e709481a47ccc83556ef9b3960a6a59c81969f41e2e912ba50",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Campaigns/CampaignPausePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain",
+    "normalized_source_sha256": "7682097811442aa4f90f178ea503793d243a3b5753a74106a77b39eadd457adb",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Campaigns/CampaignPausePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion",
+    "normalized_source_sha256": "72839a453d9b3bdfe7a2bb89f713da947f9aab761ce1addeb0ef59686be96155",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Campaigns/CampaignPausePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker",
+    "normalized_source_sha256": "6db968cc66f9767d2e392598c3a25fd9b276a93889757269f9b5ff570e4f9807",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Campaigns/CampaignPausePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations",
+    "normalized_source_sha256": "6d7baa222824d91c1d0085fcc5ed2369acf99db55c6ed027c7239f54cb2a23cd",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignPausePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Campaigns/CampaignPausePostgresTests.cs",
+    "kind": "ConstructorDeclaration",
+    "name": "PostgresFactAttribute",
+    "normalized_source_sha256": "7aa5bb48680618400ae73819c4f91f3da2ebc11950fff0be0209d747f337f2b7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_campaignRepository",
+    "normalized_source_sha256": "72dc91363c243de5c51d5de09fa6a91fafbacd29df663c91eb27480fa3070df7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_deliveryRepository",
+    "normalized_source_sha256": "5bb8b62841f9a463e77c5a13b789daaf73cbdc61ae9a869193317454a211f74f",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_recipientRepository",
+    "normalized_source_sha256": "8aa1c63e764fed2091e6899bd7ae5e17149a5e70621f44d16a7997ff53d323a6",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_service",
+    "normalized_source_sha256": "a2230902be54e334c107316d0143330ef44b68aca7f90d4b92e8df4ca67fa76b",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "ConstructorDeclaration",
+    "name": "CampaignServiceTests",
+    "normalized_source_sha256": "34206302a4b548166de9eca3c0664051e8a757a69063242205553c8d6c4aee4b",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateCampaignAsync",
+    "normalized_source_sha256": "2898d2e875250e8544652da7d034cdde4b3d53c16ca2031e1527c350577cb3b4",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateRecipient_RejectsInvalidEmail",
+    "normalized_source_sha256": "8aaccee4ede7a0b61b7050fd1cc8a8cd48aab1bd92b05455c900a1c15412ee1b",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateRecipient_RejectsDuplicateIgnoringCase",
+    "normalized_source_sha256": "4de1146089deed0d732764527acdfdb61ac9c8881d749b5bb9432dcd4f3a3c1a",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateCampaign_PersistsDraftAndOneWaitingDeliveryPerRecipient",
+    "normalized_source_sha256": "be4b7b030f245e9d8b5965705a288bcc90524f233cb430111542774f26593b73",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateCampaign_WithInvalidRecipient_PersistsNothing",
+    "normalized_source_sha256": "23667e9b2e1c409bea11a9c98d8507f577cbb10fb340375fca2514b7571c2c32",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateCampaign_FormsDeliveriesInBatchesAndBlocksChangesUntilReady",
+    "normalized_source_sha256": "e9b2730f270fee0a5dd8dc3db8b7ef954963e50098c41d37359f6a39f72e46d7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateCampaign_WhenLaterBatchFails_RemovesPartialCampaign",
+    "normalized_source_sha256": "09875c9c4b817876bab569274db20128073548c8ff4001222c9db379e8e76e9c",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateCampaign_WhenCancelledAfterFirstBatch_RemovesPartialCampaign",
+    "normalized_source_sha256": "4475d249e62b6c30f19897d255acf8686551a393e73f4ab332c25d70dac31146",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "StartCampaign_WhenAlreadyStarted_DoesNotChangeDatesOrDeliveries",
+    "normalized_source_sha256": "4f42b428caf8f2fb911172e3c4992409fd39b9d7f9044f2d0e42e53b944c9f69",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "StartCampaign_WhenCompleted_RejectsRestart",
+    "normalized_source_sha256": "91845b2e465366b867c94fc4de1534b7e5427dfa96188c4cb3dfa6af05883152",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignServiceTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "DeleteCampaign_InProgress_Throws",
+    "normalized_source_sha256": "e0b0c3cb09f82e01b4cae346c86210f938c637fc6c82971efb80b159e12a6207",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "PauseAndResume_PreserveFirstStartAndMakeRepeatedRequestsHarmless",
+    "normalized_source_sha256": "8d1d82d695ab47e6f57caca35e48e39a157228349f7ec4610c9723accfeeaba8",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "PauseAndResume_RejectDraftAndCompletedCampaigns",
+    "normalized_source_sha256": "86aec41e6768cd984e910a905590e40f97838835331e9a4cf66aa829f29ab361",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "UpdateDetails_WhenCampaignIsInProgress_Throws",
+    "normalized_source_sha256": "8bbe84897b4a362b67e01fc773307115c1dc198523c68cb98bad45992343f1d7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Complete_FromDraft_ThrowsWithoutChangingStatus",
+    "normalized_source_sha256": "bbbdf01d7878eda20f974864b31e3c4bf1eb20049a8216b57ba90ca476d6fe8b",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignWorkflowTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignWorkflowTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "PauseDuringLastSend_AllowsAcknowledgementAndResumeCompletesCampaign",
+    "normalized_source_sha256": "9d3dd9587e9ee81ac3babe5abf317a0426f824b16ea7af391b075719bca125a8",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/CampaignWorkflowTests.cs",
+    "new": "PackCall.Test/Unit/Campaigns/CampaignWorkflowTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateStartAndProcess_CompletesOnlyAfterEveryDeliveryIsTerminal",
+    "normalized_source_sha256": "9ca8d71937bbfcaa8e9eaeb3060dc2ae8d98b7bc09d1149a163f9826850aa4c9",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CountsConfirmationsAndFullPathSeparately",
+    "normalized_source_sha256": "86cca1cda2f2c3be1d961d732f8134f7eaeee854c62e1fbdc4d609a28c47cd20",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CancellationAfterTrueRetainsTerminalAndSkipsJournal",
+    "normalized_source_sha256": "6056e16e602125bdf162b06b6f3ae0b18a6e8a3de1a6a131b3b44dcd1a3e4949",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "OperatorExceptionsHaveBoundedCategoriesAndNoTerminal",
+    "normalized_source_sha256": "ccb604e221a5c39ff91334a64240e81190dcf63563aff555aa394718726b7626",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "UnknownPersistenceOutcomeDoesNotInventCommit",
+    "normalized_source_sha256": "9bf7d1e4ce37cc66e3612c42ed9742c08fe05c31d47c8aed526ee6b44f91bbfd",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "JournalDelayBelongsOnlyToJournalAndParentNotOperatorOrPersist",
+    "normalized_source_sha256": "f6f9c413b13288ee464fb499fbee44ff5153199911463f98fa9d5dd727b1cfdf",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "PauseReturnIsNotTerminal",
+    "normalized_source_sha256": "923a0f77cbaa05bc62eb4cd73e39e0656216c62538248bd57e8581f731a85d7f",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Sum",
+    "normalized_source_sha256": "3b8fcf770a10f74aeeec853e6e95e7e1e8c669bfb41f58802d62393800b4de99",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "StorageRowsRemainObservedWhenCaptureOrRecoveryJournalFails",
+    "normalized_source_sha256": "8f92fc973f43b234e0b908b618bfeb10de5c532bf40152457436d3be52a9583b",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Count",
+    "normalized_source_sha256": "1d26ab1fa64f0453993c3b0b607194b42dbecb1134714ee8f26e26aa69159784",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Collector",
+    "normalized_source_sha256": "4009675170d0194eb3b493411cab533ebc73544092e603efe2e572c34f3f2cfb",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Create",
+    "normalized_source_sha256": "f081375e2364b43611ecdfec8fb513308641925a7d5aa33e89db42b8431f5de4",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "Fail",
+    "normalized_source_sha256": "71f7648bf173d19f83efebcb8849f5550675df68325c9213fddf78ded7edcae7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "OnAppend",
+    "normalized_source_sha256": "fbd5ca892ee6d24a8e401e05ef22bed5b096298b5d73f053bc0597881698c9d1",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "Entries",
+    "normalized_source_sha256": "111b9f7b9f7621033269c8b1b800c92921ebd99c6d3839079b3362f8411e269e",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "AppendAsync",
+    "normalized_source_sha256": "fd3f8c7a47ea6fb111f461eb7d611fcfbca8a57a10260f0946b36592a75e577b",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_ticks",
+    "normalized_source_sha256": "f0ff6a7ffc03831c396251fa2c13e411060be6c3cbc4ab1b2477ff09f164a49e",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "TimestampFrequency",
+    "normalized_source_sha256": "44be83e05562950e3f7bb5fa45890fd835b4be712cbf83050d66688ccd822980",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetTimestamp",
+    "normalized_source_sha256": "8e25843a4704c55d7eb50f1693158ce736867df347e3d39521086c21e8a92577",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Advance",
+    "normalized_source_sha256": "43ac3ba5e1607128d97f981e7c2c69465deafb0140fb755fd4255e4165cdedb9",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_campaignRepository",
+    "normalized_source_sha256": "09a22fbf63bc00d92c08689210e4fa8995f7cc27958e09d96b95ad698a6d8bc0",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_deliveryRepository",
+    "normalized_source_sha256": "5bb8b62841f9a463e77c5a13b789daaf73cbdc61ae9a869193317454a211f74f",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_sender",
+    "normalized_source_sha256": "e5eb68384fbd21985f5ae0e334fa5b9283ae059a00300d23c9acfe82d1d86f32",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_journal",
+    "normalized_source_sha256": "21b95f98cd796222a62684a8fad5fa30253c199b45b30d654a26a1c6c5126b9d",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_service",
+    "normalized_source_sha256": "30c6f571e38528a05d3e5c73cc119bcfcd386ad0a1b038cb76db6fcd3cb67edc",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "ConstructorDeclaration",
+    "name": "DeliveryProcessingServiceTests",
+    "normalized_source_sha256": "a563a5c493cc229e90355000592b2b2c64361a7f6bcb0cccdac67f1a3870e745",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "PolicyExplicitlyReachesEverySenderCall",
+    "normalized_source_sha256": "e315c3bf79de0d7ea7e9a91d74b43778ff1e5a26c468408e95fe8a23a3147370",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateStartedCampaign",
+    "normalized_source_sha256": "785b4242a535ad2ca5687d304059cf980f29c77b20bd8844132ef27b707a8f13",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "AddWaitingDelivery",
+    "normalized_source_sha256": "e8c73c5f848795c574394ecb4bb4d78e059aecfd8664947971e400be363488c7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Process_WhenDeliveryIsNotInProgress_DoesNotSend",
+    "normalized_source_sha256": "dce7880ab7152f59d5c039f4f55f0792e8cc6986727847bc18b5e106374297c2",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Process_WhenCampaignIsDraft_DoesNotSend",
+    "normalized_source_sha256": "cad56b4538d728a83451b3772d5eb6159ac0f42cebef87e4c45075e54cd61431",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Process_WaitsForProviderAcknowledgementBeforeMarkingSent",
+    "normalized_source_sha256": "b0981131628d9ae002b31572061799b67824c3e5fc60eeab6fa68c8a13febc4b",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Process_WhenOperatorThrows_PreservesLockForRecovery",
+    "normalized_source_sha256": "34eeec4743e434e807e0b5d6ab36d63b0f882ba7a4842b4922a95a20d502d01e",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ReleaseExpiredLocks_ReturnsOnlyExpiredToWaiting",
+    "normalized_source_sha256": "8b28020da100f048bd9a1efc1947add0fe63b431b8051509f5dc34e3683d36bd",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Process_UnappliedStorage_DoesNotJournalOrCheckCompletion",
+    "normalized_source_sha256": "71061ed30251ebe58a803406f76953d9097f1cfbf06754dd29e5847cb31a7ecf",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryProcessingServiceTests.cs",
+    "new": "PackCall.Test/Unit/Deliveries/DeliveryProcessingServiceTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Process_OperatorCancellation_DoesNotBecomeFailure",
+    "normalized_source_sha256": "cc02c0b5ea1517cb13169b8d2643ba215478c8e582091864b723e3105ac9a0a5",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "FieldDeclaration",
+    "name": "Timeout",
+    "normalized_source_sha256": "c6cca7a6c89d0ea47a9af162008349baa640cea6072e12c613dc92a1575a7f30",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "Result",
+    "normalized_source_sha256": "9ba5220da6b3d59630ae2c5144e280535d07ccfea72d4c2541dc3500af7b8726",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "ReadDelivery",
+    "normalized_source_sha256": "6fde0ed0337529d63ed803d55a9db558f0de5b47bf60db95c0e2da4d74d8527f",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "Snapshot",
+    "normalized_source_sha256": "af0d8a315b5710b555115c9c64ba70d00d99aebee0985a9f66f9efab49d581be",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "Journal",
+    "normalized_source_sha256": "25f7aea84e17882348a5e2b558a7084a02eebf5d14ce130f0fc840d7437158c5",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "AssertTerminal",
+    "normalized_source_sha256": "a261c2bc759e922e3496916147152ba4e9ed2b80ed4c7e50f4c50e1598996420",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Deliveries/DeliveryResultLeasePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Result_ActiveLease_CompletesWithJournal",
+    "normalized_source_sha256": "bef2553f544ffe8f711bf8b913250dcb5cfadb1b45129da08456ab987e649707",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Deliveries/DeliveryResultLeasePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Result_StaleLease_DoesNotChangeRowOrJournal",
+    "normalized_source_sha256": "c50ec78ceedbf6ea926cc069b74cfc40058bbfafdc11f0fa9e74aef23052dc13",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Deliveries/DeliveryResultLeasePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Result_StorageErrorOrCancellation_DetachesBeforeSqlFailure",
+    "normalized_source_sha256": "35e727696dbb686c6b601f8a4119b10ce412b4e81eac3eaabd5d229a376a2e95",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Deliveries/DeliveryResultLeasePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Result_CompletesBeforeExpiry_RecoveryWaitingOnCommitCannotRequeueTerminal",
+    "normalized_source_sha256": "d8df19cea18823db159dcae0670ab7cdcbe7860e585b4ff356707642690305d5",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "DatabaseNow",
+    "normalized_source_sha256": "f2cabc35f479ef4e80e29c952bcf1790bc97616648fda7a41ee9272a8a9b0338",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Support/PostgresTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "WaitBlocked",
+    "normalized_source_sha256": "467d98212a1b2b51677b6f88c17e7e8149a7408a969d44c1a139e550a657f440",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Deliveries/DeliveryResultLeasePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Result_ConcurrentSql_RespectsWinnerAndTimeAfterLock",
+    "normalized_source_sha256": "11345ee1f0b6ae45379fcea23b368720fb7951cbd12f677ae9f84a8b5786ea1d",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryResultLeasePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Deliveries/DeliveryResultLeasePostgresTests.cs",
+    "kind": "ConstructorDeclaration",
+    "name": "PostgresTheoryAttribute",
+    "normalized_source_sha256": "b64387689a7919f02df2af78531eedcbb726f0c3e5c139902da0faaccaaa7e59",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryTestData.cs",
+    "new": "PackCall.Test/Support/DeliveryTestData.cs",
+    "kind": "MethodDeclaration",
+    "name": "SetCapturedForTest",
+    "normalized_source_sha256": "33b1a17a6e9c76f84a8adb0554f019071d771970e118afdc1dfd992eb194085c",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryTestData.cs",
+    "new": "PackCall.Test/Support/DeliveryTestData.cs",
+    "kind": "MethodDeclaration",
+    "name": "SetWaitingForTest",
+    "normalized_source_sha256": "4b6d9f58757bc58b55bb599e2bc85956722348cf28c36ac5b98cb83f430b5cad",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryTestData.cs",
+    "new": "PackCall.Test/Support/DeliveryTestData.cs",
+    "kind": "MethodDeclaration",
+    "name": "Set",
+    "normalized_source_sha256": "aa1b14020f4c4a502dd17c764bdbae1cfa7716dff6d984c5a993ab7258ddfad9",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Worker_CapturesProcessesAndRecoversWithAnAssignedId",
+    "normalized_source_sha256": "9b45d84702cbbe50514865359d4a42802b1c99eb8a4e27eb2b866d1bd5c64cf7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Worker_ProcessesJsonConfiguredBatchesWithLimitedParallelism",
+    "normalized_source_sha256": "281ff795914b460f9eeb726221a3004a057fc87d598e6d07023138b2452527ee",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Worker_RejectsNonPositiveBatchSize",
+    "normalized_source_sha256": "a44cda706f21ec0d60aae20d5094b284d6793f44f69c143f2cefaca0b0ba1414",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_batches",
+    "normalized_source_sha256": "18360ed44de2e198d5c7a285623832e95802eedff4689351aa494072b03a238f",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_started",
+    "normalized_source_sha256": "9848d97bd841b9a7df8c92be45af4e80cdec8979550b4524e5e69a5a55495ea7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_active",
+    "normalized_source_sha256": "c8f09fb493c4156af932f2e51dd79faf30e105884e097c2de629402add4ed0ad",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_processed",
+    "normalized_source_sha256": "a88ee747dd7b129fce88d02c52272ea756079e66c8824970ce69f014df5d4154",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Captured",
+    "normalized_source_sha256": "ca3da50f917f73fb864a150bcb34b045ccf4f86c9973488ef00b8aae5363d6e2",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "ProcessedIds",
+    "normalized_source_sha256": "479ce8b30d3f26d121b01273b2ab86396b6a1eced648ea904a72a40ff8d897dd",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "RequestedBatchSizes",
+    "normalized_source_sha256": "304b4f27bff4c62e20e7ba8ffe25c3a69fcf5b6bb2eb52cf2dff841579b9be45",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "ConcurrentProcessingCounts",
+    "normalized_source_sha256": "952be2ac17a01a5f55ab9f265084a2144d5fe6ab653880bb5b88244e6b2e48bf",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "AllLanesStarted",
+    "normalized_source_sha256": "fd200e03305eb654a4cbae80ee627e470236ac2456cbb6b072aaf92c5cc1fead",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "ContinueProcessing",
+    "normalized_source_sha256": "252fbe220c8fe7be256f4e9cca1f5bb87e40f82f9fa011c5c5ebd16c2298ac1e",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "AllProcessed",
+    "normalized_source_sha256": "81f6c05e97b603f4c675dc4c2fb76fdb3b5febf6e32e11191bfc7224b676e873",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CaptureBatchAsync",
+    "normalized_source_sha256": "fcab441f3cd55762d71fe91590f70ee052e063af10612aa8ea5391938e2a0503",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ProcessAsync",
+    "normalized_source_sha256": "e30b855620d3888f019dacfc122500c09a2d99c91f1085df4d94471668468715",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ReleaseExpiredLocksAsync",
+    "normalized_source_sha256": "6049714046a0b16758ad45443782439be76a1dbfad2d8e4d818c304a14e234c2",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CompleteCampaignIfFinishedAsync",
+    "normalized_source_sha256": "ac9720b61e3a728d21bc3d9be682381936b2a8df4103ddfc3171811134228bdc",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_captured",
+    "normalized_source_sha256": "9cb8fc9a3a30f8f1eabd5829fcc5d4b12feff247d74f4c4619e042b3aa8579eb",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Processed",
+    "normalized_source_sha256": "dd0b9bb2dc6e5f1f17133cfae6e948e2a039d407a7160b6e72674e4b1cb8c883",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Recovered",
+    "normalized_source_sha256": "72634ff46261dbd9156d54ba23f797af5c93ec1149d7da121c6b23363c94cc22",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "RequestedBatchSize",
+    "normalized_source_sha256": "0ccd27303cf6d5bdfaafb52724ae0c8621f734e4a4fb524c9aa3d6fec52d5194",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "ProcessedStatus",
+    "normalized_source_sha256": "67f346bb8be3def69fd6e3476bf3ed3fd6cac17fa8d82bb591bb611213c86948",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CaptureBatchAsync",
+    "normalized_source_sha256": "ecbd9d0efcd91ac2ed1ae9708c7ee2e76cc5de282bdccdafab47b8d05a5a9404",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ProcessAsync",
+    "normalized_source_sha256": "5364607a963503ecfb577e03013ce0e1d3425e6198ca363005c3a936474d388c",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ReleaseExpiredLocksAsync",
+    "normalized_source_sha256": "559f9d2c1de9c5aa6a06aa656a527d195e85d48db80a68d72325d88ddb4c5b95",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CompleteCampaignIfFinishedAsync",
+    "normalized_source_sha256": "ac9720b61e3a728d21bc3d9be682381936b2a8df4103ddfc3171811134228bdc",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/DeliveryWorkerTests.cs",
+    "new": "PackCall.Test/Unit/Workers/DeliveryWorkerTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetUtcNowAsync",
+    "normalized_source_sha256": "f414e9b4e955d157d71370548ded6a2982c8b3b767f77054716fd5c64bde1665",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "FieldDeclaration",
+    "name": "_store",
+    "normalized_source_sha256": "c48472fafd220ed91d03145b634ce7f201f90023504f275adc888fe40d03a1dd",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "FieldDeclaration",
+    "name": "_statuses",
+    "normalized_source_sha256": "13b8e637088f8d8d9ad108b5c6573ae602c9140226c7f90d61b2264b0282314f",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "FieldDeclaration",
+    "name": "_deliveries",
+    "normalized_source_sha256": "8d9a96582935e792d69095dac15fe99e9ee649614f3e3f92978c994079759d6e",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "ConstructorDeclaration",
+    "name": "FakeCampaignRepository",
+    "normalized_source_sha256": "9334e3229deeabc46d9e9fba202c5d3aef70ad7d1f5750939a2df48d6e3b0a39",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "CreateCount",
+    "normalized_source_sha256": "f9a8e48b3407cd6d9171dc4e4884de3de8ed3812c556b429a9706404088073a7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "UpdateCount",
+    "normalized_source_sha256": "3c5de28fa25d46e47203a0acc13774e930022cd7891ea88e9ac4956a1f16037a",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "OnGet",
+    "normalized_source_sha256": "4139cb0214d828fb1e670163bda5494390a931eeba870ba049cda7f7b3b20046",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "OnTryUpdateStatus",
+    "normalized_source_sha256": "987f761278c8aff1db9d10e156371d970b80e715154a0ed16a53ddef7335c829",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "Get",
+    "normalized_source_sha256": "ecafd684ebf07d5eaacf3d8818e7cd970da13d0f0a885973779bfd915b94547a",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetPage",
+    "normalized_source_sha256": "9b319a6a1e58208baead69c00372a3ac933a1dc7e83683220668d9e20f073cc5",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "Create",
+    "normalized_source_sha256": "6416f6a4b4bd3cf6316e912ae4d8806eb51e6ffb486eec0b12f43979d1631c85",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "Update",
+    "normalized_source_sha256": "afb649294e8278fa9174947c6af61a72f075cf952689c8dd14ed371628dd011c",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "TryUpdateStatusAsync",
+    "normalized_source_sha256": "9415d957a2182edc92147492b61ddcfbafd5d3f43e0c9dac94535b01b9d958cb",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "Delete",
+    "normalized_source_sha256": "25ff7125ba2ccd5a05e11adc5602ccc66b2b8985f5e826ed2013f7dd36e48e40",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Items",
+    "normalized_source_sha256": "e62b91b8b98c40fc39e287fad748fcea35d2c3331a8515b1f03012328feced6a",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "CreateAsync",
+    "normalized_source_sha256": "38bfe0411f075600c6fdf228b66064d87ae07cc56c60e72799cdfacfd2f56fe3",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetByEmailAsync",
+    "normalized_source_sha256": "b512dff07bf26f4d7d17a885776c31c2d40b9b2f5a773c958f1cb874999c2b99",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetBatchAsync",
+    "normalized_source_sha256": "2cea4e49c677e684bf925f11492cb6ac87770df5ae226753f1515b370dc9d9b5",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetAsync",
+    "normalized_source_sha256": "3bc5315afc42ae259fd2c7c4511c523770c71454fbb28ee1a3439eeb8f0674d1",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetPageAsync",
+    "normalized_source_sha256": "506f2116e6e2ec1daeecce71eb05915f8d87650fd8e336fa1823f1453af182f0",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "FieldDeclaration",
+    "name": "_store",
+    "normalized_source_sha256": "a9c0eccec8c7ecfe4cca78c2f370e4d01c6aa94063b01e1d526da959ae5f3d53",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "ConstructorDeclaration",
+    "name": "FakeDeliveryRepository",
+    "normalized_source_sha256": "a109d7e79c2d65f36d01ce5766918c0485ec01ccc91b5b866ead2a4725640f7e",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Items",
+    "normalized_source_sha256": "f77b29e5702afd0ebb3226f1a7ad6a5f10f14a6357c161926a4173b150619191",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "BeforeAddBatchAsync",
+    "normalized_source_sha256": "527974d6b3b7decf32ee920ee40cf91e1b30c984bbb39b4d8adc42b6e6f8e1df",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "AddBatchAsync",
+    "normalized_source_sha256": "5dbc85a95c2c4867377dd6a598c93baa810dcedb18f52a4db768849d3dad09a7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "Add",
+    "normalized_source_sha256": "13eef39474e26a549d1ea4e747924ae302ae676dafb071a21ec09161ee4cb0ad",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "RemoveByCampaign",
+    "normalized_source_sha256": "1e07e4aaf76bb94424bd19089606f9484cd9b99d4dbc828fdc2122a427a03c33",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "Get",
+    "normalized_source_sha256": "b2ac61a587741aa88b40f429403c1beca838e4723a57109a0b8454f5be118efb",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "Get",
+    "normalized_source_sha256": "c1348fd4b74311e265bfbf328e55c4aabe36e40c4a380938e0b940c980c139c4",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetPage",
+    "normalized_source_sha256": "68cab5f59025d15fa75614b4edd2e3fd90b9414bc10a4d8856a4ee3b918183c4",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetStatusCountsAsync",
+    "normalized_source_sha256": "3b1df9d39e13c9dd1587af01f2ca58094a1a81405a7ed5a786dcb8757645c0fc",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "CaptureBatchAsync",
+    "normalized_source_sha256": "32a2bf94be7599791ba1f6f6fb3c31b3fa7be3be77b727359d5925ab6302af41",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "ReleaseExpiredLocksAsync",
+    "normalized_source_sha256": "db650ddad9a922fc9086746a26f0156dfd61e7f29d4b5b0248258199228e5bd5",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "ReleaseCapturedAsync",
+    "normalized_source_sha256": "2d6230e6fada2bbca62dd7a28b124ef0f4a3eb8d7945659abb02d56a41b822f1",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "CompleteHandler",
+    "normalized_source_sha256": "596b837e0a43dffd7b608741848dd3520d721b5017f30117a4df05746fcd5301",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "PendingChecks",
+    "normalized_source_sha256": "935dc0d861b2551c63fd9f26ef47077e4c7dac841c460c62673119b843589be0",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "TryCompleteAsync",
+    "normalized_source_sha256": "8c0472ab1c6900ee665307d533c0339ac9909eae608dc631a49bde115bc4c9cd",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "HasPendingDeliveriesAsync",
+    "normalized_source_sha256": "c5c4525d140a007f2b206c3dbcd56f0d978b7e361a2f78b4b748cb28fdb4d5c8",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Handler",
+    "normalized_source_sha256": "3288bb6df947f51a239f40f2cb1b2d95483779ffbcb168cd908c8a8a4d04afc6",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "AsyncHandler",
+    "normalized_source_sha256": "d6a7909d9eddf998d3e68c884b66b57adc8704648d9a442b8bac4b51b4bf1026",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Requests",
+    "normalized_source_sha256": "b6c6a19fd5c66ff3838399c40ed012c18f8c2a12de65c4202bce90c3f5c0888f",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "SimulateErrors",
+    "normalized_source_sha256": "4e3e51c262895be050fd0bd4caac52b957b8c46b052ae2e1e3f47481ee9009fc",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "SendAsync",
+    "normalized_source_sha256": "5e7b10ca1ac3dfa52320f45e9d5f968185c12a1fe13a3964250df6b5e5c0e7a7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Entries",
+    "normalized_source_sha256": "aa636af24c2cd4d5409a72a4c2693c5b30a3c8eb0e7bab3ea7fa0d3286e72a33",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/Fakes.cs",
+    "new": "PackCall.Test/Support/Fakes.cs",
+    "kind": "MethodDeclaration",
+    "name": "AppendAsync",
+    "normalized_source_sha256": "0890bcb0e63ec106df2a5833ed17b5ab5199327f526b6696b472a808699eb6eb",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Options",
+    "normalized_source_sha256": "249e72a3e7f5937c556348942a317ca185f3b69ada48db23da850d525cab2228",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "Counter",
+    "normalized_source_sha256": "e1458cadf15047d70b3339a222264d3b44e170238638b95e2bfe11170e5c8f20",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "Duration",
+    "normalized_source_sha256": "4133160c4de18eed6c25aa7728b15842c5fb6727fd6c7c5a7e7b4b1cf2da33e0",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "EffectiveSettingsSerializationIsAnAllowlist",
+    "normalized_source_sha256": "a7cf59c2cfe8d19bfe0f626c30c192a5a44d926d53f7b35bb4adc382e1affdc1",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "DisabledHasNoListenerFilesOrWindowsAndIdentityIsPerStart",
+    "normalized_source_sha256": "ae3d4010afcfe9225f874b6159b0faa2be7426fc550bab203486ed232d28fae5",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "MonotonicPartialAndEmptyWindowsPreserveTotalsDespiteWallClockJump",
+    "normalized_source_sha256": "89bb3177ae2b0bbabf5f2edc3c7aa818458dc43b03a84f33d7b989c2ff3c5b33",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ConcurrentClosingLosesNoEventsOrHistogramSamples",
+    "normalized_source_sha256": "547c5f0215e3a4103d58c0a5534f52d5cafaefcd8cf5d8a5f130cad5b652b70a",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ListenerRecordsAndRejectsUnboundedCategories",
+    "normalized_source_sha256": "e134837de76d1859c0d296fec962722bb62c0bdf1905610ca07e3ce250010bbe",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ThrowingCallbackCannotChangeBusinessResult",
+    "normalized_source_sha256": "1f5821e5f650f4efc2840e119c4d8c921a73f2ab8d5d665a11fe24a5f56b2307",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_ticks",
+    "normalized_source_sha256": "f0ff6a7ffc03831c396251fa2c13e411060be6c3cbc4ab1b2477ff09f164a49e",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "Utc",
+    "normalized_source_sha256": "ab0bd4409ebc173e7e2d149f33374330942e2c8c1ee80e308156568fdb08ef56",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "TimestampFrequency",
+    "normalized_source_sha256": "44be83e05562950e3f7bb5fa45890fd835b4be712cbf83050d66688ccd822980",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetTimestamp",
+    "normalized_source_sha256": "8e25843a4704c55d7eb50f1693158ce736867df347e3d39521086c21e8a92577",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetUtcNow",
+    "normalized_source_sha256": "05b9af0ab2bf0de9759c8b41dec44ff399e289c07d995937890de8ee70e6b4fd",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementCollectorTests.cs",
+    "new": "PackCall.Test/Unit/Measurements/MeasurementCollectorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Tick",
+    "normalized_source_sha256": "b54ad09ab676e9e12347c334d23489b82db410bf7c28155299c850e4f51b28a4",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementWriterTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/MeasurementWriterTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_root",
+    "normalized_source_sha256": "c134d3c01cef3929baedbe64fd6a1b12654e75941ccf261dec1d2ad04271dc05",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementWriterTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/MeasurementWriterTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "BoundedRetainedTelemetryStateFitsSixteenMiB",
+    "normalized_source_sha256": "6e438b45d27243bf55d22728642aeccd407e47b8dbf9974d4dddef89bd7fef0c",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementWriterTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/MeasurementWriterTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "QueueIsBoundedAndRotationPreservesEarlyFiles",
+    "normalized_source_sha256": "10c08226d9c328f7803c0e4536ee01358739a4926dd9e9b2db4586e9882abdde",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementWriterTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/MeasurementWriterTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ClosedWindowCanBeReadBeforeFinalization",
+    "normalized_source_sha256": "3a5596bf7681890877b2671fcd43519be49af6fd816ef43ddd0fd2c6991bc226",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementWriterTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/MeasurementWriterTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "DiskErrorAndSessionLimitAreContained",
+    "normalized_source_sha256": "cd38eeb45c2713006ab7d9f3780111fce9decf0889008e4e8f5d5b7644f56fb1",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementWriterTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/MeasurementWriterTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "GracefulStopFlushesPartialAndMapsInstanceWithoutSecrets",
+    "normalized_source_sha256": "3030e158399df82bb64a2756553d763afa65b89ab035ba42e33582f3d77bc8d1",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/MeasurementWriterTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/MeasurementWriterTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Dispose",
+    "normalized_source_sha256": "5231e521a6fe32e5acdd3582fb4cc78fc7a7029f2bc5fc9f75b85d54bdc9ddd1",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorHttpTests.cs",
+    "new": "PackCall.Test/Integration/Operators/OperatorHttpTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "SharedEmailFixturesMatchProductValidation",
+    "normalized_source_sha256": "5e91c5e0a0211afc231708a5592c909352b7f1892f41b155865eec248f299677",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorHttpTests.cs",
+    "new": "PackCall.Test/Integration/Operators/OperatorHttpTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ActualHttpPayloadContainsEveryBooleanAndParsesConfirmedResults",
+    "normalized_source_sha256": "50216b435fda9776410380bf678d160f51251014b96a67d559c79308913f5432",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorHttpTests.cs",
+    "new": "PackCall.Test/Integration/Operators/OperatorHttpTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ErrorsNeverBecomeConfirmedResults",
+    "normalized_source_sha256": "c3202a4be0fa19fb58e664841828269e15ca41e268c6905ec132e8690f8c9c62",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorHttpTests.cs",
+    "new": "PackCall.Test/Integration/Operators/OperatorHttpTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ResponseLimitTimeoutAndExternalCancellation",
+    "normalized_source_sha256": "b4040a6dd16fcd870cae93620b9246439b62d7145b6fda976fe65a662e8b40f2",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorHttpTests.cs",
+    "new": "PackCall.Test/Integration/Operators/OperatorHttpTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "DisconnectAndConnectionRefusedAreTransportErrors",
+    "normalized_source_sha256": "658ff1ee0ba65796595d32112eb7c780ebb4bcda8ceac729d2fb523724e07a78",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorHttpTests.cs",
+    "new": "PackCall.Test/Integration/Support/OperatorServer.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Url",
+    "normalized_source_sha256": "85943f564815a5337f41c24e1ce7633ea6df66219f8622b0c6c4428f6d474161",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorHttpTests.cs",
+    "new": "PackCall.Test/Integration/Support/OperatorServer.cs",
+    "kind": "MethodDeclaration",
+    "name": "Sender",
+    "normalized_source_sha256": "14640a8a1ab612a2a4fb4428138a913ada621e811441e407a9b20210949c7872",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorHttpTests.cs",
+    "new": "PackCall.Test/Integration/Support/OperatorServer.cs",
+    "kind": "MethodDeclaration",
+    "name": "Start",
+    "normalized_source_sha256": "702a487750af886e7de91055561513412806a88cdbc64d78c274cc7b0fc54cd9",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorHttpTests.cs",
+    "new": "PackCall.Test/Integration/Support/OperatorServer.cs",
+    "kind": "FieldDeclaration",
+    "name": "_disposed",
+    "normalized_source_sha256": "476f2a1a0e14cfa7e774dfb7e4f0a5d9fd792e0e34bef4190d5d1093bda59582",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorHttpTests.cs",
+    "new": "PackCall.Test/Integration/Support/OperatorServer.cs",
+    "kind": "MethodDeclaration",
+    "name": "DisposeAsync",
+    "normalized_source_sha256": "93884062855840e1763abb05cb5b79103f07cca148e8ef94bb3dbbcf36e22af9",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Operators/OperatorPostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "WithSender",
+    "normalized_source_sha256": "3867ab0998c5696e706626c652d35a0925c158c438345b712b3617aa9be99def",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Operators/OperatorPostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "OperatorErrorsPreserveLeaseWithoutTerminalJournal",
+    "normalized_source_sha256": "36fd3288d502cbd7f5cab12393e14e7f93704feb2f2908c0355852602ee23ba8",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Operators/OperatorPostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ConfirmedOperatorResultsAreTerminal",
+    "normalized_source_sha256": "2e544f63b0ca4b89ad294cf9eb83691a1d0fd26eb1a110bd389bc58916c70072",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Operators/OperatorPostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "NextDouble",
+    "normalized_source_sha256": "82d316b6d15c33cd7c439161be7ac56cf06f5feccad63902d305763bd644e04b",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/OperatorPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Operators/OperatorPostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner",
+    "normalized_source_sha256": "c45146a2ab89e6ab5dddba9014c301226655a063b88158b9174c13e4b1dbaa7e",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/PerformancePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/PerformancePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "MeasurementRecoveryCommitSurvivesJournalFailure",
+    "normalized_source_sha256": "ae78def520c4438dafb9e43e72a0006338c7fa55689f02df39daf1e864550b3a",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/PerformancePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/PerformancePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "AppendAsync",
+    "normalized_source_sha256": "6ab3a61fa23c37dd4e1c320e04274194d88f625674499c0d149625ceb0575b22",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/PerformancePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/PerformancePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit",
+    "normalized_source_sha256": "e5d1df92d13e6728a6ef7c73b6947ab741baf597e74b1bb67142805c86073870",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/PerformancePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/PerformancePostgresTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "Target",
+    "normalized_source_sha256": "76b4a27dde94bcfa69b7b772dd5f688459adcea7471c8da017f0f5b2173148b7",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/PerformancePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/PerformancePostgresTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "Scenario",
+    "normalized_source_sha256": "80d5ab1f6184bf58aa63da0d8b1793a5a24e77e05b2d796c41965132916aebeb",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/PerformancePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/PerformancePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Invoke",
+    "normalized_source_sha256": "699a0b5bfc0bfd3de2502c5b5959567df2ffcede34953ad0a4a9f0b62a548733",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/PerformancePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/PerformancePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "LoseAcknowledgement",
+    "normalized_source_sha256": "b2bbfaeac374211db612da9acf38da4adfaa3ff8c347c4dd25819c33bff8a1bd",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/PerformancePostgresTests.cs",
+    "new": "PackCall.Test/Integration/Measurements/PerformancePostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "AppendAsync",
+    "normalized_source_sha256": "95a536bfd92e8686707bfe47ca07219bf7ca1f48a0c8daff510fe3b6b22a5d7c",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Request",
+    "normalized_source_sha256": "64d255844bee1544d0673c0f44dceae4e7d1fe8dbe96ade10e19a73ad87cc692",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Support/Operators/OperatorTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "Config",
+    "normalized_source_sha256": "0d837a52f01bd4e65c6f946419b525582c28ceb414edbbe34c1addf606f55040",
+    "source_preserved": true,
+    "modifier_change": "private -\u003E private protected in extracted support"
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "RequiredKeysNeverFallback",
+    "normalized_source_sha256": "1a83d01761d11eacf3b3a33bd794a00dc7e67719b1e1c8c3e248703f4dbda328",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ProdGuardPrecedesModeAndStorage",
+    "normalized_source_sha256": "3df44bfc3d54ed4769ab1e57c4aaeb70ef7e95867d6088590779a9a473e61550",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "StrictBool",
+    "normalized_source_sha256": "87d70b01b10507f5c3a39b76852257d007900a7e7fb4cf0077fbb99b3d1307d4",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "InvalidBool",
+    "normalized_source_sha256": "21d878ab2164b0ae17b28469384756c980b6d566d688f0dbf8c734dcc2626c9b",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "InvalidUrlsNeverLeakInput",
+    "normalized_source_sha256": "60f3b73c3db5ca068e67964e3ec966bb0638acc14e098033d8fd3aaca13c1f4b",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "InvalidTimeoutsFail",
+    "normalized_source_sha256": "9bef744e2b241c746116d43631fe6d9cd13b1768a30f3cf0a367a440296616ae",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "LastConfigurationSourceWinsWithoutValidValueFallback",
+    "normalized_source_sha256": "f4646f27c92620dad8264dcd08e3127b05b8c5b660c54d5a210460e92972c5ad",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "MockIndependentDrawPerCallAndExplicitFalse",
+    "normalized_source_sha256": "e25d62d7e87c6e5f52d606eb9c6cfcca2e1615603cfeb9b56de53fe8f358ab5c",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "InvalidRequestIsNeverConfirmedRejection",
+    "normalized_source_sha256": "590a8a6370d1ff23be298cdb893946a9b8fa685eed5df0cab68fe42634152b2a",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "OneSender",
+    "normalized_source_sha256": "75349835afa598f08d06714ae33be3f38345f3f7146e1d328a0b228c46cf84e8",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Unit/Operators/TestOperatorTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "PositiveTimeoutRoundsUpToTimerResolution",
+    "normalized_source_sha256": "66118a090248fb9e4238ce68e01120c28292c19bb2209a18eb943419b8408c8f",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Integration/Operators/OperatorRegistrationTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ProductionRegistrationMapsSimulateErrorsIntoProcessing",
+    "normalized_source_sha256": "f136332c30bf2e4667476709e7ad55d19956809c7a953d7512798417ee4d783d",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Support/Operators/OperatorTestBase.cs",
+    "kind": "FieldDeclaration",
+    "name": "Calls",
+    "normalized_source_sha256": "6d8eeea0879e0a3359f90fc6ce752c93fe886186222dd024c6d02642af332389",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/TestOperatorTests.cs",
+    "new": "PackCall.Test/Support/Operators/OperatorTestBase.cs",
+    "kind": "MethodDeclaration",
+    "name": "NextDouble",
+    "normalized_source_sha256": "478a34620358c085b37730e4b6fb3ae447d8605ff7f5f1b3f5db36edfe187b68",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Budget_UsesDatabaseClockAndElapsed_WithoutChangingBatchExpiry",
+    "normalized_source_sha256": "dc56e32f0b46c94cfaa8bbbd785a761bb0b0d9d1c14f795a29eeae023cd279df",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Budget_CancelsActiveProcessing_ThenContinuesLaneWithoutChangingLease",
+    "normalized_source_sha256": "1183560643c76cfb3e7cd91ec3e9b6073dac2cb7c63140e99ab10a4492834d76",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "Elapsed",
+    "normalized_source_sha256": "2ea0dd15c593312c72942075e07cb4f93c9d84b59c037abb509907b19b045da2",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "TimestampFrequency",
+    "normalized_source_sha256": "7d871b33b297154062da8db01024357b1daf3cdddab1e41926f882d0fab475aa",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetTimestamp",
+    "normalized_source_sha256": "5cd343061986791da44bdebf1e17eb1b92c6d54b1d20dfb7869f1cf67960a89a",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetUtcNowAsync",
+    "normalized_source_sha256": "97f47e15340de57d3b69ac21941a0bd6efaebec84a602409abd737581ad4af5c",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_capture",
+    "normalized_source_sha256": "5e8c007f1abd6a41937c5115413a16f43d8b0c32b1e4a2864a0d6ba9decf4ae3",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Expiry",
+    "normalized_source_sha256": "565036b780b83622a6932a2b88e642a0ea505e257dfa1b9d204d7290526ce91f",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Sent",
+    "normalized_source_sha256": "33c3ab77948d8fea06f163d7cdf4521ee20620d2a9ee61a7868f92a17c46144f",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Batch",
+    "normalized_source_sha256": "bc2f2ee73900f792d16b145c4ecacea5496be2adbf97f7d48d9d00d9d68c2a02",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "NextCapture",
+    "normalized_source_sha256": "8929e8bb16fef780daf366e7635908af2760ef8604ecec082976911fc91dec64",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CaptureBatchAsync",
+    "normalized_source_sha256": "925237c6d6b8cdd1e0d800e1f9cd3483363765c89bbc15396fe462e1d7a1e39f",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "Handler",
+    "normalized_source_sha256": "a35d06a369e09e829c3fa522bca1af37afa6b24458d452e06370859de8b18ca2",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ProcessAsync",
+    "normalized_source_sha256": "581da28aa44fe1e43e99f952d4192c32fe1380458c3c11251d9192921a5465d1",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ReleaseExpiredLocksAsync",
+    "normalized_source_sha256": "6049714046a0b16758ad45443782439be76a1dbfad2d8e4d818c304a14e234c2",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerLeaseBudgetTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerLeaseBudgetTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CompleteCampaignIfFinishedAsync",
+    "normalized_source_sha256": "81b0e60ba2762e630bd4435f53e3882d6e601b666163cab76ed7d1f57d63909e",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "BatchWaitIncludesCaptureJournalAndPreviousRowsButNotWallClockJump",
+    "normalized_source_sha256": "dd5e97575087c64d56240f3ad2fab22e05cc904063777a6e2826415939537186",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "LeaseSkipOrInvalidOwnerDoesNotCallService",
+    "normalized_source_sha256": "f0a45e83258ea9cff2629231e4bdb0f3cce5ad2eafebebaea8904b684412b7c4",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Invoke",
+    "normalized_source_sha256": "37a501c57257584ccf333e3a3aa7d11f5c49cd6c8b5fbb4afc0aa907b0a0bde9",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "HostAndLeaseCancellationAreDistinct",
+    "normalized_source_sha256": "4f091355ad1564e5fc77a4d9354407eb8b89f24e2978da3a85ea5c9027281d83",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "Ticks",
+    "normalized_source_sha256": "b718f11d484f5c66b9846bb96a4088bf7294bbaaa82f1551584d0690232a26be",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "TimestampFrequency",
+    "normalized_source_sha256": "44be83e05562950e3f7bb5fa45890fd835b4be712cbf83050d66688ccd822980",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetTimestamp",
+    "normalized_source_sha256": "f13e05effe904cf6617003c9552a585dcd8c0286cde59350967b537931733fb8",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetUtcNow",
+    "normalized_source_sha256": "2ffda018f893f36a9335d6fa81d1014b0ac44dd901444305fe7b5fa340a15221",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "GetUtcNowAsync",
+    "normalized_source_sha256": "f414e9b4e955d157d71370548ded6a2982c8b3b767f77054716fd5c64bde1665",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "Calls",
+    "normalized_source_sha256": "6d8eeea0879e0a3359f90fc6ce752c93fe886186222dd024c6d02642af332389",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "WaitForCancellation",
+    "normalized_source_sha256": "340d21666f9ed51c76ad69380f846e72c41a86d1726e08378c4998ac9190cf9d",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ProcessAsync",
+    "normalized_source_sha256": "8e5cb8a20d11796d3015c2d8211fe89e0ab234ed6ad99733241d76ddcb0f902d",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CaptureBatchAsync",
+    "normalized_source_sha256": "0d28f7b91c36466177940083ec2be4a369e3c8ddd94919013296884b1cec8b9d",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "ReleaseExpiredLocksAsync",
+    "normalized_source_sha256": "4b57c8c03030ba3f1c250680fe3a3a685d2dcf2c7465d7231b762c0c814da184",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerMeasurementTests.cs",
+    "new": "PackCall.Test/Unit/Workers/WorkerMeasurementTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "CompleteCampaignIfFinishedAsync",
+    "normalized_source_sha256": "a09ac414abb7fdb9f2b07b788d71772bed4ec04eb7fa643423b1ee6c5ba800e5",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Workers/WorkerPostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "Capture_UsesOneDatabaseTimestamp_RecoveryPreservesLeaseReplacedWhileWaiting",
+    "normalized_source_sha256": "bf9dc4ad30bc37c856a9157404eb81a8c38875368f2c5e38d00e23e5b077e0be",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Workers/WorkerPostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "SchemaGate_WaitsForExactHistory_RejectsUnknown_ObservesCancellation",
+    "normalized_source_sha256": "5e893f0f4293dc96a0ec669402c557c89b6e5df6fa3666a345892750e5b51750",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Workers/WorkerPostgresTests.cs",
+    "kind": "FieldDeclaration",
+    "name": "_stop",
+    "normalized_source_sha256": "096816e2dfb0123a346b9219df42977deaacb8807f68b2f1936f7ea4390e266d",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Workers/WorkerPostgresTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "ApplicationStarted",
+    "normalized_source_sha256": "ed1586fc9a98f5f2a18ff79d95e3b4ed5474fc38e75d5be417d57f18c906be59",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Workers/WorkerPostgresTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "ApplicationStopping",
+    "normalized_source_sha256": "b23260eb96dcbf421dc25be56ec412c1ce81e246e87b8ddd72281fb42645cef8",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Workers/WorkerPostgresTests.cs",
+    "kind": "PropertyDeclaration",
+    "name": "ApplicationStopped",
+    "normalized_source_sha256": "0b8694dfaa43a2396b097a76941b91fc0c44de421e77e5cd61c76404b80a6422",
+    "source_preserved": true,
+    "modifier_change": null
+  },
+  {
+    "old": "PackCall.Core.Test/WorkerPostgresTests.cs",
+    "new": "PackCall.Test/Integration/Workers/WorkerPostgresTests.cs",
+    "kind": "MethodDeclaration",
+    "name": "StopApplication",
+    "normalized_source_sha256": "d8c7a3ee17df8299f2b325bb6dadcf3050a7b7de1bb0720dd3e29f65d95a0fdc",
+    "source_preserved": true,
+    "modifier_change": null
+  }
+]

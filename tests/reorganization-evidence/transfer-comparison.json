@@ -1,0 +1,13 @@
+{
+  "identities_and_outcomes_equal": true,
+  "records": 148,
+  "callers_updated_before_deletion": [
+    "PackCall.slnx",
+    "scripts/performance/postgres_tests.py",
+    "tests/acceptance/story-2-2-workers/verify.py",
+    "tests/acceptance/story-2-2-workers/README.md",
+    "tests/acceptance/story-11-1-test-email-operator/run.py"
+  ],
+  "source_hashes": "transfer-copy.json",
+  "old_project_still_exists": true
+}

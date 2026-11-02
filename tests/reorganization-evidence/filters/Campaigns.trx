@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="4883f203-b83a-4c93-89b5-6bb1efce551b" name="GV@USERHOM-FATLF67 2026-11-02 20:52:05" runUser="USERHOM-FATLF67\GV" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-11-02T20:52:05.9795284+03:00" queuing="2026-11-02T20:52:05.9795289+03:00" start="2026-11-02T20:52:05.1532912+03:00" finish="2026-11-02T20:52:05.9998859+03:00" />
+  <TestSettings name="default" id="d89b61b0-8dc2-4c9a-86be-2c15ff896a6d">
+    <Deployment runDeploymentRoot="GV_USERHOM-FATLF67_2026-11-02_20_52_05" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="2c5f27dc-5262-42cb-92cb-b3111fa61e97" testId="830a1908-0f32-4a3d-e457-f759dd683ece" testName="PackCall.Core.Test.CampaignServiceTests.CreateCampaign_WithInvalidRecipient_PersistsNothing" computerName="USERHOM-FATLF67" duration="00:00:00.0010833" startTime="2026-11-02T20:52:05.9497366+03:00" endTime="2026-11-02T20:52:05.9497851+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2c5f27dc-5262-42cb-92cb-b3111fa61e97" />
+    <UnitTestResult executionId="a9a7b066-8c62-4531-aecf-f8822cb3741e" testId="35a3b6a7-8c41-eb14-f86d-a484c1f4389f" testName="PackCall.Core.Test.CampaignTests.PauseAndResume_PreserveFirstStartAndMakeRepeatedRequestsHarmless" computerName="USERHOM-FATLF67" duration="00:00:00.0027193" startTime="2026-11-02T20:52:05.9164143+03:00" endTime="2026-11-02T20:52:05.9164583+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a9a7b066-8c62-4531-aecf-f8822cb3741e" />
+    <UnitTestResult executionId="d4da13bf-5a54-491e-8042-ed9affc74ff0" testId="22d79108-ff44-e344-96a1-4c82ee9c1a5b" testName="PackCall.Core.Test.CampaignTests.Complete_FromDraft_ThrowsWithoutChangingStatus" computerName="USERHOM-FATLF67" duration="00:00:00.0003644" startTime="2026-11-02T20:52:05.9162453+03:00" endTime="2026-11-02T20:52:05.9163078+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d4da13bf-5a54-491e-8042-ed9affc74ff0" />
+    <UnitTestResult executionId="7959368a-e0f2-4d4d-a49f-f6a8bc8e4f5a" testId="1b6a309a-fa44-e660-ccff-b6d7e91a50b6" testName="PackCall.Core.Test.CampaignServiceTests.CreateRecipient_RejectsDuplicateIgnoringCase" computerName="USERHOM-FATLF67" duration="00:00:00.0015838" startTime="2026-11-02T20:52:05.9499229+03:00" endTime="2026-11-02T20:52:05.9518742+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7959368a-e0f2-4d4d-a49f-f6a8bc8e4f5a" />
+    <UnitTestResult executionId="a6c729ef-7ddc-44bd-a19e-fc4ec63f86b9" testId="03679e9e-3065-2822-830d-f4c34a70585d" testName="PackCall.Core.Test.CampaignServiceTests.DeleteCampaign_InProgress_Throws" computerName="USERHOM-FATLF67" duration="00:00:00.0012769" startTime="2026-11-02T20:52:05.9495806+03:00" endTime="2026-11-02T20:52:05.9496090+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a6c729ef-7ddc-44bd-a19e-fc4ec63f86b9" />
+    <UnitTestResult executionId="2cb3984d-92c2-4c91-9972-f6c0c6a1ea34" testId="1a9d73cf-f0d6-248e-e33f-723119363a66" testName="PackCall.Core.Test.CampaignPausePostgresTests.StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T20:52:05.9547577+03:00" endTime="2026-11-02T20:52:05.9547655+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2cb3984d-92c2-4c91-9972-f6c0c6a1ea34">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5d2ec3aa-973a-404b-8d70-0965712c9842" testId="e54ba081-0a58-2207-4b93-7f9a1ae44625" testName="PackCall.Core.Test.CampaignWorkflowTests.CreateStartAndProcess_CompletesOnlyAfterEveryDeliveryIsTerminal(failLastDelivery: True)" computerName="USERHOM-FATLF67" duration="00:00:00.0466591" startTime="2026-11-02T20:52:05.8824412+03:00" endTime="2026-11-02T20:52:05.9499795+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5d2ec3aa-973a-404b-8d70-0965712c9842" />
+    <UnitTestResult executionId="e0a7e242-bada-4cc2-aba7-378c31c5e31b" testId="4131ea16-9840-3f03-6ad9-457f34f8a53a" testName="PackCall.Core.Test.CampaignServiceTests.CreateCampaign_WhenCancelledAfterFirstBatch_RemovesPartialCampaign" computerName="USERHOM-FATLF67" duration="00:00:00.0033557" startTime="2026-11-02T20:52:05.9494870+03:00" endTime="2026-11-02T20:52:05.9495098+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0a7e242-bada-4cc2-aba7-378c31c5e31b" />
+    <UnitTestResult executionId="62231c39-9646-4029-8137-066df932e8e0" testId="112dc666-41a6-3372-5a0b-0edc48869d09" testName="PackCall.Core.Test.CampaignServiceTests.StartCampaign_WhenCompleted_RejectsRestart" computerName="USERHOM-FATLF67" duration="00:00:00.0009374" startTime="2026-11-02T20:52:05.9492384+03:00" endTime="2026-11-02T20:52:05.9492698+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="62231c39-9646-4029-8137-066df932e8e0" />
+    <UnitTestResult executionId="15577a7c-5f86-4b30-8752-c796e138ae95" testId="dd932981-3b8e-700e-a797-85909fa79c73" testName="PackCall.Core.Test.CampaignServiceTests.CreateRecipient_RejectsInvalidEmail(email: &quot;invalid-email&quot;)" computerName="USERHOM-FATLF67" duration="00:00:00.0003750" startTime="2026-11-02T20:52:05.9486019+03:00" endTime="2026-11-02T20:52:05.9486971+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="15577a7c-5f86-4b30-8752-c796e138ae95" />
+    <UnitTestResult executionId="abe4d2c0-15cf-44c5-99b5-51b61266eb53" testId="2cacdd75-de6a-4807-04d2-e5b4d5f8c363" testName="PackCall.Core.Test.CampaignTests.PauseAndResume_RejectDraftAndCompletedCampaigns(completed: False)" computerName="USERHOM-FATLF67" duration="00:00:00.0014199" startTime="2026-11-02T20:52:05.9143009+03:00" endTime="2026-11-02T20:52:05.9143961+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="abe4d2c0-15cf-44c5-99b5-51b61266eb53" />
+    <UnitTestResult executionId="6a54b249-2bca-4718-88be-716f47e6cf01" testId="9c867279-9d26-4bef-db7a-348f4e1353e2" testName="PackCall.Core.Test.CampaignWorkflowTests.CreateStartAndProcess_CompletesOnlyAfterEveryDeliveryIsTerminal(failLastDelivery: False)" computerName="USERHOM-FATLF67" duration="00:00:00.0007749" startTime="2026-11-02T20:52:05.9516963+03:00" endTime="2026-11-02T20:52:05.9517361+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6a54b249-2bca-4718-88be-716f47e6cf01" />
+    <UnitTestResult executionId="c7e7dc8c-3479-45d1-90f6-2b839da23fdc" testId="7634bdbe-da28-6cdd-f3ce-af23df317266" testName="PackCall.Core.Test.CampaignServiceTests.CreateRecipient_RejectsInvalidEmail(email: &quot;Name &lt;user@example.com&gt;&quot;)" computerName="USERHOM-FATLF67" duration="00:00:00.0022307" startTime="2026-11-02T20:52:05.9184600+03:00" endTime="2026-11-02T20:52:05.9184839+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c7e7dc8c-3479-45d1-90f6-2b839da23fdc" />
+    <UnitTestResult executionId="c944ae50-bcaf-492c-aa25-a48e5c381ef3" testId="4035a3b3-8e1b-1da2-a56c-bef866622830" testName="PackCall.Core.Test.CampaignWorkflowTests.PauseDuringLastSend_AllowsAcknowledgementAndResumeCompletesCampaign" computerName="USERHOM-FATLF67" duration="00:00:00.0074993" startTime="2026-11-02T20:52:05.9518496+03:00" endTime="2026-11-02T20:52:05.9521304+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c944ae50-bcaf-492c-aa25-a48e5c381ef3" />
+    <UnitTestResult executionId="e12812d4-988f-4916-a5ea-585b13c08f9a" testId="0035adc0-4551-aded-c82c-f2461a455169" testName="PackCall.Core.Test.CampaignServiceTests.CreateCampaign_PersistsDraftAndOneWaitingDeliveryPerRecipient" computerName="USERHOM-FATLF67" duration="00:00:00.0097997" startTime="2026-11-02T20:52:05.9493996+03:00" endTime="2026-11-02T20:52:05.9494248+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e12812d4-988f-4916-a5ea-585b13c08f9a" />
+    <UnitTestResult executionId="8179c350-709e-4945-8258-a810358a5a8a" testId="a4fe1aa5-3174-a98d-c2a2-e06c48ff56cf" testName="PackCall.Core.Test.CampaignServiceTests.CreateRecipient_RejectsInvalidEmail(email: &quot;&quot;)" computerName="USERHOM-FATLF67" duration="00:00:00.0000274" startTime="2026-11-02T20:52:05.9490752+03:00" endTime="2026-11-02T20:52:05.9491259+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8179c350-709e-4945-8258-a810358a5a8a" />
+    <UnitTestResult executionId="0ade6d6e-1a3b-4a5a-b886-cdeb9500cd87" testId="5037f3af-5190-8a43-f09a-9481746f8881" testName="PackCall.Core.Test.CampaignPausePostgresTests.ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T20:52:05.9522551+03:00" endTime="2026-11-02T20:52:05.9526167+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0ade6d6e-1a3b-4a5a-b886-cdeb9500cd87">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f6adad99-adc8-420b-8fb0-9f2886eae61f" testId="3766de74-761c-1f5c-be2c-8249a8f2e753" testName="PackCall.Core.Test.CampaignPausePostgresTests.HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T20:52:05.9546530+03:00" endTime="2026-11-02T20:52:05.9546616+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f6adad99-adc8-420b-8fb0-9f2886eae61f">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="7e267ca8-a62f-4778-b2aa-8cf26e6cdf45" testId="f2092485-5090-4626-8c46-8dc04da5bbe1" testName="PackCall.Core.Test.CampaignTests.UpdateDetails_WhenCampaignIsInProgress_Throws" computerName="USERHOM-FATLF67" duration="00:00:00.0002624" startTime="2026-11-02T20:52:05.9160527+03:00" endTime="2026-11-02T20:52:05.9160826+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7e267ca8-a62f-4778-b2aa-8cf26e6cdf45" />
+    <UnitTestResult executionId="59fe0112-5fc0-4577-ac22-cbac4b6c9dc4" testId="fe3b3e8a-450c-3c05-8672-31c89fd3be49" testName="PackCall.Core.Test.CampaignTests.PauseAndResume_RejectDraftAndCompletedCampaigns(completed: True)" computerName="USERHOM-FATLF67" duration="00:00:00.0138859" startTime="2026-11-02T20:52:05.8808789+03:00" endTime="2026-11-02T20:52:05.9030090+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="59fe0112-5fc0-4577-ac22-cbac4b6c9dc4" />
+    <UnitTestResult executionId="8d4f1534-88b9-47c1-bc3f-32d4254b9198" testId="76f5ed40-40a5-faa9-ee2d-c6c67ed265ad" testName="PackCall.Core.Test.CampaignServiceTests.StartCampaign_WhenAlreadyStarted_DoesNotChangeDatesOrDeliveries" computerName="USERHOM-FATLF67" duration="00:00:00.0011954" startTime="2026-11-02T20:52:05.9519419+03:00" endTime="2026-11-02T20:52:05.9519691+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8d4f1534-88b9-47c1-bc3f-32d4254b9198" />
+    <UnitTestResult executionId="6c41ea55-e4e9-4d83-9a69-2758accef714" testId="f4d943ed-fe90-46a8-9515-b2b70c490a1c" testName="PackCall.Core.Test.CampaignPausePostgresTests.PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T20:52:05.9548566+03:00" endTime="2026-11-02T20:52:05.9548652+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6c41ea55-e4e9-4d83-9a69-2758accef714">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3592f8f4-6cf3-4595-a4b9-d3e27f23c049" testId="dfd3b97a-fe98-acfb-5236-9dd8de32ac09" testName="PackCall.Core.Test.CampaignPausePostgresTests.PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T20:52:05.9544667+03:00" endTime="2026-11-02T20:52:05.9544937+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3592f8f4-6cf3-4595-a4b9-d3e27f23c049">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="80ff6c25-47bb-4a97-8a4b-feb1679285ec" testId="bfe5031a-da71-1ea0-e563-e89a846ca83f" testName="PackCall.Core.Test.CampaignServiceTests.CreateCampaign_WhenLaterBatchFails_RemovesPartialCampaign" computerName="USERHOM-FATLF67" duration="00:00:00.0039050" startTime="2026-11-02T20:52:05.9166230+03:00" endTime="2026-11-02T20:52:05.9183711+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="80ff6c25-47bb-4a97-8a4b-feb1679285ec" />
+    <UnitTestResult executionId="3880138b-f0cc-4cc2-a44c-a6db18d7d658" testId="e5ba5c47-78d8-b1a3-046d-cd47fbb8b7c8" testName="PackCall.Core.Test.CampaignServiceTests.CreateCampaign_FormsDeliveriesInBatchesAndBlocksChangesUntilReady" computerName="USERHOM-FATLF67" duration="00:00:00.0235078" startTime="2026-11-02T20:52:05.8824004+03:00" endTime="2026-11-02T20:52:05.9165176+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3880138b-f0cc-4cc2-a44c-a6db18d7d658" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.CreateRecipient_RejectsInvalidEmail(email: &quot;&quot;)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="a4fe1aa5-3174-a98d-c2a2-e06c48ff56cf">
+      <Execution id="8179c350-709e-4945-8258-a810358a5a8a" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="CreateRecipient_RejectsInvalidEmail" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignWorkflowTests.CreateStartAndProcess_CompletesOnlyAfterEveryDeliveryIsTerminal(failLastDelivery: False)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="9c867279-9d26-4bef-db7a-348f4e1353e2">
+      <Execution id="6a54b249-2bca-4718-88be-716f47e6cf01" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignWorkflowTests" name="CreateStartAndProcess_CompletesOnlyAfterEveryDeliveryIsTerminal" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignPausePostgresTests.PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="f4d943ed-fe90-46a8-9515-b2b70c490a1c">
+      <Execution id="6c41ea55-e4e9-4d83-9a69-2758accef714" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignPausePostgresTests" name="PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignPausePostgresTests.PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="dfd3b97a-fe98-acfb-5236-9dd8de32ac09">
+      <Execution id="3592f8f4-6cf3-4595-a4b9-d3e27f23c049" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignPausePostgresTests" name="PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignPausePostgresTests.HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="3766de74-761c-1f5c-be2c-8249a8f2e753">
+      <Execution id="f6adad99-adc8-420b-8fb0-9f2886eae61f" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignPausePostgresTests" name="HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignTests.Complete_FromDraft_ThrowsWithoutChangingStatus" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="22d79108-ff44-e344-96a1-4c82ee9c1a5b">
+      <Execution id="d4da13bf-5a54-491e-8042-ed9affc74ff0" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignTests" name="Complete_FromDraft_ThrowsWithoutChangingStatus" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.StartCampaign_WhenAlreadyStarted_DoesNotChangeDatesOrDeliveries" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="76f5ed40-40a5-faa9-ee2d-c6c67ed265ad">
+      <Execution id="8d4f1534-88b9-47c1-bc3f-32d4254b9198" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="StartCampaign_WhenAlreadyStarted_DoesNotChangeDatesOrDeliveries" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.CreateRecipient_RejectsInvalidEmail(email: &quot;Name &lt;user@example.com&gt;&quot;)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="7634bdbe-da28-6cdd-f3ce-af23df317266">
+      <Execution id="c7e7dc8c-3479-45d1-90f6-2b839da23fdc" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="CreateRecipient_RejectsInvalidEmail" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.CreateRecipient_RejectsInvalidEmail(email: &quot;invalid-email&quot;)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="dd932981-3b8e-700e-a797-85909fa79c73">
+      <Execution id="15577a7c-5f86-4b30-8752-c796e138ae95" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="CreateRecipient_RejectsInvalidEmail" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.DeleteCampaign_InProgress_Throws" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="03679e9e-3065-2822-830d-f4c34a70585d">
+      <Execution id="a6c729ef-7ddc-44bd-a19e-fc4ec63f86b9" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="DeleteCampaign_InProgress_Throws" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignTests.UpdateDetails_WhenCampaignIsInProgress_Throws" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="f2092485-5090-4626-8c46-8dc04da5bbe1">
+      <Execution id="7e267ca8-a62f-4778-b2aa-8cf26e6cdf45" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignTests" name="UpdateDetails_WhenCampaignIsInProgress_Throws" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignTests.PauseAndResume_RejectDraftAndCompletedCampaigns(completed: True)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="fe3b3e8a-450c-3c05-8672-31c89fd3be49">
+      <Execution id="59fe0112-5fc0-4577-ac22-cbac4b6c9dc4" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignTests" name="PauseAndResume_RejectDraftAndCompletedCampaigns" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.CreateCampaign_WithInvalidRecipient_PersistsNothing" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="830a1908-0f32-4a3d-e457-f759dd683ece">
+      <Execution id="2c5f27dc-5262-42cb-92cb-b3111fa61e97" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="CreateCampaign_WithInvalidRecipient_PersistsNothing" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignPausePostgresTests.ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="5037f3af-5190-8a43-f09a-9481746f8881">
+      <Execution id="0ade6d6e-1a3b-4a5a-b886-cdeb9500cd87" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignPausePostgresTests" name="ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.StartCampaign_WhenCompleted_RejectsRestart" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="112dc666-41a6-3372-5a0b-0edc48869d09">
+      <Execution id="62231c39-9646-4029-8137-066df932e8e0" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="StartCampaign_WhenCompleted_RejectsRestart" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.CreateCampaign_WhenLaterBatchFails_RemovesPartialCampaign" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="bfe5031a-da71-1ea0-e563-e89a846ca83f">
+      <Execution id="80ff6c25-47bb-4a97-8a4b-feb1679285ec" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="CreateCampaign_WhenLaterBatchFails_RemovesPartialCampaign" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignWorkflowTests.CreateStartAndProcess_CompletesOnlyAfterEveryDeliveryIsTerminal(failLastDelivery: True)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="e54ba081-0a58-2207-4b93-7f9a1ae44625">
+      <Execution id="5d2ec3aa-973a-404b-8d70-0965712c9842" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignWorkflowTests" name="CreateStartAndProcess_CompletesOnlyAfterEveryDeliveryIsTerminal" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignTests.PauseAndResume_PreserveFirstStartAndMakeRepeatedRequestsHarmless" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="35a3b6a7-8c41-eb14-f86d-a484c1f4389f">
+      <Execution id="a9a7b066-8c62-4531-aecf-f8822cb3741e" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignTests" name="PauseAndResume_PreserveFirstStartAndMakeRepeatedRequestsHarmless" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.CreateCampaign_FormsDeliveriesInBatchesAndBlocksChangesUntilReady" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="e5ba5c47-78d8-b1a3-046d-cd47fbb8b7c8">
+      <Execution id="3880138b-f0cc-4cc2-a44c-a6db18d7d658" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="CreateCampaign_FormsDeliveriesInBatchesAndBlocksChangesUntilReady" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.CreateRecipient_RejectsDuplicateIgnoringCase" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="1b6a309a-fa44-e660-ccff-b6d7e91a50b6">
+      <Execution id="7959368a-e0f2-4d4d-a49f-f6a8bc8e4f5a" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="CreateRecipient_RejectsDuplicateIgnoringCase" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.CreateCampaign_PersistsDraftAndOneWaitingDeliveryPerRecipient" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="0035adc0-4551-aded-c82c-f2461a455169">
+      <Execution id="e12812d4-988f-4916-a5ea-585b13c08f9a" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="CreateCampaign_PersistsDraftAndOneWaitingDeliveryPerRecipient" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignPausePostgresTests.StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="1a9d73cf-f0d6-248e-e33f-723119363a66">
+      <Execution id="2cb3984d-92c2-4c91-9972-f6c0c6a1ea34" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignPausePostgresTests" name="StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignWorkflowTests.PauseDuringLastSend_AllowsAcknowledgementAndResumeCompletesCampaign" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="4035a3b3-8e1b-1da2-a56c-bef866622830">
+      <Execution id="c944ae50-bcaf-492c-aa25-a48e5c381ef3" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignWorkflowTests" name="PauseDuringLastSend_AllowsAcknowledgementAndResumeCompletesCampaign" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignServiceTests.CreateCampaign_WhenCancelledAfterFirstBatch_RemovesPartialCampaign" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="4131ea16-9840-3f03-6ad9-457f34f8a53a">
+      <Execution id="e0a7e242-bada-4cc2-aba7-378c31c5e31b" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignServiceTests" name="CreateCampaign_WhenCancelledAfterFirstBatch_RemovesPartialCampaign" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignTests.PauseAndResume_RejectDraftAndCompletedCampaigns(completed: False)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="2cacdd75-de6a-4807-04d2-e5b4d5f8c363">
+      <Execution id="abe4d2c0-15cf-44c5-99b5-51b61266eb53" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignTests" name="PauseAndResume_RejectDraftAndCompletedCampaigns" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="830a1908-0f32-4a3d-e457-f759dd683ece" executionId="2c5f27dc-5262-42cb-92cb-b3111fa61e97" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="35a3b6a7-8c41-eb14-f86d-a484c1f4389f" executionId="a9a7b066-8c62-4531-aecf-f8822cb3741e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="22d79108-ff44-e344-96a1-4c82ee9c1a5b" executionId="d4da13bf-5a54-491e-8042-ed9affc74ff0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b6a309a-fa44-e660-ccff-b6d7e91a50b6" executionId="7959368a-e0f2-4d4d-a49f-f6a8bc8e4f5a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="03679e9e-3065-2822-830d-f4c34a70585d" executionId="a6c729ef-7ddc-44bd-a19e-fc4ec63f86b9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a9d73cf-f0d6-248e-e33f-723119363a66" executionId="2cb3984d-92c2-4c91-9972-f6c0c6a1ea34" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e54ba081-0a58-2207-4b93-7f9a1ae44625" executionId="5d2ec3aa-973a-404b-8d70-0965712c9842" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4131ea16-9840-3f03-6ad9-457f34f8a53a" executionId="e0a7e242-bada-4cc2-aba7-378c31c5e31b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="112dc666-41a6-3372-5a0b-0edc48869d09" executionId="62231c39-9646-4029-8137-066df932e8e0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dd932981-3b8e-700e-a797-85909fa79c73" executionId="15577a7c-5f86-4b30-8752-c796e138ae95" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2cacdd75-de6a-4807-04d2-e5b4d5f8c363" executionId="abe4d2c0-15cf-44c5-99b5-51b61266eb53" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9c867279-9d26-4bef-db7a-348f4e1353e2" executionId="6a54b249-2bca-4718-88be-716f47e6cf01" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7634bdbe-da28-6cdd-f3ce-af23df317266" executionId="c7e7dc8c-3479-45d1-90f6-2b839da23fdc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4035a3b3-8e1b-1da2-a56c-bef866622830" executionId="c944ae50-bcaf-492c-aa25-a48e5c381ef3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0035adc0-4551-aded-c82c-f2461a455169" executionId="e12812d4-988f-4916-a5ea-585b13c08f9a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a4fe1aa5-3174-a98d-c2a2-e06c48ff56cf" executionId="8179c350-709e-4945-8258-a810358a5a8a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5037f3af-5190-8a43-f09a-9481746f8881" executionId="0ade6d6e-1a3b-4a5a-b886-cdeb9500cd87" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3766de74-761c-1f5c-be2c-8249a8f2e753" executionId="f6adad99-adc8-420b-8fb0-9f2886eae61f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f2092485-5090-4626-8c46-8dc04da5bbe1" executionId="7e267ca8-a62f-4778-b2aa-8cf26e6cdf45" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="fe3b3e8a-450c-3c05-8672-31c89fd3be49" executionId="59fe0112-5fc0-4577-ac22-cbac4b6c9dc4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="76f5ed40-40a5-faa9-ee2d-c6c67ed265ad" executionId="8d4f1534-88b9-47c1-bc3f-32d4254b9198" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f4d943ed-fe90-46a8-9515-b2b70c490a1c" executionId="6c41ea55-e4e9-4d83-9a69-2758accef714" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dfd3b97a-fe98-acfb-5236-9dd8de32ac09" executionId="3592f8f4-6cf3-4595-a4b9-d3e27f23c049" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bfe5031a-da71-1ea0-e563-e89a846ca83f" executionId="80ff6c25-47bb-4a97-8a4b-feb1679285ec" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e5ba5c47-78d8-b1a3-046d-cd47fbb8b7c8" executionId="3880138b-f0cc-4cc2-a44c-a6db18d7d658" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Список результатов" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Все загруженные результаты" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="25" executed="20" passed="20" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.13)&#xD;
+[xUnit.net 00:00:00.13]   Discovering: PackCall.Test&#xD;
+[xUnit.net 00:00:00.22]   Discovered:  PackCall.Test&#xD;
+[xUnit.net 00:00:00.25]   Starting:    PackCall.Test&#xD;
+[xUnit.net 00:00:00.35]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:00.35]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:00.35]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:00.35]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:00.35]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:00.35]   Finished:    PackCall.Test&#xD;
+Тест "PackCall.Core.Test.CampaignPausePostgresTests.ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.CampaignPausePostgresTests.PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.CampaignPausePostgresTests.HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.CampaignPausePostgresTests.StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.CampaignPausePostgresTests.PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain" пропущен в тестовом запуске.&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T20:52:05.9848370+03:00">
+        <Text>[xUnit.net 00:00:00.35]     PackCall.Core.Test.CampaignPausePostgresTests.ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T20:52:05.9850721+03:00">
+        <Text>[xUnit.net 00:00:00.35]     PackCall.Core.Test.CampaignPausePostgresTests.PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T20:52:05.9850896+03:00">
+        <Text>[xUnit.net 00:00:00.35]     PackCall.Core.Test.CampaignPausePostgresTests.HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T20:52:05.9851065+03:00">
+        <Text>[xUnit.net 00:00:00.35]     PackCall.Core.Test.CampaignPausePostgresTests.StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T20:52:05.9851172+03:00">
+        <Text>[xUnit.net 00:00:00.35]     PackCall.Core.Test.CampaignPausePostgresTests.PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain [SKIP]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

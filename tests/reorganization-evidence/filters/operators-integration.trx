@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="8ca28e8f-af92-4bca-a502-c109dcf0d537" name="GV@USERHOM-FATLF67 2026-11-02 21:02:51" runUser="USERHOM-FATLF67\GV" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-11-02T21:02:51.1317201+03:00" queuing="2026-11-02T21:02:51.1317203+03:00" start="2026-11-02T21:02:50.3776613+03:00" finish="2026-11-02T21:02:53.3658218+03:00" />
+  <TestSettings name="default" id="3755412e-3ce1-4ac2-9fd4-c8ac87d38b7a">
+    <Deployment runDeploymentRoot="GV_USERHOM-FATLF67_2026-11-02_21_02_51" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="b9d241f6-b168-408c-92d2-bbc705a5d1f8" testId="5a0aa755-1171-bad2-61dc-43c4c4b7a910" testName="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;inprocess&quot;, simulate: False)" computerName="USERHOM-FATLF67" duration="00:00:00.0028665" startTime="2026-11-02T21:02:51.0535010+03:00" endTime="2026-11-02T21:02:51.0565230+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b9d241f6-b168-408c-92d2-bbc705a5d1f8" />
+    <UnitTestResult executionId="e10ce703-62ba-43c7-b98c-a548a7290cc1" testId="806e26e5-1ab2-ccd2-9209-4a8409197dd4" testName="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;inprocess&quot;, simulate: True)" computerName="USERHOM-FATLF67" duration="00:00:00.1145273" startTime="2026-11-02T21:02:50.8756251+03:00" endTime="2026-11-02T21:02:50.9975025+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e10ce703-62ba-43c7-b98c-a548a7290cc1" />
+    <UnitTestResult executionId="2b19befb-a949-487c-9fdd-728575c1e68a" testId="99cedd31-e2b2-b67c-48e4-86dbea10a87f" testName="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;http&quot;, simulate: True)" computerName="USERHOM-FATLF67" duration="00:00:00.0050190" startTime="2026-11-02T21:02:51.0487144+03:00" endTime="2026-11-02T21:02:51.0534013+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2b19befb-a949-487c-9fdd-728575c1e68a" />
+    <UnitTestResult executionId="37d73a75-deb8-4bb9-b116-cb745ca9a786" testId="3665c5f5-5324-0809-e81a-44a08654bed6" testName="PackCall.Core.Test.OperatorHttpTests.SharedEmailFixturesMatchProductValidation" computerName="USERHOM-FATLF67" duration="00:00:00.0071010" startTime="2026-11-02T21:02:51.1059348+03:00" endTime="2026-11-02T21:02:51.1122264+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="37d73a75-deb8-4bb9-b116-cb745ca9a786" />
+    <UnitTestResult executionId="e2e5b3e7-3f9f-4ac1-a276-66155ae308e2" testId="fa7c852d-0147-6819-8736-a10dcb1597ec" testName="PackCall.Core.Test.OperatorHttpTests.DisconnectAndConnectionRefusedAreTransportErrors" computerName="USERHOM-FATLF67" duration="00:00:02.0519510" startTime="2026-11-02T21:02:51.2758878+03:00" endTime="2026-11-02T21:02:53.3280684+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e2e5b3e7-3f9f-4ac1-a276-66155ae308e2" />
+    <UnitTestResult executionId="23eda1f3-33bc-490f-bf14-eaedefe02e1e" testId="85a06ca6-2b52-de39-362a-3628430129b8" testName="PackCall.Core.Test.OperatorHttpTests.ActualHttpPayloadContainsEveryBooleanAndParsesConfirmedResults" computerName="USERHOM-FATLF67" duration="00:00:00.1745665" startTime="2026-11-02T21:02:50.8742541+03:00" endTime="2026-11-02T21:02:51.0536008+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="23eda1f3-33bc-490f-bf14-eaedefe02e1e" />
+    <UnitTestResult executionId="f5c44ef6-e444-4341-934a-4bcc92f70851" testId="df89b441-f5a9-a7dd-a3d6-8a3ce824836e" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;SimulatedOpera&quot;···, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0039679" startTime="2026-11-02T21:02:51.1057251+03:00" endTime="2026-11-02T21:02:51.1057557+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f5c44ef6-e444-4341-934a-4bcc92f70851" />
+    <UnitTestResult executionId="54e75e47-c614-4532-ab02-9878934a6b2e" testId="c15cc3f6-c386-ad3c-60a9-377222e16b9b" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 302, body: &quot;&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0057140" startTime="2026-11-02T21:02:51.1053276+03:00" endTime="2026-11-02T21:02:51.1053743+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="54e75e47-c614-4532-ab02-9878934a6b2e" />
+    <UnitTestResult executionId="25eac755-51c7-460c-b7f2-74d45100f5be" testId="d1b20f86-3792-4b1f-bc93-b2f84f7155ba" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0030236" startTime="2026-11-02T21:02:51.0751464+03:00" endTime="2026-11-02T21:02:51.0783361+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="25eac755-51c7-460c-b7f2-74d45100f5be" />
+    <UnitTestResult executionId="d0d93ad8-5170-4916-b9d3-60f7e1626157" testId="74398668-ec75-d616-9807-bd0815019d1d" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 500, body: &quot;marker&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorServiceException))" computerName="USERHOM-FATLF67" duration="00:00:00.0038872" startTime="2026-11-02T21:02:51.0710123+03:00" endTime="2026-11-02T21:02:51.0750689+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d0d93ad8-5170-4916-b9d3-60f7e1626157" />
+    <UnitTestResult executionId="03b699ce-7a8a-497f-8834-94704f70cbed" testId="30368626-1c7b-403e-0108-3a4bdc345bb7" testName="PackCall.Core.Test.OperatorHttpTests.ResponseLimitTimeoutAndExternalCancellation" computerName="USERHOM-FATLF67" duration="00:00:00.1631038" startTime="2026-11-02T21:02:51.1123674+03:00" endTime="2026-11-02T21:02:51.2757164+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="03b699ce-7a8a-497f-8834-94704f70cbed" />
+    <UnitTestResult executionId="1d79fa81-3375-4d70-8c32-0efc1b7146bb" testId="4b8780cf-b996-fddd-4cde-73cd4c942a76" testName="PackCall.Core.Test.OperatorPostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:02:53.3319377+03:00" endTime="2026-11-02T21:02:53.3319509+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1d79fa81-3375-4d70-8c32-0efc1b7146bb">
+      <Output>
+        <ErrorInfo>
+          <Message>Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="49a99756-fef4-4c76-817e-457b60d603d6" testId="9236c40c-d16b-03af-e3c4-1ede31a1df72" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 415, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0033309" startTime="2026-11-02T21:02:51.1058067+03:00" endTime="2026-11-02T21:02:51.1058272+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="49a99756-fef4-4c76-817e-457b60d603d6" />
+    <UnitTestResult executionId="d55f50e1-8696-4097-8382-cc75981e2ee7" testId="f607deb1-95f0-88f4-7f3f-6ef7b6b95821" testName="PackCall.Core.Test.OperatorPostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:02:53.3316284+03:00" endTime="2026-11-02T21:02:53.3316596+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d55f50e1-8696-4097-8382-cc75981e2ee7">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="062dbb52-6e6f-4eb7-bed5-1106098c5407" testId="d7034ea1-5e32-31f2-ad42-b297d6c55146" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 422, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorValidationException))" computerName="USERHOM-FATLF67" duration="00:00:00.0035248" startTime="2026-11-02T21:02:51.0784096+03:00" endTime="2026-11-02T21:02:51.0821522+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="062dbb52-6e6f-4eb7-bed5-1106098c5407" />
+    <UnitTestResult executionId="36addc62-4bd8-4833-b006-6bf8799f832a" testId="e574bb50-7040-edec-af15-3a3a96e3de39" testName="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;http&quot;, simulate: False)" computerName="USERHOM-FATLF67" duration="00:00:00.0496244" startTime="2026-11-02T21:02:51.0063287+03:00" endTime="2026-11-02T21:02:51.0481423+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="36addc62-4bd8-4833-b006-6bf8799f832a" />
+    <UnitTestResult executionId="b99a8ac9-6e01-4b70-a3f9-a8d7d5dc0bd8" testId="d06359a7-d264-7474-6b97-14c90245eaf5" testName="PackCall.Core.Test.OperatorPostgresTests.ConfirmedOperatorResultsAreTerminal" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:02:53.3290314+03:00" endTime="2026-11-02T21:02:53.3294008+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b99a8ac9-6e01-4b70-a3f9-a8d7d5dc0bd8">
+      <Output>
+        <ErrorInfo>
+          <Message>Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="77b7a5a8-ee74-42b6-8e62-1e1ebe2e892f" testId="f404e1d4-72a3-0eb4-209c-427a13255bfd" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;AcceptedByProv&quot;···, contentType: &quot;text/plain&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0037656" startTime="2026-11-02T21:02:51.1056286+03:00" endTime="2026-11-02T21:02:51.1056611+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="77b7a5a8-ee74-42b6-8e62-1e1ebe2e892f" />
+    <UnitTestResult executionId="43fee3cc-0cda-41b4-a604-13f34d083e6f" testId="d44512d3-f466-f9c4-0bc1-a44a98422b51" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;AcceptedByProv&quot;···, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0160916" startTime="2026-11-02T21:02:51.0550561+03:00" endTime="2026-11-02T21:02:51.0709229+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="43fee3cc-0cda-41b4-a604-13f34d083e6f" />
+    <UnitTestResult executionId="3bb23db3-c5a6-453f-8a58-2169199d8af1" testId="42b4b66f-4ec4-4e4d-541d-e18790824c7b" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;bad marker&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0045010" startTime="2026-11-02T21:02:51.1058595+03:00" endTime="2026-11-02T21:02:51.1058788+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3bb23db3-c5a6-453f-8a58-2169199d8af1" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;http&quot;, simulate: False)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="e574bb50-7040-edec-af15-3a3a96e3de39">
+      <Execution id="36addc62-4bd8-4833-b006-6bf8799f832a" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorRegistrationTests" name="ProductionRegistrationMapsSimulateErrorsIntoProcessing" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;SimulatedOpera&quot;···, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="df89b441-f5a9-a7dd-a3d6-8a3ce824836e">
+      <Execution id="f5c44ef6-e444-4341-934a-4bcc92f70851" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;inprocess&quot;, simulate: True)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="806e26e5-1ab2-ccd2-9209-4a8409197dd4">
+      <Execution id="e10ce703-62ba-43c7-b98c-a548a7290cc1" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorRegistrationTests" name="ProductionRegistrationMapsSimulateErrorsIntoProcessing" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 302, body: &quot;&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="c15cc3f6-c386-ad3c-60a9-377222e16b9b">
+      <Execution id="54e75e47-c614-4532-ab02-9878934a6b2e" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;AcceptedByProv&quot;···, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="d44512d3-f466-f9c4-0bc1-a44a98422b51">
+      <Execution id="43fee3cc-0cda-41b4-a604-13f34d083e6f" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ActualHttpPayloadContainsEveryBooleanAndParsesConfirmedResults" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="85a06ca6-2b52-de39-362a-3628430129b8">
+      <Execution id="23eda1f3-33bc-490f-bf14-eaedefe02e1e" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ActualHttpPayloadContainsEveryBooleanAndParsesConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorPostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="4b8780cf-b996-fddd-4cde-73cd4c942a76">
+      <Execution id="1d79fa81-3375-4d70-8c32-0efc1b7146bb" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorPostgresTests" name="OperatorErrorsPreserveLeaseWithoutTerminalJournal" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;inprocess&quot;, simulate: False)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="5a0aa755-1171-bad2-61dc-43c4c4b7a910">
+      <Execution id="b9d241f6-b168-408c-92d2-bbc705a5d1f8" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorRegistrationTests" name="ProductionRegistrationMapsSimulateErrorsIntoProcessing" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;bad marker&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="42b4b66f-4ec4-4e4d-541d-e18790824c7b">
+      <Execution id="3bb23db3-c5a6-453f-8a58-2169199d8af1" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorPostgresTests.ConfirmedOperatorResultsAreTerminal" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="d06359a7-d264-7474-6b97-14c90245eaf5">
+      <Execution id="b99a8ac9-6e01-4b70-a3f9-a8d7d5dc0bd8" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorPostgresTests" name="ConfirmedOperatorResultsAreTerminal" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorPostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="f607deb1-95f0-88f4-7f3f-6ef7b6b95821">
+      <Execution id="d55f50e1-8696-4097-8382-cc75981e2ee7" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorPostgresTests" name="LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 415, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="9236c40c-d16b-03af-e3c4-1ede31a1df72">
+      <Execution id="49a99756-fef4-4c76-817e-457b60d603d6" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.SharedEmailFixturesMatchProductValidation" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="3665c5f5-5324-0809-e81a-44a08654bed6">
+      <Execution id="37d73a75-deb8-4bb9-b116-cb745ca9a786" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="SharedEmailFixturesMatchProductValidation" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;http&quot;, simulate: True)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="99cedd31-e2b2-b67c-48e4-86dbea10a87f">
+      <Execution id="2b19befb-a949-487c-9fdd-728575c1e68a" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorRegistrationTests" name="ProductionRegistrationMapsSimulateErrorsIntoProcessing" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.DisconnectAndConnectionRefusedAreTransportErrors" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="fa7c852d-0147-6819-8736-a10dcb1597ec">
+      <Execution id="e2e5b3e7-3f9f-4ac1-a276-66155ae308e2" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="DisconnectAndConnectionRefusedAreTransportErrors" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 422, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorValidationException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="d7034ea1-5e32-31f2-ad42-b297d6c55146">
+      <Execution id="062dbb52-6e6f-4eb7-bed5-1106098c5407" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 500, body: &quot;marker&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorServiceException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="74398668-ec75-d616-9807-bd0815019d1d">
+      <Execution id="d0d93ad8-5170-4916-b9d3-60f7e1626157" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;AcceptedByProv&quot;···, contentType: &quot;text/plain&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="f404e1d4-72a3-0eb4-209c-427a13255bfd">
+      <Execution id="77b7a5a8-ee74-42b6-8e62-1e1ebe2e892f" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ResponseLimitTimeoutAndExternalCancellation" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="30368626-1c7b-403e-0108-3a4bdc345bb7">
+      <Execution id="03b699ce-7a8a-497f-8834-94704f70cbed" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ResponseLimitTimeoutAndExternalCancellation" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="d1b20f86-3792-4b1f-bc93-b2f84f7155ba">
+      <Execution id="25eac755-51c7-460c-b7f2-74d45100f5be" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="5a0aa755-1171-bad2-61dc-43c4c4b7a910" executionId="b9d241f6-b168-408c-92d2-bbc705a5d1f8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="806e26e5-1ab2-ccd2-9209-4a8409197dd4" executionId="e10ce703-62ba-43c7-b98c-a548a7290cc1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="99cedd31-e2b2-b67c-48e4-86dbea10a87f" executionId="2b19befb-a949-487c-9fdd-728575c1e68a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3665c5f5-5324-0809-e81a-44a08654bed6" executionId="37d73a75-deb8-4bb9-b116-cb745ca9a786" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="fa7c852d-0147-6819-8736-a10dcb1597ec" executionId="e2e5b3e7-3f9f-4ac1-a276-66155ae308e2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="85a06ca6-2b52-de39-362a-3628430129b8" executionId="23eda1f3-33bc-490f-bf14-eaedefe02e1e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="df89b441-f5a9-a7dd-a3d6-8a3ce824836e" executionId="f5c44ef6-e444-4341-934a-4bcc92f70851" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c15cc3f6-c386-ad3c-60a9-377222e16b9b" executionId="54e75e47-c614-4532-ab02-9878934a6b2e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d1b20f86-3792-4b1f-bc93-b2f84f7155ba" executionId="25eac755-51c7-460c-b7f2-74d45100f5be" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="74398668-ec75-d616-9807-bd0815019d1d" executionId="d0d93ad8-5170-4916-b9d3-60f7e1626157" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="30368626-1c7b-403e-0108-3a4bdc345bb7" executionId="03b699ce-7a8a-497f-8834-94704f70cbed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4b8780cf-b996-fddd-4cde-73cd4c942a76" executionId="1d79fa81-3375-4d70-8c32-0efc1b7146bb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9236c40c-d16b-03af-e3c4-1ede31a1df72" executionId="49a99756-fef4-4c76-817e-457b60d603d6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f607deb1-95f0-88f4-7f3f-6ef7b6b95821" executionId="d55f50e1-8696-4097-8382-cc75981e2ee7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d7034ea1-5e32-31f2-ad42-b297d6c55146" executionId="062dbb52-6e6f-4eb7-bed5-1106098c5407" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e574bb50-7040-edec-af15-3a3a96e3de39" executionId="36addc62-4bd8-4833-b006-6bf8799f832a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d06359a7-d264-7474-6b97-14c90245eaf5" executionId="b99a8ac9-6e01-4b70-a3f9-a8d7d5dc0bd8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f404e1d4-72a3-0eb4-209c-427a13255bfd" executionId="77b7a5a8-ee74-42b6-8e62-1e1ebe2e892f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d44512d3-f466-f9c4-0bc1-a44a98422b51" executionId="43fee3cc-0cda-41b4-a604-13f34d083e6f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="42b4b66f-4ec4-4e4d-541d-e18790824c7b" executionId="3bb23db3-c5a6-453f-8a58-2169199d8af1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Список результатов" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Все загруженные результаты" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="20" executed="17" passed="17" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.13)&#xD;
+[xUnit.net 00:00:00.08]   Discovering: PackCall.Test&#xD;
+[xUnit.net 00:00:00.14]   Discovered:  PackCall.Test&#xD;
+[xUnit.net 00:00:00.16]   Starting:    PackCall.Test&#xD;
+[xUnit.net 00:00:02.64]       Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.&#xD;
+[xUnit.net 00:00:02.64]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:02.64]       Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.&#xD;
+[xUnit.net 00:00:02.64]   Finished:    PackCall.Test&#xD;
+Тест "PackCall.Core.Test.OperatorPostgresTests.ConfirmedOperatorResultsAreTerminal" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.OperatorPostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.OperatorPostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal" пропущен в тестовом запуске.&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:02:53.3308569+03:00">
+        <Text>[xUnit.net 00:00:02.64]     PackCall.Core.Test.OperatorPostgresTests.ConfirmedOperatorResultsAreTerminal [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:02:53.3318008+03:00">
+        <Text>[xUnit.net 00:00:02.64]     PackCall.Core.Test.OperatorPostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:02:53.3320657+03:00">
+        <Text>[xUnit.net 00:00:02.64]     PackCall.Core.Test.OperatorPostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal [SKIP]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

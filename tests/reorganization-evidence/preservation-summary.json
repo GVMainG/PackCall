@@ -1,0 +1,23 @@
+{
+  "csharp_test_methods": 87,
+  "inline_cases": 135,
+  "trx_records": 148,
+  "passed": 131,
+  "skipped": 17,
+  "identity_mapping_equal": true,
+  "python_functions": 141,
+  "python_test_methods": 27,
+  "original_comments_retained": true,
+  "csharp_all_members": 268,
+  "csharp_expression_bodied_tests": 3,
+  "csharp_all_members_preserved": true,
+  "category_partition_counts": {
+    "Unit": {
+      "Passed": 109
+    },
+    "Integration": {
+      "NotExecuted": 17,
+      "Passed": 22
+    }
+  }
+}

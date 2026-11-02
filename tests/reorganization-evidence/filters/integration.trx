@@ -1,0 +1,451 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="9ff6fcf2-d0f5-4131-a17e-537bebb66e6a" name="GV@USERHOM-FATLF67 2026-11-02 21:07:23" runUser="USERHOM-FATLF67\GV" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-11-02T21:07:23.1310894+03:00" queuing="2026-11-02T21:07:23.1310896+03:00" start="2026-11-02T21:07:22.4856568+03:00" finish="2026-11-02T21:07:25.4598039+03:00" />
+  <TestSettings name="default" id="93ff25a4-347d-40f3-a35d-e60dc32135b1">
+    <Deployment runDeploymentRoot="GV_USERHOM-FATLF67_2026-11-02_21_07_23" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="56de5a78-f2f0-46cf-9f2c-aaf23ced0097" testId="3766de74-761c-1f5c-be2c-8249a8f2e753" testName="PackCall.Core.Test.CampaignPausePostgresTests.HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.4267293+03:00" endTime="2026-11-02T21:07:25.4267406+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="56de5a78-f2f0-46cf-9f2c-aaf23ced0097">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="dd7b3535-419b-431e-87c5-1b49295c22d2" testId="a1750936-56d0-b7f9-6b8e-c548712e0f62" testName="PackCall.Core.Test.MeasurementWriterTests.GracefulStopFlushesPartialAndMapsInstanceWithoutSecrets" computerName="USERHOM-FATLF67" duration="00:00:00.0510524" startTime="2026-11-02T21:07:25.3676463+03:00" endTime="2026-11-02T21:07:25.4188962+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dd7b3535-419b-431e-87c5-1b49295c22d2" />
+    <UnitTestResult executionId="9d060b93-929a-41d0-a64f-037442b97047" testId="99cedd31-e2b2-b67c-48e4-86dbea10a87f" testName="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;http&quot;, simulate: True)" computerName="USERHOM-FATLF67" duration="00:00:00.0042329" startTime="2026-11-02T21:07:23.0602731+03:00" endTime="2026-11-02T21:07:23.0643788+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9d060b93-929a-41d0-a64f-037442b97047" />
+    <UnitTestResult executionId="7dc6054d-cd5c-4478-a8ed-6a654ff597c5" testId="c8ef2657-3346-b7be-4aea-d62dde3586c4" testName="PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_ActiveLease_CompletesWithJournal" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.4239342+03:00" endTime="2026-11-02T21:07:25.4239487+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7dc6054d-cd5c-4478-a8ed-6a654ff597c5">
+      <Output>
+        <ErrorInfo>
+          <Message>Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="87b4371c-7835-4f82-aa66-3041f5e516ce" testId="1a9d73cf-f0d6-248e-e33f-723119363a66" testName="PackCall.Core.Test.CampaignPausePostgresTests.StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.4269054+03:00" endTime="2026-11-02T21:07:25.4269179+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="87b4371c-7835-4f82-aa66-3041f5e516ce">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="94a37477-d033-42aa-af53-599ab0906a59" testId="3488606c-34c3-a518-e392-8dfb46ac050e" testName="PackCall.Core.Test.WorkerPostgresTests.SchemaGate_WaitsForExactHistory_RejectsUnknown_ObservesCancellation" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.3046146+03:00" endTime="2026-11-02T21:07:25.3046487+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="94a37477-d033-42aa-af53-599ab0906a59">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="6d282e34-c9b1-4d0f-ad82-7ad1fd4afc96" testId="d1b20f86-3792-4b1f-bc93-b2f84f7155ba" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0031016" startTime="2026-11-02T21:07:23.0834878+03:00" endTime="2026-11-02T21:07:23.0867417+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d282e34-c9b1-4d0f-ad82-7ad1fd4afc96" />
+    <UnitTestResult executionId="71e34e30-5420-4e30-91ce-2dc4173c3d94" testId="5037f3af-5190-8a43-f09a-9481746f8881" testName="PackCall.Core.Test.CampaignPausePostgresTests.ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.4263887+03:00" endTime="2026-11-02T21:07:25.4264044+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="71e34e30-5420-4e30-91ce-2dc4173c3d94">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="9cd83998-f9ec-477f-9b4e-aa7eb26755a0" testId="30368626-1c7b-403e-0108-3a4bdc345bb7" testName="PackCall.Core.Test.OperatorHttpTests.ResponseLimitTimeoutAndExternalCancellation" computerName="USERHOM-FATLF67" duration="00:00:00.1539777" startTime="2026-11-02T21:07:23.1107328+03:00" endTime="2026-11-02T21:07:23.2649403+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9cd83998-f9ec-477f-9b4e-aa7eb26755a0" />
+    <UnitTestResult executionId="c4684ff6-b9d7-42cb-9d94-be86e5b1aabb" testId="42b4b66f-4ec4-4e4d-541d-e18790824c7b" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;bad marker&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0032795" startTime="2026-11-02T21:07:23.1088374+03:00" endTime="2026-11-02T21:07:23.1088549+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c4684ff6-b9d7-42cb-9d94-be86e5b1aabb" />
+    <UnitTestResult executionId="69f3c746-66bb-4cf1-beea-cb251eb2e469" testId="f404e1d4-72a3-0eb4-209c-427a13255bfd" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;AcceptedByProv&quot;···, contentType: &quot;text/plain&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0030844" startTime="2026-11-02T21:07:23.1086795+03:00" endTime="2026-11-02T21:07:23.1087007+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="69f3c746-66bb-4cf1-beea-cb251eb2e469" />
+    <UnitTestResult executionId="b1fba741-3cc2-4b02-8af4-4a899f35ee77" testId="806e26e5-1ab2-ccd2-9209-4a8409197dd4" testName="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;inprocess&quot;, simulate: True)" computerName="USERHOM-FATLF67" duration="00:00:00.0903235" startTime="2026-11-02T21:07:22.9236699+03:00" endTime="2026-11-02T21:07:23.0213962+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b1fba741-3cc2-4b02-8af4-4a899f35ee77" />
+    <UnitTestResult executionId="c990fac6-a05e-4aab-b4f8-72aca9af76c2" testId="f607deb1-95f0-88f4-7f3f-6ef7b6b95821" testName="PackCall.Core.Test.OperatorPostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.3053203+03:00" endTime="2026-11-02T21:07:25.3053357+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c990fac6-a05e-4aab-b4f8-72aca9af76c2">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2e07164b-5e51-489e-9013-050a45e97e56" testId="9236c40c-d16b-03af-e3c4-1ede31a1df72" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 415, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0027742" startTime="2026-11-02T21:07:23.1087903+03:00" endTime="2026-11-02T21:07:23.1088079+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2e07164b-5e51-489e-9013-050a45e97e56" />
+    <UnitTestResult executionId="cb224d91-10d2-42aa-b1eb-dbd38467c2e5" testId="76965fb2-a3f0-8370-66dc-465ee7d1381c" testName="PackCall.Core.Test.MeasurementWriterTests.ClosedWindowCanBeReadBeforeFinalization" computerName="USERHOM-FATLF67" duration="00:00:00.0256705" startTime="2026-11-02T21:07:25.3416150+03:00" endTime="2026-11-02T21:07:25.3674772+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cb224d91-10d2-42aa-b1eb-dbd38467c2e5" />
+    <UnitTestResult executionId="58448813-342c-475e-860b-181b144ce9df" testId="fa7c852d-0147-6819-8736-a10dcb1597ec" testName="PackCall.Core.Test.OperatorHttpTests.DisconnectAndConnectionRefusedAreTransportErrors" computerName="USERHOM-FATLF67" duration="00:00:02.0337405" startTime="2026-11-02T21:07:23.2650829+03:00" endTime="2026-11-02T21:07:25.2991146+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="58448813-342c-475e-860b-181b144ce9df" />
+    <UnitTestResult executionId="9386bb45-eb3f-404a-9b4a-4beef58ab1b2" testId="d7034ea1-5e32-31f2-ad42-b297d6c55146" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 422, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorValidationException))" computerName="USERHOM-FATLF67" duration="00:00:00.0028675" startTime="2026-11-02T21:07:23.0868123+03:00" endTime="2026-11-02T21:07:23.0898174+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9386bb45-eb3f-404a-9b4a-4beef58ab1b2" />
+    <UnitTestResult executionId="fc538a26-5564-48a3-b357-e89a7bf895f2" testId="5a0aa755-1171-bad2-61dc-43c4c4b7a910" testName="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;inprocess&quot;, simulate: False)" computerName="USERHOM-FATLF67" duration="00:00:00.0024188" startTime="2026-11-02T21:07:23.0644284+03:00" endTime="2026-11-02T21:07:23.0669578+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fc538a26-5564-48a3-b357-e89a7bf895f2" />
+    <UnitTestResult executionId="5f4b97c2-39bb-4224-bd2c-a262001ecbc7" testId="be793ffb-f790-f87f-6a2a-4e414e7994a2" testName="PackCall.Core.Test.PerformancePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.3056735+03:00" endTime="2026-11-02T21:07:25.3056831+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5f4b97c2-39bb-4224-bd2c-a262001ecbc7">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="1eaadc9a-1aab-4e26-a027-a95e4a36ca02" testId="d44512d3-f466-f9c4-0bc1-a44a98422b51" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;AcceptedByProv&quot;···, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0131572" startTime="2026-11-02T21:07:23.0655613+03:00" endTime="2026-11-02T21:07:23.0784636+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1eaadc9a-1aab-4e26-a027-a95e4a36ca02" />
+    <UnitTestResult executionId="00a6fa68-c282-42c0-b403-0d041218bac6" testId="85a06ca6-2b52-de39-362a-3628430129b8" testName="PackCall.Core.Test.OperatorHttpTests.ActualHttpPayloadContainsEveryBooleanAndParsesConfirmedResults" computerName="USERHOM-FATLF67" duration="00:00:00.1367775" startTime="2026-11-02T21:07:22.9250776+03:00" endTime="2026-11-02T21:07:23.0643087+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="00a6fa68-c282-42c0-b403-0d041218bac6" />
+    <UnitTestResult executionId="4575ad19-ad56-449b-8dcb-d3614332be8e" testId="3665c5f5-5324-0809-e81a-44a08654bed6" testName="PackCall.Core.Test.OperatorHttpTests.SharedEmailFixturesMatchProductValidation" computerName="USERHOM-FATLF67" duration="00:00:00.0046778" startTime="2026-11-02T21:07:23.1089060+03:00" endTime="2026-11-02T21:07:23.1106391+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4575ad19-ad56-449b-8dcb-d3614332be8e" />
+    <UnitTestResult executionId="30234d56-acd9-401f-851b-2aa1ddb9c645" testId="df89b441-f5a9-a7dd-a3d6-8a3ce824836e" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;SimulatedOpera&quot;···, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0027776" startTime="2026-11-02T21:07:23.1087389+03:00" endTime="2026-11-02T21:07:23.1087581+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="30234d56-acd9-401f-851b-2aa1ddb9c645" />
+    <UnitTestResult executionId="58cc5634-dddd-4464-bc1c-efc14d9b9ef5" testId="1c148534-a9ef-ac6b-f260-ad37a36fe4c1" testName="PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_StorageErrorOrCancellation_DetachesBeforeSqlFailure" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.4244944+03:00" endTime="2026-11-02T21:07:25.4245082+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="58cc5634-dddd-4464-bc1c-efc14d9b9ef5">
+      <Output>
+        <ErrorInfo>
+          <Message>Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d6a745fa-93d0-47ac-8c58-6cded1ed2809" testId="80645d39-b00a-0ade-8829-61b24c7274cd" testName="PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_CompletesBeforeExpiry_RecoveryWaitingOnCommitCannotRequeueTerminal" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.4248843+03:00" endTime="2026-11-02T21:07:25.4249053+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d6a745fa-93d0-47ac-8c58-6cded1ed2809">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="461a49a7-cc92-4864-b684-a89b7a533c3a" testId="19f7d2fc-691c-50e2-fe7d-d79f5461ea66" testName="PackCall.Core.Test.PerformancePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.3058207+03:00" endTime="2026-11-02T21:07:25.3058301+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="461a49a7-cc92-4864-b684-a89b7a533c3a">
+      <Output>
+        <ErrorInfo>
+          <Message>Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a9526444-94c3-4753-8c5e-a8de1fa7aed0" testId="bb0e837a-793f-fe3a-ac83-f6f5e8eeb88d" testName="PackCall.Core.Test.MeasurementWriterTests.BoundedRetainedTelemetryStateFitsSixteenMiB" computerName="USERHOM-FATLF67" duration="00:00:00.0194174" startTime="2026-11-02T21:07:25.3059815+03:00" endTime="2026-11-02T21:07:25.3204568+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a9526444-94c3-4753-8c5e-a8de1fa7aed0" />
+    <UnitTestResult executionId="9af936c2-03a2-4664-9323-d7d775303539" testId="9afe4851-7017-f2a0-b53e-e155f2cee22d" testName="PackCall.Core.Test.MeasurementWriterTests.DiskErrorAndSessionLimitAreContained" computerName="USERHOM-FATLF67" duration="00:00:00.0043462" startTime="2026-11-02T21:07:25.4190558+03:00" endTime="2026-11-02T21:07:25.4235381+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9af936c2-03a2-4664-9323-d7d775303539" />
+    <UnitTestResult executionId="8bb9717c-fdfc-4b02-b731-92198c22f03d" testId="e574bb50-7040-edec-af15-3a3a96e3de39" testName="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;http&quot;, simulate: False)" computerName="USERHOM-FATLF67" duration="00:00:00.0377148" startTime="2026-11-02T21:07:23.0279859+03:00" endTime="2026-11-02T21:07:23.0598452+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8bb9717c-fdfc-4b02-b731-92198c22f03d" />
+    <UnitTestResult executionId="7863f6e2-4801-4d1b-b8a8-6b4e07a33bb9" testId="245c3a10-a4f1-2a73-68c1-1a2f8c6a1422" testName="PackCall.Core.Test.WorkerPostgresTests.Capture_UsesOneDatabaseTimestamp_RecoveryPreservesLeaseReplacedWhileWaiting" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.3000811+03:00" endTime="2026-11-02T21:07:25.3003925+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7863f6e2-4801-4d1b-b8a8-6b4e07a33bb9">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5fcd134a-62ce-42aa-b5e1-26a5dd3a3760" testId="74398668-ec75-d616-9807-bd0815019d1d" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 500, body: &quot;marker&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorServiceException))" computerName="USERHOM-FATLF67" duration="00:00:00.0046801" startTime="2026-11-02T21:07:23.0785578+03:00" endTime="2026-11-02T21:07:23.0833945+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5fcd134a-62ce-42aa-b5e1-26a5dd3a3760" />
+    <UnitTestResult executionId="a19cc23b-b549-46d6-ab3a-01126c61c0f0" testId="b68e7859-fe0a-12df-bb93-192c03c29a83" testName="PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_ConcurrentSql_RespectsWinnerAndTimeAfterLock" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.4250975+03:00" endTime="2026-11-02T21:07:25.4251125+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a19cc23b-b549-46d6-ab3a-01126c61c0f0">
+      <Output>
+        <ErrorInfo>
+          <Message>Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="0a1df4c6-28a0-46ad-a1f1-0d2ceefec44c" testId="f4d943ed-fe90-46a8-9515-b2b70c490a1c" testName="PackCall.Core.Test.CampaignPausePostgresTests.PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.4270681+03:00" endTime="2026-11-02T21:07:25.4270799+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0a1df4c6-28a0-46ad-a1f1-0d2ceefec44c">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a2e61c39-3b77-4ecb-9938-03ffa68ad07a" testId="dfd3b97a-fe98-acfb-5236-9dd8de32ac09" testName="PackCall.Core.Test.CampaignPausePostgresTests.PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.4265497+03:00" endTime="2026-11-02T21:07:25.4265631+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a2e61c39-3b77-4ecb-9938-03ffa68ad07a">
+      <Output>
+        <ErrorInfo>
+          <Message>Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="e0e93f58-a1f3-4210-b06c-56fced25ee6a" testId="ff7c7705-4f53-c6e9-76db-c7f49dd1a0d8" testName="PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_StaleLease_DoesNotChangeRowOrJournal" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.4246870+03:00" endTime="2026-11-02T21:07:25.4247038+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0e93f58-a1f3-4210-b06c-56fced25ee6a">
+      <Output>
+        <ErrorInfo>
+          <Message>Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f5efd5d1-0bec-4d2a-8602-39cc679abe03" testId="c15cc3f6-c386-ad3c-60a9-377222e16b9b" testName="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 302, body: &quot;&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" computerName="USERHOM-FATLF67" duration="00:00:00.0028114" startTime="2026-11-02T21:07:23.1084815+03:00" endTime="2026-11-02T21:07:23.1085208+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f5efd5d1-0bec-4d2a-8602-39cc679abe03" />
+    <UnitTestResult executionId="efae14d2-46d2-46f6-9fe8-64d442b1fdac" testId="d06359a7-d264-7474-6b97-14c90245eaf5" testName="PackCall.Core.Test.OperatorPostgresTests.ConfirmedOperatorResultsAreTerminal" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.3050959+03:00" endTime="2026-11-02T21:07:25.3051103+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="efae14d2-46d2-46f6-9fe8-64d442b1fdac">
+      <Output>
+        <ErrorInfo>
+          <Message>Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="0ebd8541-922f-4c45-ab3e-cf37dd83f370" testId="4b8780cf-b996-fddd-4cde-73cd4c942a76" testName="PackCall.Core.Test.OperatorPostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal" computerName="USERHOM-FATLF67" duration="00:00:00.0010000" startTime="2026-11-02T21:07:25.3055103+03:00" endTime="2026-11-02T21:07:25.3055205+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0ebd8541-922f-4c45-ab3e-cf37dd83f370">
+      <Output>
+        <ErrorInfo>
+          <Message>Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d21f120e-00d4-4abe-a02f-6c7a6fd611b0" testId="3ae459c0-5d01-420a-6557-90108f404a88" testName="PackCall.Core.Test.MeasurementWriterTests.QueueIsBoundedAndRotationPreservesEarlyFiles" computerName="USERHOM-FATLF67" duration="00:00:00.0210612" startTime="2026-11-02T21:07:25.3215563+03:00" endTime="2026-11-02T21:07:25.3414566+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d21f120e-00d4-4abe-a02f-6c7a6fd611b0" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="PackCall.Core.Test.PerformancePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="19f7d2fc-691c-50e2-fe7d-d79f5461ea66">
+      <Execution id="461a49a7-cc92-4864-b684-a89b7a533c3a" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.PerformancePostgresTests" name="MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;inprocess&quot;, simulate: False)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="5a0aa755-1171-bad2-61dc-43c4c4b7a910">
+      <Execution id="fc538a26-5564-48a3-b357-e89a7bf895f2" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorRegistrationTests" name="ProductionRegistrationMapsSimulateErrorsIntoProcessing" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.DisconnectAndConnectionRefusedAreTransportErrors" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="fa7c852d-0147-6819-8736-a10dcb1597ec">
+      <Execution id="58448813-342c-475e-860b-181b144ce9df" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="DisconnectAndConnectionRefusedAreTransportErrors" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;SimulatedOpera&quot;···, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="df89b441-f5a9-a7dd-a3d6-8a3ce824836e">
+      <Execution id="30234d56-acd9-401f-851b-2aa1ddb9c645" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementWriterTests.QueueIsBoundedAndRotationPreservesEarlyFiles" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="3ae459c0-5d01-420a-6557-90108f404a88">
+      <Execution id="d21f120e-00d4-4abe-a02f-6c7a6fd611b0" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementWriterTests" name="QueueIsBoundedAndRotationPreservesEarlyFiles" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_ConcurrentSql_RespectsWinnerAndTimeAfterLock" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="b68e7859-fe0a-12df-bb93-192c03c29a83">
+      <Execution id="a19cc23b-b549-46d6-ab3a-01126c61c0f0" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.DeliveryResultLeasePostgresTests" name="Result_ConcurrentSql_RespectsWinnerAndTimeAfterLock" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="d1b20f86-3792-4b1f-bc93-b2f84f7155ba">
+      <Execution id="6d282e34-c9b1-4d0f-ad82-7ad1fd4afc96" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.PerformancePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="be793ffb-f790-f87f-6a2a-4e414e7994a2">
+      <Execution id="5f4b97c2-39bb-4224-bd2c-a262001ecbc7" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.PerformancePostgresTests" name="MeasurementRecoveryCommitSurvivesJournalFailure" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.WorkerPostgresTests.SchemaGate_WaitsForExactHistory_RejectsUnknown_ObservesCancellation" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="3488606c-34c3-a518-e392-8dfb46ac050e">
+      <Execution id="94a37477-d033-42aa-af53-599ab0906a59" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.WorkerPostgresTests" name="SchemaGate_WaitsForExactHistory_RejectsUnknown_ObservesCancellation" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;inprocess&quot;, simulate: True)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="806e26e5-1ab2-ccd2-9209-4a8409197dd4">
+      <Execution id="b1fba741-3cc2-4b02-8af4-4a899f35ee77" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorRegistrationTests" name="ProductionRegistrationMapsSimulateErrorsIntoProcessing" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_StaleLease_DoesNotChangeRowOrJournal" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="ff7c7705-4f53-c6e9-76db-c7f49dd1a0d8">
+      <Execution id="e0e93f58-a1f3-4210-b06c-56fced25ee6a" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.DeliveryResultLeasePostgresTests" name="Result_StaleLease_DoesNotChangeRowOrJournal" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignPausePostgresTests.HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="3766de74-761c-1f5c-be2c-8249a8f2e753">
+      <Execution id="56de5a78-f2f0-46cf-9f2c-aaf23ced0097" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignPausePostgresTests" name="HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ResponseLimitTimeoutAndExternalCancellation" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="30368626-1c7b-403e-0108-3a4bdc345bb7">
+      <Execution id="9cd83998-f9ec-477f-9b4e-aa7eb26755a0" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ResponseLimitTimeoutAndExternalCancellation" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignPausePostgresTests.StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="1a9d73cf-f0d6-248e-e33f-723119363a66">
+      <Execution id="87b4371c-7835-4f82-aa66-3041f5e516ce" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignPausePostgresTests" name="StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;http&quot;, simulate: False)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="e574bb50-7040-edec-af15-3a3a96e3de39">
+      <Execution id="8bb9717c-fdfc-4b02-b731-92198c22f03d" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorRegistrationTests" name="ProductionRegistrationMapsSimulateErrorsIntoProcessing" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementWriterTests.BoundedRetainedTelemetryStateFitsSixteenMiB" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="bb0e837a-793f-fe3a-ac83-f6f5e8eeb88d">
+      <Execution id="a9526444-94c3-4753-8c5e-a8de1fa7aed0" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementWriterTests" name="BoundedRetainedTelemetryStateFitsSixteenMiB" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementWriterTests.GracefulStopFlushesPartialAndMapsInstanceWithoutSecrets" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="a1750936-56d0-b7f9-6b8e-c548712e0f62">
+      <Execution id="dd7b3535-419b-431e-87c5-1b49295c22d2" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementWriterTests" name="GracefulStopFlushesPartialAndMapsInstanceWithoutSecrets" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.SharedEmailFixturesMatchProductValidation" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="3665c5f5-5324-0809-e81a-44a08654bed6">
+      <Execution id="4575ad19-ad56-449b-8dcb-d3614332be8e" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="SharedEmailFixturesMatchProductValidation" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignPausePostgresTests.PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="f4d943ed-fe90-46a8-9515-b2b70c490a1c">
+      <Execution id="0a1df4c6-28a0-46ad-a1f1-0d2ceefec44c" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignPausePostgresTests" name="PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementWriterTests.ClosedWindowCanBeReadBeforeFinalization" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="76965fb2-a3f0-8370-66dc-465ee7d1381c">
+      <Execution id="cb224d91-10d2-42aa-b1eb-dbd38467c2e5" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementWriterTests" name="ClosedWindowCanBeReadBeforeFinalization" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorRegistrationTests.ProductionRegistrationMapsSimulateErrorsIntoProcessing(mode: &quot;http&quot;, simulate: True)" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="99cedd31-e2b2-b67c-48e4-86dbea10a87f">
+      <Execution id="9d060b93-929a-41d0-a64f-037442b97047" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorRegistrationTests" name="ProductionRegistrationMapsSimulateErrorsIntoProcessing" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;AcceptedByProv&quot;···, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="d44512d3-f466-f9c4-0bc1-a44a98422b51">
+      <Execution id="1eaadc9a-1aab-4e26-a027-a95e4a36ca02" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_CompletesBeforeExpiry_RecoveryWaitingOnCommitCannotRequeueTerminal" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="80645d39-b00a-0ade-8829-61b24c7274cd">
+      <Execution id="d6a745fa-93d0-47ac-8c58-6cded1ed2809" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.DeliveryResultLeasePostgresTests" name="Result_CompletesBeforeExpiry_RecoveryWaitingOnCommitCannotRequeueTerminal" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.WorkerPostgresTests.Capture_UsesOneDatabaseTimestamp_RecoveryPreservesLeaseReplacedWhileWaiting" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="245c3a10-a4f1-2a73-68c1-1a2f8c6a1422">
+      <Execution id="7863f6e2-4801-4d1b-b8a8-6b4e07a33bb9" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.WorkerPostgresTests" name="Capture_UsesOneDatabaseTimestamp_RecoveryPreservesLeaseReplacedWhileWaiting" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;bad marker&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="42b4b66f-4ec4-4e4d-541d-e18790824c7b">
+      <Execution id="c4684ff6-b9d7-42cb-9d94-be86e5b1aabb" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorPostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="f607deb1-95f0-88f4-7f3f-6ef7b6b95821">
+      <Execution id="c990fac6-a05e-4aab-b4f8-72aca9af76c2" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorPostgresTests" name="LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorPostgresTests.ConfirmedOperatorResultsAreTerminal" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="d06359a7-d264-7474-6b97-14c90245eaf5">
+      <Execution id="efae14d2-46d2-46f6-9fe8-64d442b1fdac" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorPostgresTests" name="ConfirmedOperatorResultsAreTerminal" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 500, body: &quot;marker&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorServiceException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="74398668-ec75-d616-9807-bd0815019d1d">
+      <Execution id="5fcd134a-62ce-42aa-b5e1-26a5dd3a3760" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_StorageErrorOrCancellation_DetachesBeforeSqlFailure" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="1c148534-a9ef-ac6b-f260-ad37a36fe4c1">
+      <Execution id="58cc5634-dddd-4464-bc1c-efc14d9b9ef5" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.DeliveryResultLeasePostgresTests" name="Result_StorageErrorOrCancellation_DetachesBeforeSqlFailure" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignPausePostgresTests.PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="dfd3b97a-fe98-acfb-5236-9dd8de32ac09">
+      <Execution id="a2e61c39-3b77-4ecb-9938-03ffa68ad07a" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignPausePostgresTests" name="PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.MeasurementWriterTests.DiskErrorAndSessionLimitAreContained" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="9afe4851-7017-f2a0-b53e-e155f2cee22d">
+      <Execution id="9af936c2-03a2-4664-9323-d7d775303539" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.MeasurementWriterTests" name="DiskErrorAndSessionLimitAreContained" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 422, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorValidationException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="d7034ea1-5e32-31f2-ad42-b297d6c55146">
+      <Execution id="9386bb45-eb3f-404a-9b4a-4beef58ab1b2" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 200, body: &quot;{\&quot;result\&quot;:\&quot;accepted\&quot;,\&quot;code\&quot;:\&quot;AcceptedByProv&quot;···, contentType: &quot;text/plain&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="f404e1d4-72a3-0eb4-209c-427a13255bfd">
+      <Execution id="69f3c746-66bb-4cf1-beea-cb251eb2e469" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_ActiveLease_CompletesWithJournal" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="c8ef2657-3346-b7be-4aea-d62dde3586c4">
+      <Execution id="7dc6054d-cd5c-4478-a8ed-6a654ff597c5" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.DeliveryResultLeasePostgresTests" name="Result_ActiveLease_CompletesWithJournal" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorPostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="4b8780cf-b996-fddd-4cde-73cd4c942a76">
+      <Execution id="0ebd8541-922f-4c45-ab3e-cf37dd83f370" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorPostgresTests" name="OperatorErrorsPreserveLeaseWithoutTerminalJournal" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.CampaignPausePostgresTests.ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="5037f3af-5190-8a43-f09a-9481746f8881">
+      <Execution id="71e34e30-5420-4e30-91ce-2dc4173c3d94" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.CampaignPausePostgresTests" name="ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 302, body: &quot;&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="c15cc3f6-c386-ad3c-60a9-377222e16b9b">
+      <Execution id="f5efd5d1-0bec-4d2a-8602-39cc679abe03" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ErrorsNeverBecomeConfirmedResults(status: 415, body: &quot;{}&quot;, contentType: &quot;application/json&quot;, error: typeof(PackCall.Infrastructure.Sending.TestOperatorProtocolException))" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="9236c40c-d16b-03af-e3c4-1ede31a1df72">
+      <Execution id="2e07164b-5e51-489e-9013-050a45e97e56" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ErrorsNeverBecomeConfirmedResults" />
+    </UnitTest>
+    <UnitTest name="PackCall.Core.Test.OperatorHttpTests.ActualHttpPayloadContainsEveryBooleanAndParsesConfirmedResults" storage="c:\users\gv\source\repos\packcall\packcall.test\bin\debug\net10.0\packcall.test.dll" id="85a06ca6-2b52-de39-362a-3628430129b8">
+      <Execution id="00a6fa68-c282-42c0-b403-0d041218bac6" />
+      <TestMethod codeBase="C:\Users\GV\source\repos\PackCall\PackCall.Test\bin\Debug\net10.0\PackCall.Test.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="PackCall.Core.Test.OperatorHttpTests" name="ActualHttpPayloadContainsEveryBooleanAndParsesConfirmedResults" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="3766de74-761c-1f5c-be2c-8249a8f2e753" executionId="56de5a78-f2f0-46cf-9f2c-aaf23ced0097" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a1750936-56d0-b7f9-6b8e-c548712e0f62" executionId="dd7b3535-419b-431e-87c5-1b49295c22d2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="99cedd31-e2b2-b67c-48e4-86dbea10a87f" executionId="9d060b93-929a-41d0-a64f-037442b97047" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c8ef2657-3346-b7be-4aea-d62dde3586c4" executionId="7dc6054d-cd5c-4478-a8ed-6a654ff597c5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a9d73cf-f0d6-248e-e33f-723119363a66" executionId="87b4371c-7835-4f82-aa66-3041f5e516ce" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3488606c-34c3-a518-e392-8dfb46ac050e" executionId="94a37477-d033-42aa-af53-599ab0906a59" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d1b20f86-3792-4b1f-bc93-b2f84f7155ba" executionId="6d282e34-c9b1-4d0f-ad82-7ad1fd4afc96" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5037f3af-5190-8a43-f09a-9481746f8881" executionId="71e34e30-5420-4e30-91ce-2dc4173c3d94" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="30368626-1c7b-403e-0108-3a4bdc345bb7" executionId="9cd83998-f9ec-477f-9b4e-aa7eb26755a0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="42b4b66f-4ec4-4e4d-541d-e18790824c7b" executionId="c4684ff6-b9d7-42cb-9d94-be86e5b1aabb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f404e1d4-72a3-0eb4-209c-427a13255bfd" executionId="69f3c746-66bb-4cf1-beea-cb251eb2e469" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="806e26e5-1ab2-ccd2-9209-4a8409197dd4" executionId="b1fba741-3cc2-4b02-8af4-4a899f35ee77" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f607deb1-95f0-88f4-7f3f-6ef7b6b95821" executionId="c990fac6-a05e-4aab-b4f8-72aca9af76c2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9236c40c-d16b-03af-e3c4-1ede31a1df72" executionId="2e07164b-5e51-489e-9013-050a45e97e56" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="76965fb2-a3f0-8370-66dc-465ee7d1381c" executionId="cb224d91-10d2-42aa-b1eb-dbd38467c2e5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="fa7c852d-0147-6819-8736-a10dcb1597ec" executionId="58448813-342c-475e-860b-181b144ce9df" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d7034ea1-5e32-31f2-ad42-b297d6c55146" executionId="9386bb45-eb3f-404a-9b4a-4beef58ab1b2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5a0aa755-1171-bad2-61dc-43c4c4b7a910" executionId="fc538a26-5564-48a3-b357-e89a7bf895f2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="be793ffb-f790-f87f-6a2a-4e414e7994a2" executionId="5f4b97c2-39bb-4224-bd2c-a262001ecbc7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d44512d3-f466-f9c4-0bc1-a44a98422b51" executionId="1eaadc9a-1aab-4e26-a027-a95e4a36ca02" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="85a06ca6-2b52-de39-362a-3628430129b8" executionId="00a6fa68-c282-42c0-b403-0d041218bac6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3665c5f5-5324-0809-e81a-44a08654bed6" executionId="4575ad19-ad56-449b-8dcb-d3614332be8e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="df89b441-f5a9-a7dd-a3d6-8a3ce824836e" executionId="30234d56-acd9-401f-851b-2aa1ddb9c645" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c148534-a9ef-ac6b-f260-ad37a36fe4c1" executionId="58cc5634-dddd-4464-bc1c-efc14d9b9ef5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="80645d39-b00a-0ade-8829-61b24c7274cd" executionId="d6a745fa-93d0-47ac-8c58-6cded1ed2809" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19f7d2fc-691c-50e2-fe7d-d79f5461ea66" executionId="461a49a7-cc92-4864-b684-a89b7a533c3a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bb0e837a-793f-fe3a-ac83-f6f5e8eeb88d" executionId="a9526444-94c3-4753-8c5e-a8de1fa7aed0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9afe4851-7017-f2a0-b53e-e155f2cee22d" executionId="9af936c2-03a2-4664-9323-d7d775303539" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e574bb50-7040-edec-af15-3a3a96e3de39" executionId="8bb9717c-fdfc-4b02-b731-92198c22f03d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="245c3a10-a4f1-2a73-68c1-1a2f8c6a1422" executionId="7863f6e2-4801-4d1b-b8a8-6b4e07a33bb9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="74398668-ec75-d616-9807-bd0815019d1d" executionId="5fcd134a-62ce-42aa-b5e1-26a5dd3a3760" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b68e7859-fe0a-12df-bb93-192c03c29a83" executionId="a19cc23b-b549-46d6-ab3a-01126c61c0f0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f4d943ed-fe90-46a8-9515-b2b70c490a1c" executionId="0a1df4c6-28a0-46ad-a1f1-0d2ceefec44c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dfd3b97a-fe98-acfb-5236-9dd8de32ac09" executionId="a2e61c39-3b77-4ecb-9938-03ffa68ad07a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ff7c7705-4f53-c6e9-76db-c7f49dd1a0d8" executionId="e0e93f58-a1f3-4210-b06c-56fced25ee6a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c15cc3f6-c386-ad3c-60a9-377222e16b9b" executionId="f5efd5d1-0bec-4d2a-8602-39cc679abe03" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d06359a7-d264-7474-6b97-14c90245eaf5" executionId="efae14d2-46d2-46f6-9fe8-64d442b1fdac" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4b8780cf-b996-fddd-4cde-73cd4c942a76" executionId="0ebd8541-922f-4c45-ab3e-cf37dd83f370" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3ae459c0-5d01-420a-6557-90108f404a88" executionId="d21f120e-00d4-4abe-a02f-6c7a6fd611b0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Список результатов" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Все загруженные результаты" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="39" executed="22" passed="22" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.13)&#xD;
+[xUnit.net 00:00:00.06]   Discovering: PackCall.Test&#xD;
+[xUnit.net 00:00:00.12]   Discovered:  PackCall.Test&#xD;
+[xUnit.net 00:00:00.14]   Starting:    PackCall.Test&#xD;
+[xUnit.net 00:00:02.53]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:02.54]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:02.54]       Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.&#xD;
+[xUnit.net 00:00:02.54]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:02.54]       Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.&#xD;
+[xUnit.net 00:00:02.54]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:02.54]       Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.&#xD;
+Тест "PackCall.Core.Test.WorkerPostgresTests.Capture_UsesOneDatabaseTimestamp_RecoveryPreservesLeaseReplacedWhileWaiting" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.WorkerPostgresTests.SchemaGate_WaitsForExactHistory_RejectsUnknown_ObservesCancellation" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.OperatorPostgresTests.ConfirmedOperatorResultsAreTerminal" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.OperatorPostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.OperatorPostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.PerformancePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.PerformancePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit" пропущен в тестовом запуске.&#xD;
+[xUnit.net 00:00:02.65]       Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.&#xD;
+[xUnit.net 00:00:02.66]       Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.&#xD;
+[xUnit.net 00:00:02.66]       Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.&#xD;
+[xUnit.net 00:00:02.66]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:02.66]       Задайте PACKCALL_TEST_POSTGRES для проверки на PostgreSQL.&#xD;
+Тест "PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_ActiveLease_CompletesWithJournal" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_StorageErrorOrCancellation_DetachesBeforeSqlFailure" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_StaleLease_DoesNotChangeRowOrJournal" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_CompletesBeforeExpiry_RecoveryWaitingOnCommitCannotRequeueTerminal" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_ConcurrentSql_RespectsWinnerAndTimeAfterLock" пропущен в тестовом запуске.&#xD;
+[xUnit.net 00:00:02.66]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:02.66]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:02.66]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:02.66]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:02.66]       Set PACKCALL_TEST_POSTGRES to run against an isolated schema in PostgreSQL.&#xD;
+[xUnit.net 00:00:02.66]   Finished:    PackCall.Test&#xD;
+Тест "PackCall.Core.Test.CampaignPausePostgresTests.ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.CampaignPausePostgresTests.PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.CampaignPausePostgresTests.HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.CampaignPausePostgresTests.StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion" пропущен в тестовом запуске.&#xD;
+Тест "PackCall.Core.Test.CampaignPausePostgresTests.PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain" пропущен в тестовом запуске.&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.3030152+03:00">
+        <Text>[xUnit.net 00:00:02.53]     PackCall.Core.Test.WorkerPostgresTests.Capture_UsesOneDatabaseTimestamp_RecoveryPreservesLeaseReplacedWhileWaiting [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.3049280+03:00">
+        <Text>[xUnit.net 00:00:02.54]     PackCall.Core.Test.WorkerPostgresTests.SchemaGate_WaitsForExactHistory_RejectsUnknown_ObservesCancellation [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.3051877+03:00">
+        <Text>[xUnit.net 00:00:02.54]     PackCall.Core.Test.OperatorPostgresTests.ConfirmedOperatorResultsAreTerminal [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.3054070+03:00">
+        <Text>[xUnit.net 00:00:02.54]     PackCall.Core.Test.OperatorPostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.3055744+03:00">
+        <Text>[xUnit.net 00:00:02.54]     PackCall.Core.Test.OperatorPostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.3057344+03:00">
+        <Text>[xUnit.net 00:00:02.54]     PackCall.Core.Test.PerformancePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.3058889+03:00">
+        <Text>[xUnit.net 00:00:02.54]     PackCall.Core.Test.PerformancePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.4242476+03:00">
+        <Text>[xUnit.net 00:00:02.65]     PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_ActiveLease_CompletesWithJournal [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.4245663+03:00">
+        <Text>[xUnit.net 00:00:02.66]     PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_StorageErrorOrCancellation_DetachesBeforeSqlFailure [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.4247839+03:00">
+        <Text>[xUnit.net 00:00:02.66]     PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_StaleLease_DoesNotChangeRowOrJournal [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.4249853+03:00">
+        <Text>[xUnit.net 00:00:02.66]     PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_CompletesBeforeExpiry_RecoveryWaitingOnCommitCannotRequeueTerminal [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.4252247+03:00">
+        <Text>[xUnit.net 00:00:02.66]     PackCall.Core.Test.DeliveryResultLeasePostgresTests.Result_ConcurrentSql_RespectsWinnerAndTimeAfterLock [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.4274838+03:00">
+        <Text>[xUnit.net 00:00:02.66]     PackCall.Core.Test.CampaignPausePostgresTests.ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.4274983+03:00">
+        <Text>[xUnit.net 00:00:02.66]     PackCall.Core.Test.CampaignPausePostgresTests.PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.4275105+03:00">
+        <Text>[xUnit.net 00:00:02.66]     PackCall.Core.Test.CampaignPausePostgresTests.HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.4275260+03:00">
+        <Text>[xUnit.net 00:00:02.66]     PackCall.Core.Test.CampaignPausePostgresTests.StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion [SKIP]</Text>
+      </RunInfo>
+      <RunInfo computerName="USERHOM-FATLF67" outcome="Warning" timestamp="2026-11-02T21:07:25.4275396+03:00">
+        <Text>[xUnit.net 00:00:02.66]     PackCall.Core.Test.CampaignPausePostgresTests.PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain [SKIP]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>
