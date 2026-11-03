@@ -17,9 +17,14 @@ CI — GitHub Actions, workflow `.github/workflows/ci.yml`.
     применение EF-миграций через `PackCall.Migrator` и интеграционные тесты
     (`--filter "Category=Integration"`) с `PACKCALL_TEST_POSTGRES`; TRX-гейт требует
     executed > 0 и **0 skipped**;
+  - `python_offline` — «Python offline checks»: `pip install -r scripts/performance/requirements.txt`
+    и `python -m pytest tests/tools/performance` (без внешних сервисов);
+  - `docker_build` — «Docker image builds»: сборка `PackCall.Api`, `PackCall.Worker`,
+    `PackCall.Migrator` и `PackCall.TestEmailOperator` (без push/логина);
   - `ci_required` — «CI required»: агрегирующий обязательный check.
-- Логи и TRX: `ci-logs-<sha>-<run_id>` (сборка/unit) и `integration-logs-<sha>-<run_id>`
-  (миграции/интеграционные тесты), хранение 14 дней.
+- Логи и TRX: `ci-logs-<sha>-<run_id>` (сборка/unit), `integration-logs-<sha>-<run_id>`
+  (миграции/интеграционные тесты), `python-offline-logs-<sha>-<run_id>` и
+  `docker-build-logs-<sha>-<run_id>`; хранение 14 дней.
 - Локальные предпосылки: .NET SDK 10, Python 3.11+, Docker Engine.
 - Миграции применяются к схеме `public`; интеграционные тесты работают в собственных временных
   схемах (`PostgresTestBase`). Факт применения миграции проверяет `MigrationAppliedTests`.

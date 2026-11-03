@@ -81,7 +81,7 @@ lifecycle и metric definitions. `examples/` содержит только си�
 
 ```powershell
 python -m pip install -r scripts/performance/requirements.txt
-python -m unittest discover -s tests/tools/performance -p 'test_*.py' -v
+python -m pytest tests/tools/performance -q
 ```
 
 Единицы: длительности операций — ms, интервалы — s, CPU — s/cores,

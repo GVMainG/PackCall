@@ -39,6 +39,17 @@
 - Коды выхода: `0` — отчёт принят (печатается число executed/skipped), `1` — ноль тестов или
   запрещённые скипы, `2` — TRX не читается/невалиден.
 
+## `check_junit.py`
+
+Аналог `check_trx.py` для JUnit XML: pytest выходит с кодом 0 даже при полностью пропущенных
+тестах, поэтому python-гейт проверяет отчёт и падает при нуле исполненных тестов, а с флагом
+`--forbid-skipped` — и при любом пропущенном тесте.
+
+- `python3 scripts/ci/check_junit.py artifacts/python-offline.xml`
+- `python3 scripts/ci/check_junit.py --forbid-skipped artifacts/python-offline.xml`
+- Коды выхода: `0` — отчёт принят, `1` — ноль тестов или запрещённые скипы, `2` — файл не
+  читается/невалиден.
+
 ## `release_gate.py`
 
 Проверка перед постановкой тега: для указанного коммита через GitHub API проверяется, что

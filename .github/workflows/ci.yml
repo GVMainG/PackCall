@@ -119,13 +119,72 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
-  # Story 1.4 adds its job here and to ci_required.needs; the aggregate checks
-  # every entry of `needs` through toJSON, so a forgotten dependency is caught
-  # only if it is listed in `needs` (the workflow-contract test enforces it).
+  python_offline:
+    name: Python offline checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Prepare artifact directory
+        run: mkdir -p artifacts
+      - name: Install committed requirements
+        shell: bash
+        run: pip install -r scripts/performance/requirements.txt 2>&1 | tee artifacts/python-install.log
+      - name: Run offline performance tests
+        shell: bash
+        run: python -m pytest tests/tools/performance -q --tb=short --junitxml=artifacts/python-offline.xml 2>&1 | tee artifacts/python-offline.log
+      - name: Assert offline tests actually ran without skips
+        run: python3 scripts/ci/check_junit.py --forbid-skipped artifacts/python-offline.xml
+      - name: Upload offline check logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-offline-logs-${{ github.sha }}-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 14
+          if-no-files-found: warn
+
+  docker_build:
+    name: Docker image builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare artifact directory
+        if: always()
+        run: mkdir -p artifacts
+      - name: Build PackCall.Api
+        shell: bash
+        run: docker build -f src/PackCall.Api/Dockerfile -t packcall-api . 2>&1 | tee artifacts/docker-api.log
+      - name: Build PackCall.Worker
+        shell: bash
+        run: docker build -f src/PackCall.Worker/Dockerfile -t packcall-worker . 2>&1 | tee artifacts/docker-worker.log
+      - name: Build PackCall.Migrator
+        shell: bash
+        run: docker build -f src/PackCall.Migrator/Dockerfile -t packcall-migrator . 2>&1 | tee artifacts/docker-migrator.log
+      - name: Build PackCall.TestEmailOperator
+        shell: bash
+        run: docker build -f src/PackCall.TestEmailOperator/Dockerfile -t packcall-test-email-operator src/PackCall.TestEmailOperator 2>&1 | tee artifacts/docker-test-email-operator.log
+      - name: Upload Docker build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-build-logs-${{ github.sha }}-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 14
+          if-no-files-found: warn
+
+  # The aggregate checks every entry of `needs` through toJSON, so a forgotten
+  # dependency is caught only if it is listed in `needs` (the workflow-contract
+  # test enforces that every job is listed).
   ci_required:
     name: CI required
     if: always()
-    needs: [utf8_sources, build_and_unit, integration]
+    needs: [utf8_sources, build_and_unit, integration, python_offline, docker_build]
     runs-on: ubuntu-latest
     steps:
       - name: Verify every required job succeeded

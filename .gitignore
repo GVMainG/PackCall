@@ -396,3 +396,5 @@ FodyWeavers.xsd
 /docs/**/*.key
 /docs/**/*.p12
 /docs/**/*.snk
+# Python tooling caches
+.pytest_cache/

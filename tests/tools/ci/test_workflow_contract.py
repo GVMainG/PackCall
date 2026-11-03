@@ -42,7 +42,8 @@ class WorkflowContractTests(unittest.TestCase):
 
     def test_dotnet_pipelines_use_a_pipefail_capable_shell(self):
         # `shell: bash` enables -o pipefail; without it a failing dotnet piped into tee is swallowed.
-        self.assertGreaterEqual(TEXT.count("shell: bash"), 2)
+        for job in ("build_and_unit", "integration"):
+            self.assertIn("shell: bash", job_block(job))
 
     def test_gate_tests_run_in_ci(self):
         self.assertIn("tests/tools/ci", job_block("utf8_sources"))
@@ -58,6 +59,21 @@ class WorkflowContractTests(unittest.TestCase):
             block.index("--forbid-skipped"),
             block.index("LogFileName=integration.trx"),
         )
+
+    def test_python_offline_job_uses_pytest_and_committed_requirements(self):
+        block = job_block("python_offline")
+        self.assertIn("scripts/performance/requirements.txt", block)
+        self.assertIn("python -m pytest tests/tools/performance", block)
+        self.assertIn("--junitxml=artifacts/python-offline.xml", block)
+        self.assertIn("check_junit.py --forbid-skipped artifacts/python-offline.xml", block)
+        self.assertIn("shell: bash", block)
+
+    def test_docker_build_job_builds_all_four_images(self):
+        block = job_block("docker_build")
+        for name in ("PackCall.Api", "PackCall.Worker", "PackCall.Migrator", "PackCall.TestEmailOperator"):
+            self.assertIn(name, block)
+        self.assertEqual(4, block.count("docker build"))
+        self.assertIn("shell: bash", block)
 
 
 if __name__ == "__main__":
