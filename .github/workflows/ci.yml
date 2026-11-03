@@ -5,9 +5,14 @@ on:
   push:
     branches: [master]
     tags: ["v*"]
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   utf8_sources:
@@ -16,7 +21,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Test the UTF-8 gate itself
+      - name: Test the CI gates themselves
         run: python3 -m unittest discover -s tests/tools/ci -p "test_*.py" -v
       - name: Check tracked C# sources are strict UTF-8
         run: python3 scripts/ci/check_utf8_sources.py
@@ -31,25 +36,32 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - name: Build (Release)
+        shell: bash
         run: |
           mkdir -p artifacts
           dotnet build PackCall.slnx -c Release --nologo 2>&1 | tee artifacts/build.log
       - name: Unit tests
+        shell: bash
         run: |
           mkdir -p artifacts/test-results
           dotnet test tests/PackCall.Test/PackCall.Test.csproj -c Release --no-build --nologo \
             --filter "Category=Unit" \
             --logger "trx;LogFileName=unit.trx" \
             --results-directory artifacts/test-results 2>&1 | tee artifacts/unit.log
+      - name: Assert unit tests actually ran
+        run: python3 scripts/ci/check_trx.py artifacts/test-results/unit.trx
       - name: Upload CI logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ci-logs-${{ github.sha }}
+          name: ci-logs-${{ github.sha }}-${{ github.run_id }}
           path: artifacts/
+          retention-days: 14
           if-no-files-found: error
 
-  # Stories 1.3-1.4 add their jobs here and to ci_required.needs.
+  # Stories 1.3-1.4 add their jobs here and to ci_required.needs; the aggregate
+  # checks every entry of `needs` through toJSON, so a forgotten dependency
+  # would still be caught only if it is listed in `needs`.
   ci_required:
     name: CI required
     if: always()
@@ -58,12 +70,9 @@ jobs:
     steps:
       - name: Verify every required job succeeded
         env:
-          UTF8_RESULT: ${{ needs.utf8_sources.result }}
-          BUILD_RESULT: ${{ needs.build_and_unit.result }}
+          NEEDS: ${{ toJSON(needs) }}
         run: |
-          echo "utf8_sources: $UTF8_RESULT"
-          echo "build_and_unit: $BUILD_RESULT"
-          status=0
-          test "$UTF8_RESULT" = success || { echo "::error::required job utf8_sources did not succeed: $UTF8_RESULT"; status=1; }
-          test "$BUILD_RESULT" = success || { echo "::error::required job build_and_unit did not succeed: $BUILD_RESULT"; status=1; }
-          exit $status
+          echo "required job results:"
+          echo "$NEEDS"
+          echo "$NEEDS" | jq -e 'to_entries | all(.value.result == "success")' > /dev/null \
+            || { echo "::error::a required job did not succeed"; exit 1; }
