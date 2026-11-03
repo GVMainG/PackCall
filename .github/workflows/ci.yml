@@ -35,6 +35,9 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+      - name: Prepare artifact directory
+        if: always()
+        run: mkdir -p artifacts/test-results
       - name: Build (Release)
         shell: bash
         run: |
@@ -48,8 +51,8 @@ jobs:
             --filter "Category=Unit" \
             --logger "trx;LogFileName=unit.trx" \
             --results-directory artifacts/test-results 2>&1 | tee artifacts/unit.log
-      - name: Assert unit tests actually ran
-        run: python3 scripts/ci/check_trx.py artifacts/test-results/unit.trx
+      - name: Assert unit tests actually ran without skips
+        run: python3 scripts/ci/check_trx.py --forbid-skipped artifacts/test-results/unit.trx
       - name: Upload CI logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -57,15 +60,72 @@ jobs:
           name: ci-logs-${{ github.sha }}-${{ github.run_id }}
           path: artifacts/
           retention-days: 14
-          if-no-files-found: error
+          if-no-files-found: warn
 
-  # Stories 1.3-1.4 add their jobs here and to ci_required.needs; the aggregate
-  # checks every entry of `needs` through toJSON, so a forgotten dependency
-  # would still be caught only if it is listed in `needs`.
+  integration:
+    name: Integration tests (PostgreSQL)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:18.6-alpine3.24
+        env:
+          POSTGRES_DB: packcall
+          POSTGRES_USER: packcall
+          POSTGRES_PASSWORD: packcall-ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U packcall -d packcall"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Prepare artifact directory
+        if: always()
+        run: mkdir -p artifacts/test-results
+      - name: Build (Release)
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          dotnet build PackCall.slnx -c Release --nologo 2>&1 | tee artifacts/build.log
+      - name: Apply EF migrations
+        shell: bash
+        env:
+          ConnectionStrings__Postgres: "Host=localhost;Port=5432;Database=packcall;Username=packcall;Password=packcall-ci"
+        run: dotnet run --project src/PackCall.Migrator -c Release --no-build 2>&1 | tee artifacts/migrate.log
+      - name: Integration tests
+        shell: bash
+        env:
+          PACKCALL_TEST_POSTGRES: "Host=localhost;Port=5432;Database=packcall;Username=packcall;Password=packcall-ci"
+        run: |
+          mkdir -p artifacts/test-results
+          dotnet test tests/PackCall.Test/PackCall.Test.csproj -c Release --no-build --nologo \
+            --filter "Category=Integration" \
+            --logger "trx;LogFileName=integration.trx" \
+            --results-directory artifacts/test-results 2>&1 | tee artifacts/integration.log
+      - name: Assert integration tests ran without skips
+        run: python3 scripts/ci/check_trx.py --forbid-skipped artifacts/test-results/integration.trx
+      - name: Upload integration diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-logs-${{ github.sha }}-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 14
+          if-no-files-found: warn
+
+  # Story 1.4 adds its job here and to ci_required.needs; the aggregate checks
+  # every entry of `needs` through toJSON, so a forgotten dependency is caught
+  # only if it is listed in `needs` (the workflow-contract test enforces it).
   ci_required:
     name: CI required
     if: always()
-    needs: [utf8_sources, build_and_unit]
+    needs: [utf8_sources, build_and_unit, integration]
     runs-on: ubuntu-latest
     steps:
       - name: Verify every required job succeeded

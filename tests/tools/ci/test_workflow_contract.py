@@ -47,6 +47,18 @@ class WorkflowContractTests(unittest.TestCase):
     def test_gate_tests_run_in_ci(self):
         self.assertIn("tests/tools/ci", job_block("utf8_sources"))
 
+    def test_integration_job_uses_postgres_and_forbids_skips(self):
+        block = job_block("integration")
+        self.assertIn("postgres:18.6-alpine3.24", block)
+        self.assertIn("PACKCALL_TEST_POSTGRES", block)
+        self.assertIn("shell: bash", block)
+        self.assertIn("--forbid-skipped artifacts/test-results/integration.trx", block)
+        # The guard must run after the test step that writes the TRX.
+        self.assertGreater(
+            block.index("--forbid-skipped"),
+            block.index("LogFileName=integration.trx"),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
