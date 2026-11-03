@@ -24,4 +24,24 @@
   с неверными символами, но без U+FFFD) — вне контракта гейта.
 
 Тесты гейта: `tests/tools/ci/test_check_utf8_sources.py`. В CI они запускаются в job
-`utf8-sources` (`.github/workflows/ci.yml`) перед самой проверкой исходников.
+`utf8_sources` (`.github/workflows/ci.yml`) перед самой проверкой исходников.
+
+## `release_gate.py`
+
+Проверка перед постановкой тега: для указанного коммита через GitHub API проверяется, что
+обязательный агрегирующий check (`CI required`) завершён успешно.
+
+Команда:
+
+```bash
+GITHUB_TOKEN=... python3 scripts/ci/release_gate.py --commit <sha>
+```
+
+Параметры: `--commit` (обязательный), `--repo owner/name` (по умолчанию `GITHUB_REPOSITORY`),
+`--required NAME` (повторяемый; по умолчанию `CI required`).
+
+Коды выхода: `0` — все обязательные проверки успешны, `1` — проверка провалена, отсутствует или
+ещё выполняется (тег не ставится), `2` — ошибка окружения (нет токена, сеть, HTTP, JSON).
+
+Токен читается только из `GITHUB_TOKEN` и никогда не печатается. Тесты:
+`tests/tools/ci/test_release_gate.py` (GitHub API замокан, сеть не нужна).

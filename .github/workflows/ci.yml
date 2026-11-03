@@ -1,14 +1,16 @@
 name: CI
 
 on:
-  push:
   pull_request:
+  push:
+    branches: [master]
+    tags: ["v*"]
 
 permissions:
   contents: read
 
 jobs:
-  utf8-sources:
+  utf8_sources:
     name: Strict UTF-8 sources
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -18,3 +20,50 @@ jobs:
         run: python3 -m unittest discover -s tests/tools/ci -p "test_*.py" -v
       - name: Check tracked C# sources are strict UTF-8
         run: python3 scripts/ci/check_utf8_sources.py
+
+  build_and_unit:
+    name: Build and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Build (Release)
+        run: |
+          mkdir -p artifacts
+          dotnet build PackCall.slnx -c Release --nologo 2>&1 | tee artifacts/build.log
+      - name: Unit tests
+        run: |
+          mkdir -p artifacts/test-results
+          dotnet test tests/PackCall.Test/PackCall.Test.csproj -c Release --no-build --nologo \
+            --filter "Category=Unit" \
+            --logger "trx;LogFileName=unit.trx" \
+            --results-directory artifacts/test-results 2>&1 | tee artifacts/unit.log
+      - name: Upload CI logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-logs-${{ github.sha }}
+          path: artifacts/
+          if-no-files-found: error
+
+  # Stories 1.3-1.4 add their jobs here and to ci_required.needs.
+  ci_required:
+    name: CI required
+    if: always()
+    needs: [utf8_sources, build_and_unit]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify every required job succeeded
+        env:
+          UTF8_RESULT: ${{ needs.utf8_sources.result }}
+          BUILD_RESULT: ${{ needs.build_and_unit.result }}
+        run: |
+          echo "utf8_sources: $UTF8_RESULT"
+          echo "build_and_unit: $BUILD_RESULT"
+          status=0
+          test "$UTF8_RESULT" = success || { echo "::error::required job utf8_sources did not succeed: $UTF8_RESULT"; status=1; }
+          test "$BUILD_RESULT" = success || { echo "::error::required job build_and_unit did not succeed: $BUILD_RESULT"; status=1; }
+          exit $status
