@@ -154,6 +154,21 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - name: Verify TEST_SIMULATE_ERRORS defaults to false
+        env:
+          DOCKER_REGISTRY: ""
+          POSTGRES_DB: packcall
+          POSTGRES_USER: packcall
+          POSTGRES_PASSWORD: packcall
+          PACKCALL_ENVIRONMENT: test
+          TEST_SENDER_MODE: inprocess
+          TEST_SIMULATE_ERRORS: ""
+          TEST_OPERATOR_URL: ""
+          TEST_OPERATOR_TIMEOUT_SECONDS: "5"
+        run: |
+          flag=$(docker compose -f docker-compose.yml config --format json | jq -r '.services["packcall.worker"].environment.TEST_SIMULATE_ERRORS')
+          echo "TEST_SIMULATE_ERRORS=$flag"
+          test "$flag" = "false"
       - name: Prepare artifact directory
         if: always()
         run: mkdir -p artifacts

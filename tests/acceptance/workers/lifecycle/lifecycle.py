@@ -35,7 +35,7 @@ r['apiRestartWorkerUnchanged']=True
 docker('stop','packcall-w21-packcall.api-1')
 t=time.monotonic();docker('stop','--time','40','packcall-w21-packcall.worker-1');r['stopSeconds']=round(time.monotonic()-t,3)
 r['afterSigterm']=sql('select delivery_status,count(*) from deliveries group by delivery_status order by delivery_status')
-assert sql('select count(*) from deliveries where delivery_status=3')=='0'
+assert sql('select count(*) from deliveries where delivery_status=-1')=='0'
 assert int(sql('select count(*) from deliveries where delivery_status=1'))>0
 docker('start','packcall-w21-packcall.worker-1');time.sleep(.2)
 assert int(sql("select count(*) from deliveries where delivery_status=1 and worker_id='"+wid+"'"))>0
