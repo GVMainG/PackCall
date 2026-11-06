@@ -15,7 +15,7 @@ def wait(check,seconds=15):
  raise AssertionError('Timed out')
 def start(name,app,database='packcall',extra=()):
  docker('rm','-f',name,check=False)
- docker('run','-d','--name',name,'--network',network,'-e',f'ConnectionStrings__Postgres=Host=packcall.db;Database={database};Username=packcall;Password=packcall',*extra,'packcall'+app.lower())
+ docker('run','-d','--name',name,'--network',network,'-e',f'ConnectionStrings__Postgres=Host=packcall.db;Database={database};Username=packcall;Password=packcall','-e','PACKCALL_ENVIRONMENT=test','-e','TEST_SENDER_MODE=inprocess','-e','TEST_SIMULATE_ERRORS=false',*extra,'packcall'+app.lower())
 def exitcode(name):
  wait(lambda:docker('inspect','-f','{{.State.Running}}',name)=='false',70)
  return int(docker('inspect','-f','{{.State.ExitCode}}',name))
