@@ -30,6 +30,7 @@ assert sql('select count(*) from deliveries where delivery_status<>0')=='0'
 docker('start','packcall-w21-packcall.worker-1')
 def owner():return sql('select worker_id from deliveries where delivery_status=1 limit 1')
 wid=wait(owner);r['workerId']=wid
+docker('stop','packcall-w21-packcall.worker-1')
 docker('restart','packcall-w21-packcall.api-1');wait(ready);assert owner()==wid
 r['apiRestartWorkerUnchanged']=True
 docker('stop','packcall-w21-packcall.api-1')
