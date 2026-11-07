@@ -1,48 +1,45 @@
 # RUN-2 — ремонт приёмки (`startup.py`, `shutdown-probes.py`)
 
-**Результат:** `startup.py` — PASS; `shutdown-probes.py` — фикс применён, прогон требует полного
-W21-проекта (worker + probe publish), отложен.
-**Commit SHA:** `b69d107dfc61c2702d5e747cc278e7f1d32795cc`
+**Результат:** PASS (оба сценария).
+**Commit SHA:** `c12e0f0` (финальный; предыдущие фиксы `b69d107`, `e881f54`)
 
 ## Дефект
 
 `startup.py`/`shutdown-probes.py` запускали контейнеры прямым `docker run` без обязательных
-переменных хоста. Образы и probe (`tests/PackCall.Worker.Probe`) вызывают
-`TestOperatorSettings.Parse`, который требует `PACKCALL_ENVIRONMENT` и `TEST_SENDER_MODE`, поэтому
-контейнер падал на старте с конфигурационным исключением, а не с понятным сообщением.
+переменных хоста (`PACKCALL_ENVIRONMENT`, `TEST_SENDER_MODE`). Образы и probe
+(`tests/PackCall.Worker.Probe`) вызывают `TestOperatorSettings.Parse`, который без валидного
+режима падает на старте, поэтому сценарии падали неинформативно.
 
 ## Исправление
 
-В каждый прямой `docker run` добавлены `-e PACKCALL_ENVIRONMENT=test`, `-e
-TEST_SENDER_MODE=inprocess`, `-e TEST_SIMULATE_ERRORS=false` (в `startup.py` — через `start()`;
-в `shutdown-probes.py` — для probe-контейнера). Строка подключения уже передавалась; теперь
-передаётся и режим тестового оператора, поэтому сценарии не зависят от окружения compose.
+Общий набор `HOST_ENV` в `support.py` (`PACKCALL_ENVIRONMENT=test`,
+`TEST_SENDER_MODE=inprocess`, `TEST_SIMULATE_ERRORS=false`), передаётся в каждом прямом
+`docker run`; в `startup.py` обязательные флаги ставятся **после** `*extra`, чтобы caller не
+переопределил тест-режим (строку подключения по-прежнему можно переопределить для негативных
+сценариев). `TEST_OPERATOR_URL`/`TEST_OPERATOR_TIMEOUT_SECONDS` нужны только для Compose-интерполяции
+и в direct `docker run` не обязательны (inprocess).
 
 ## Проверка
 
 - `python tests/acceptance/workers/lifecycle/startup.py` → exit 0; `startup.json` фиксирует все
-  gate-сценарии: `gateNoDdl=0`, `waitThenReady`, SIGTERM-гейты (Api/Worker), недоступная БД
-  (exit 1), неизвестная миграция (exit 1), повторный migrator (exit 0), `migratorSigtermExit=1`,
-  `emptyTimeout` (exit 1, ~60s).
-- Среда: локальный Compose-проект `packcall-w21` (только `packcall.db`) + собранные образы
-  `packcallapi`/`packcallworker`/`packcallmigrator`.
+  gate-сценарии (gateNoDdl, SIGTERM-гейты, недоступная БД, неизвестная миграция, повторный
+  migrator, emptyTimeout ~60s).
+- `python tests/acceptance/workers/lifecycle/shutdown-probes.py` → exit 0; оба режима
+  (`before` ~0.3s, `ignore` ~30.3s) с `leaseRetained=true`, `noTerminalJournal=true`.
+- Probe опубликован: `dotnet publish tests/PackCall.Worker.Probe -c Release -o $env:TEMP/packcall-w21-probe`.
 
 ## Команда воспроизведения
 
 ```bash
-# .env (для compose-интерполяции)
-DOCKER_REGISTRY=
-PACKCALL_ENVIRONMENT=test
-TEST_SENDER_MODE=inprocess
-POSTGRES_DB=packcall
-POSTGRES_USER=packcall
-POSTGRES_PASSWORD=packcall
-TEST_SIMULATE_ERRORS=false
-TEST_OPERATOR_URL=
-TEST_OPERATOR_TIMEOUT_SECONDS=5
-
-docker compose -p packcall-w21 -f docker-compose.yml up -d packcall.db
+# .env (для Compose-интерполяции): DOCKER_REGISTRY=, PACKCALL_ENVIRONMENT=test,
+# TEST_SENDER_MODE=inprocess, POSTGRES_DB/USER/PASSWORD=packcall, TEST_SIMULATE_ERRORS=false,
+# TEST_OPERATOR_URL=, TEST_OPERATOR_TIMEOUT_SECONDS=5
+docker compose -p packcall-w21 -f docker-compose.yml up -d
+docker exec packcall-w21-packcall.db-1 psql -U packcall -d packcall -Atc \
+  "INSERT INTO recipients(id,email) VALUES(gen_random_uuid(),'probe@example.test') ON CONFLICT DO NOTHING"
+dotnet publish tests/PackCall.Worker.Probe/PackCall.Worker.Probe.csproj -c Release -o $env:TEMP/packcall-w21-probe
 python tests/acceptance/workers/lifecycle/startup.py
+python tests/acceptance/workers/lifecycle/shutdown-probes.py
 ```
 
 Среда: Windows, Docker Desktop (Linux containers), Python 3.13.

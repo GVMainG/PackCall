@@ -39,4 +39,8 @@ python tests/acceptance/workers/lifecycle/compose-failure.py
 
 JSON-свидетельства сохраняются в `_bmad-output/implementation-artifacts/story-2-1-worker`, отчёт и TRX остаются там же. Скрипты не удаляют volumes. После проверки остановите тестовые сервисы/контейнеры; сохраните volumes, если они нужны для повторной проверки. Не используйте рабочий Compose project name.
 
-Исходное ограничение: startup.py, images.py и shutdown-probes.py используют прямой `docker run`; они не передают весь обязательный production environment, включая PACKCALL_ENVIRONMENT/TEST_SENDER_MODE. `.env` применяется к Compose, но не переносится автоматически в direct docker run. Поэтому подготовка выше исправляет предусловия Compose, но не делает полный исторический сценарий совместимым с текущей production конфигурацией. Эти сценарии не исправлялись и не выполнялись в реорганизации; их ошибки нельзя считать регрессией переноса без отдельной проверки.
+Исходное ограничение: `images.py` использует прямой `docker run` и не передаёт весь обязательный
+production environment (`PACKCALL_ENVIRONMENT`/`TEST_SENDER_MODE`). `startup.py` и
+`shutdown-probes.py` передают обязательный env через общий `HOST_ENV` из `support.py`
+(RUN-2, исправлено в beta.2). `.env` применяется к Compose, но не переносится автоматически в
+direct `docker run`.
