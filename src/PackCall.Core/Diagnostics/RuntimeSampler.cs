@@ -9,6 +9,8 @@ public sealed class RuntimeSampler(Guid sessionId, Guid processInstanceId, TimeP
     private readonly Guid _instanceId = Guid.NewGuid();
     private readonly long _boot = (time ?? TimeProvider.System).GetTimestamp();
     private long _sequence, _previousAllocated = GC.GetTotalAllocatedBytes();
+    private DateTimeOffset? _lastUtc;
+    private double? _lastElapsedEnd;
     public Guid InstanceId => _instanceId;
 
     public byte[] Collect(double periodSeconds = 5, double lagSeconds = 0)
@@ -39,14 +41,24 @@ public sealed class RuntimeSampler(Guid sessionId, Guid processInstanceId, TimeP
         Add("collector.cpu", "s", "delta", Math.Max(0, process.TotalProcessorTime.TotalSeconds - cpuStart));
         Add("collector.rss", "bytes", "gauge", process.WorkingSet64);
         var end = _time.GetTimestamp();
-        Add("collector.duration", "s", "gauge", _time.GetElapsedTime(start, end).TotalSeconds);
+        var duration = _time.GetElapsedTime(start, end).TotalSeconds;
+        var elapsedEnd = _time.GetElapsedTime(_boot, end).TotalSeconds;
+        var quality = "complete";
+        if (utc < _lastUtc)
+            quality = "clock_jump";
+        else if (elapsedEnd < _lastElapsedEnd)
+            quality = "partial";
+        _lastUtc = utc;
+        _lastElapsedEnd = elapsedEnd;
+
+        Add("collector.duration", "s", "gauge", duration);
         return JsonSerializer.SerializeToUtf8Bytes(new
         {
             schema_version = 1, session_id = sessionId, source = "runtime", instance_id = _instanceId,
             process_instance_id = processInstanceId, sequence = _sequence++, start_utc = utc, end_utc = _time.GetUtcNow(),
-            duration_s = _time.GetElapsedTime(start, end).TotalSeconds,
+            duration_s = duration,
             elapsed_start_s = _time.GetElapsedTime(_boot, start).TotalSeconds,
-            elapsed_end_s = _time.GetElapsedTime(_boot, end).TotalSeconds, quality = "complete",
+            elapsed_end_s = elapsedEnd, quality,
             period_s = periodSeconds, lag_s = lagSeconds, receipt_utc = _time.GetUtcNow(), metrics
         });
     }

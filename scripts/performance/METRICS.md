@@ -74,6 +74,13 @@ CPU seconds / фактические elapsed seconds, denominator — одно �
 Runtime снимается каждые 5 s после окончания предыдущего sample. Collector duration
 измеряется монотонно; collector CPU для встроенного sampler — изменение CPU всего
 процесса за sample (включает конкурентную бизнес-работу, не точная самооценка).
+
+Первый runtime sample получает `quality = "complete"`. Далее sampler сравнивает
+`start_utc` и `elapsed_end_s` с соответствующими границами предыдущего sample
+того же instance. Уменьшение `start_utc` даёт `clock_jump`, уменьшение
+`elapsed_end_s` даёт `partial`. При одновременном уменьшении приоритет у
+`clock_jump`. Если обе границы сохранились или выросли, sample получает `complete`.
+
 Внешний Python collector сохраняет собственные CPU/RSS; CPU дочерних docker/psql/
 PowerShell команд не входит в Python process CPU, но их ожидание входит в duration.
 
