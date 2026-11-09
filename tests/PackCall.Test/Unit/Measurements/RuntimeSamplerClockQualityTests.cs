@@ -22,7 +22,9 @@ public sealed class RuntimeSamplerClockQualityTests
     public void AdvancingClocksKeepTheNextCollectComplete()
     {
         CollectQuality();
-        _clock.Advance(utcSeconds: 5, elapsedSeconds: 5);
+        _clock.Advance(utcSeconds: 0, elapsedSeconds: 5);
+        var startUtc = DateTimeOffset.UnixEpoch.AddSeconds(5);
+        _clock.SetUtcReadings(startUtc, startUtc.AddSeconds(1), startUtc.AddSeconds(2));
 
         Assert.Equal("complete", CollectQuality());
     }
@@ -45,6 +47,34 @@ public sealed class RuntimeSamplerClockQualityTests
 
         _clock.Advance(utcSeconds: 1, elapsedSeconds: 1);
         Assert.Equal("complete", CollectQuality());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void BackwardUtcJumpWithinCollectMarksClockJumpAndPreservesObservedEnd(bool hasPreviousSample)
+    {
+        if (hasPreviousSample)
+            Assert.Equal("complete", CollectQuality());
+
+        var startUtc = DateTimeOffset.UnixEpoch.AddSeconds(10);
+        var endUtc = startUtc.AddSeconds(-5);
+        var receiptUtc = startUtc.AddSeconds(1);
+        _clock.Advance(utcSeconds: 0, elapsedSeconds: 10);
+        _clock.SetUtcReadings(startUtc, endUtc, receiptUtc);
+
+        using var sample = JsonDocument.Parse(_sampler.Collect());
+        Assert.Equal("clock_jump", sample.RootElement.GetProperty("quality").GetString());
+        Assert.Equal(startUtc, sample.RootElement.GetProperty("start_utc").GetDateTimeOffset());
+        Assert.Equal(endUtc, sample.RootElement.GetProperty("end_utc").GetDateTimeOffset());
+        Assert.Equal(receiptUtc, sample.RootElement.GetProperty("receipt_utc").GetDateTimeOffset());
+
+        var nextStartUtc = startUtc.AddSeconds(-1);
+        var nextEndUtc = startUtc.AddSeconds(2);
+        _clock.Advance(utcSeconds: 0, elapsedSeconds: 5);
+        _clock.SetUtcReadings(nextStartUtc, nextEndUtc, nextEndUtc.AddSeconds(1));
+
+        Assert.Equal("clock_jump", CollectQuality());
     }
 
     [Fact]
@@ -78,12 +108,15 @@ public sealed class RuntimeSamplerClockQualityTests
 
     private sealed class Clock : TimeProvider
     {
+        private Queue<DateTimeOffset> _utcReadings = new();
         private DateTimeOffset _utc = DateTimeOffset.UnixEpoch;
         private long _timestamp;
 
         public override long TimestampFrequency => 1;
         public override long GetTimestamp() => _timestamp;
-        public override DateTimeOffset GetUtcNow() => _utc;
+        public override DateTimeOffset GetUtcNow() => _utcReadings.TryDequeue(out var utc) ? utc : _utc;
+
+        public void SetUtcReadings(params DateTimeOffset[] readings) => _utcReadings = new(readings);
 
         public void Advance(int utcSeconds, int elapsedSeconds)
         {

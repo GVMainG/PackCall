@@ -75,11 +75,16 @@ Runtime снимается каждые 5 s после окончания пре
 измеряется монотонно; collector CPU для встроенного sampler — изменение CPU всего
 процесса за sample (включает конкурентную бизнес-работу, не точная самооценка).
 
-Первый runtime sample получает `quality = "complete"`. Далее sampler сравнивает
-`start_utc` и `elapsed_end_s` с соответствующими границами предыдущего sample
-того же instance. Уменьшение `start_utc` даёт `clock_jump`, уменьшение
-`elapsed_end_s` даёт `partial`. При одновременном уменьшении приоритет у
-`clock_jump`. Если обе границы сохранились или выросли, sample получает `complete`.
+Runtime sample получает `quality = "clock_jump"`, если `end_utc` раньше
+`start_utc` в этом sample или `start_utc` раньше `start_utc` предыдущего sample
+того же instance. Сравнение `end_utc` и `start_utc` действует и для первого
+sample. В `end_utc` записывается показание, по которому определён откат,
+а `receipt_utc` снимается отдельно. Уменьшение `elapsed_end_s` относительно
+предыдущего sample даёт `partial`. При одновременном откате UTC и монотонного
+времени приоритет у `clock_jump`. В остальных случаях `quality = "complete"`.
+Если в одном JSONL монотонные границы замеров одного instance пересекаются
+более чем на 1 мкс, reader завершает чтение с ошибкой `overlapping_windows`
+даже при `quality = "partial"`.
 
 Внешний Python collector сохраняет собственные CPU/RSS; CPU дочерних docker/psql/
 PowerShell команд не входит в Python process CPU, но их ожидание входит в duration.

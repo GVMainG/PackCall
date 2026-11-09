@@ -16,7 +16,7 @@ public sealed class RuntimeSampler(Guid sessionId, Guid processInstanceId, TimeP
     public byte[] Collect(double periodSeconds = 5, double lagSeconds = 0)
     {
         var start = _time.GetTimestamp();
-        var utc = _time.GetUtcNow();
+        var startUtc = _time.GetUtcNow();
         using var process = Process.GetCurrentProcess();
         var cpuStart = process.TotalProcessorTime.TotalSeconds;
         var allocated = GC.GetTotalAllocatedBytes();
@@ -43,19 +43,21 @@ public sealed class RuntimeSampler(Guid sessionId, Guid processInstanceId, TimeP
         var end = _time.GetTimestamp();
         var duration = _time.GetElapsedTime(start, end).TotalSeconds;
         var elapsedEnd = _time.GetElapsedTime(_boot, end).TotalSeconds;
+        Add("collector.duration", "s", "gauge", duration);
+
+        var endUtc = _time.GetUtcNow();
         var quality = "complete";
-        if (utc < _lastUtc)
+        if (endUtc < startUtc || startUtc < _lastUtc)
             quality = "clock_jump";
         else if (elapsedEnd < _lastElapsedEnd)
             quality = "partial";
-        _lastUtc = utc;
+        _lastUtc = startUtc;
         _lastElapsedEnd = elapsedEnd;
 
-        Add("collector.duration", "s", "gauge", duration);
         return JsonSerializer.SerializeToUtf8Bytes(new
         {
             schema_version = 1, session_id = sessionId, source = "runtime", instance_id = _instanceId,
-            process_instance_id = processInstanceId, sequence = _sequence++, start_utc = utc, end_utc = _time.GetUtcNow(),
+            process_instance_id = processInstanceId, sequence = _sequence++, start_utc = startUtc, end_utc = endUtc,
             duration_s = duration,
             elapsed_start_s = _time.GetElapsedTime(_boot, start).TotalSeconds,
             elapsed_end_s = elapsedEnd, quality,
