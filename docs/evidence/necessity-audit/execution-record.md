@@ -25,88 +25,170 @@
 
 ### Команды baseline
 
-Из корня чистого checkout указанного SHA. Для воспроизведения нужен новый каталог результатов без распакованного `source/`, отдельная Docker-сеть и локальная тестовая БД. На исходном прогоне `PACKCALL_TEST_POSTGRES` сформирован в процессе PowerShell для одноразового контейнера. Для мигратора та же строка передана через `ConnectionStrings__Postgres`. Порт БД на хост не публиковался.
+Исходный прогон использовал теги `mcr.microsoft.com/dotnet/sdk:10.0` и `postgres:18.6-alpine3.24`, каталог `artifacts/test-results/story-1-11/` и сеть `packcall-story-1-11`. БД запущена командой `docker run -d --name packcall-story-1-11-db --network packcall-story-1-11 -e POSTGRES_DB=packcall_audit -e POSTGRES_PASSWORD postgres:18.6-alpine3.24`. Тесты получали строку подключения через `PACKCALL_TEST_POSTGRES`, мигратор — через `ConnectionStrings__Postgres`. Порт БД на хост не публиковался.
+
+Повтор из корня чистого checkout указанного SHA использует те же команды архивации, сборки, миграции и тестов, образы по проверенным `RepoDigests` и отдельный подкаталог `replay-*`. PostgreSQL создаётся и запускается отдельными командами для очистки при ошибке запуска.
 
 ```powershell
-$ErrorActionPreference = 'Stop'
-$baseline = git rev-parse HEAD
-git status --porcelain
-git merge-base --is-ancestor 47db371 HEAD
-if ($LASTEXITCODE -ne 0 -or (git status --porcelain) -or
-    $baseline -ne 'b75d7fe7726b1b12255686a2ff73a520037f8942') {
-    throw 'Expected clean checkout of the baseline SHA'
-}
-
-$artifactRoot = (New-Item -ItemType Directory -Force 'artifacts/test-results/story-1-11').FullName
-$archiveRoot = (New-Item -ItemType Directory (Join-Path $artifactRoot 'source')).FullName
-git archive --format=tar --output (Join-Path $artifactRoot 'source.tar') $baseline
-if ($LASTEXITCODE -ne 0) { throw 'git archive failed' }
-tar -xf (Join-Path $artifactRoot 'source.tar') -C $archiveRoot
-if ($LASTEXITCODE -ne 0) { throw 'tar failed' }
-
-$sdkImage = 'mcr.microsoft.com/dotnet/sdk:10.0'
-$postgresImage = 'postgres:18.6-alpine3.24'
-$sourceMount = "type=bind,source=$archiveRoot,target=/src,readonly"
-$resultsMount = "type=bind,source=$artifactRoot,target=/results"
-$networkName = 'packcall-story-1-11'
-$dbName = 'packcall-story-1-11-db'
-
-docker run --rm $sdkImage dotnet --info |
-    Tee-Object -FilePath (Join-Path $artifactRoot 'dotnet-info.log')
-if ($LASTEXITCODE -ne 0) { throw 'SDK probe failed' }
-docker run --rm --mount $sourceMount --mount $resultsMount -w /src $sdkImage `
-    dotnet test tests/PackCall.Test/PackCall.Test.csproj -c Release --artifacts-path /tmp/packcall-build `
-    --filter 'Category=Unit' --logger 'trx;LogFileName=unit.trx' --results-directory /results |
-    Tee-Object -FilePath (Join-Path $artifactRoot 'unit.log')
-if ($LASTEXITCODE -ne 0) { throw 'Unit tests failed' }
-
-docker network create $networkName
-if ($LASTEXITCODE -ne 0) { throw 'Test network creation failed' }
-$createdDatabase = $false
-try {
-    $env:POSTGRES_PASSWORD = [guid]::NewGuid().ToString('N')
-    $env:PACKCALL_TEST_POSTGRES = "Host=$dbName;Port=5432;Database=packcall_audit;Username=postgres;Password=$env:POSTGRES_PASSWORD"
-    $env:ConnectionStrings__Postgres = $env:PACKCALL_TEST_POSTGRES
-    docker run -d --name $dbName --network $networkName -e POSTGRES_DB=packcall_audit `
-        -e POSTGRES_PASSWORD $postgresImage
-    if ($LASTEXITCODE -ne 0) { throw 'Test PostgreSQL startup failed' }
-    $createdDatabase = $true
-    for ($attempt = 0; $attempt -lt 30; $attempt++) {
-        docker exec $dbName pg_isready -h 127.0.0.1 -U postgres -d packcall_audit | Out-Null
-        if ($LASTEXITCODE -eq 0) { break }
-        Start-Sleep -Seconds 1
+& {
+    $ErrorActionPreference = 'Stop'
+    $PSNativeCommandUseErrorActionPreference = $false
+    $baseline = git rev-parse HEAD
+    if ($LASTEXITCODE -ne 0 -or $baseline -ne 'b75d7fe7726b1b12255686a2ff73a520037f8942') {
+        throw 'Expected checkout of the baseline SHA'
     }
-    if ($LASTEXITCODE -ne 0) { throw 'Test PostgreSQL unavailable' }
-    docker exec $dbName psql -U postgres -d packcall_audit -Atc 'SHOW server_version;' |
-        Tee-Object -FilePath (Join-Path $artifactRoot 'postgres-version.log')
-    if ($LASTEXITCODE -ne 0) { throw 'PostgreSQL version query failed' }
+    $workingTree = git status --porcelain
+    if ($LASTEXITCODE -ne 0 -or $workingTree) { throw 'Expected a clean checkout' }
+    git merge-base --is-ancestor 47db371 HEAD
+    if ($LASTEXITCODE -ne 0) { throw 'Missing test relocation' }
 
-    docker run --rm --network $networkName --mount $sourceMount -w /src `
-        -e ConnectionStrings__Postgres -e PACKCALL_ENVIRONMENT=test -e TEST_SENDER_MODE=inprocess `
-        -e TEST_SIMULATE_ERRORS=false $sdkImage dotnet run `
-        --project src/PackCall.Migrator/PackCall.Migrator.csproj -c Release --artifacts-path /tmp/packcall-build |
-        Tee-Object -FilePath (Join-Path $artifactRoot 'migration.log')
-    if ($LASTEXITCODE -ne 0) { throw 'Migrator failed' }
-    docker run --rm --network $networkName --mount $sourceMount --mount $resultsMount -w /src `
-        -e PACKCALL_TEST_POSTGRES $sdkImage dotnet test tests/PackCall.Test/PackCall.Test.csproj `
-        -c Release --artifacts-path /tmp/packcall-build --filter 'Category=Integration' `
-        --logger 'trx;LogFileName=integration.trx' --results-directory /results |
-        Tee-Object -FilePath (Join-Path $artifactRoot 'integration.log')
-    if ($LASTEXITCODE -ne 0) { throw 'Integration tests failed' }
-}
-finally {
-    if ($createdDatabase) { docker rm -fv $dbName }
-    docker network rm $networkName
-    Remove-Item Env:POSTGRES_PASSWORD, Env:PACKCALL_TEST_POSTGRES, Env:ConnectionStrings__Postgres -ErrorAction SilentlyContinue
-}
+    $runId = [guid]::NewGuid().ToString('N')
+    $artifactRoot = (New-Item -ItemType Directory "artifacts/test-results/story-1-11/replay-$runId").FullName
+    $archiveRoot = (New-Item -ItemType Directory (Join-Path $artifactRoot 'source')).FullName
+    git archive --format=tar --output (Join-Path $artifactRoot 'source.tar') $baseline
+    if ($LASTEXITCODE -ne 0) { throw 'git archive failed' }
+    tar -xf (Join-Path $artifactRoot 'source.tar') -C $archiveRoot
+    if ($LASTEXITCODE -ne 0) { throw 'tar failed' }
 
-python scripts/ci/check_trx.py --forbid-skipped 'artifacts/test-results/story-1-11/unit.trx'
-if ($LASTEXITCODE -ne 0) { throw 'Unit TRX failed validation' }
-python scripts/ci/check_trx.py --forbid-skipped 'artifacts/test-results/story-1-11/integration.trx'
-if ($LASTEXITCODE -ne 0) { throw 'Integration TRX failed validation' }
-if ((git rev-parse HEAD) -ne $baseline -or (git status --porcelain)) {
-    throw 'Checkout changed during the run'
+    $sdkImage = 'mcr.microsoft.com/dotnet/sdk@sha256:fe0fd4e93bd2fbb47c883b7a6369e5c8d3db8bf01cdc5981f6ee35fbdf3ff4fb'
+    $postgresImage = 'postgres@sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5'
+    $sourceMount = "type=bind,source=$archiveRoot,target=/src,readonly"
+    $resultsMount = "type=bind,source=$artifactRoot,target=/results"
+    $networkName = "packcall-story-1-11-$runId"
+    $dbName = "$networkName-db"
+
+    docker run --rm $sdkImage dotnet --info |
+        Tee-Object -FilePath (Join-Path $artifactRoot 'dotnet-info.log')
+    if ($LASTEXITCODE -ne 0) { throw 'SDK probe failed' }
+    docker run --rm --mount $sourceMount --mount $resultsMount -w /src $sdkImage `
+        dotnet test tests/PackCall.Test/PackCall.Test.csproj -c Release --artifacts-path /tmp/packcall-build `
+        --filter 'Category=Unit' --logger 'trx;LogFileName=unit.trx' --results-directory /results |
+        Tee-Object -FilePath (Join-Path $artifactRoot 'unit.log')
+    if ($LASTEXITCODE -ne 0) { throw 'Unit tests failed' }
+
+    $savedEnv = @{}
+    foreach ($name in 'POSTGRES_PASSWORD', 'PACKCALL_TEST_POSTGRES', 'ConnectionStrings__Postgres') {
+        $savedEnv[$name] = [Environment]::GetEnvironmentVariable($name)
+    }
+    $createdNetwork = $false
+    $createdDatabase = $false
+    try {
+        docker network create $networkName
+        if ($LASTEXITCODE -ne 0) { throw 'Test network creation failed' }
+        $createdNetwork = $true
+
+        $env:POSTGRES_PASSWORD = [guid]::NewGuid().ToString('N')
+        $env:PACKCALL_TEST_POSTGRES = "Host=$dbName;Port=5432;Database=packcall_audit;Username=postgres;Password=$env:POSTGRES_PASSWORD"
+        $env:ConnectionStrings__Postgres = $env:PACKCALL_TEST_POSTGRES
+        docker create --name $dbName --network $networkName -e POSTGRES_DB=packcall_audit `
+            -e POSTGRES_PASSWORD $postgresImage
+        if ($LASTEXITCODE -ne 0) { throw 'Test PostgreSQL creation failed' }
+        $createdDatabase = $true
+        docker start $dbName
+        if ($LASTEXITCODE -ne 0) { throw 'Test PostgreSQL startup failed' }
+        for ($attempt = 0; $attempt -lt 30; $attempt++) {
+            docker exec $dbName pg_isready -h 127.0.0.1 -U postgres -d packcall_audit | Out-Null
+            if ($LASTEXITCODE -eq 0) { break }
+            Start-Sleep -Seconds 1
+        }
+        if ($LASTEXITCODE -ne 0) { throw 'Test PostgreSQL unavailable' }
+        docker exec $dbName psql -U postgres -d packcall_audit -Atc 'SHOW server_version;' |
+            Tee-Object -FilePath (Join-Path $artifactRoot 'postgres-version.log')
+        if ($LASTEXITCODE -ne 0) { throw 'PostgreSQL version query failed' }
+
+        docker run --rm --network $networkName --mount $sourceMount -w /src `
+            -e ConnectionStrings__Postgres -e PACKCALL_ENVIRONMENT=test -e TEST_SENDER_MODE=inprocess `
+            -e TEST_SIMULATE_ERRORS=false $sdkImage dotnet run `
+            --project src/PackCall.Migrator/PackCall.Migrator.csproj -c Release --artifacts-path /tmp/packcall-build |
+            Tee-Object -FilePath (Join-Path $artifactRoot 'migration.log')
+        if ($LASTEXITCODE -ne 0) { throw 'Migrator failed' }
+        docker run --rm --network $networkName --mount $sourceMount --mount $resultsMount -w /src `
+            -e PACKCALL_TEST_POSTGRES $sdkImage dotnet test tests/PackCall.Test/PackCall.Test.csproj `
+            -c Release --artifacts-path /tmp/packcall-build --filter 'Category=Integration' `
+            --logger 'trx;LogFileName=integration.trx' --results-directory /results |
+            Tee-Object -FilePath (Join-Path $artifactRoot 'integration.log')
+        if ($LASTEXITCODE -ne 0) { throw 'Integration tests failed' }
+    }
+    finally {
+        $cleanupWarnings = @()
+        if ($createdDatabase) {
+            try {
+                docker rm -fv $dbName
+                if ($LASTEXITCODE -ne 0) { throw 'docker rm failed' }
+            }
+            catch { $cleanupWarnings += "Could not remove test database container $dbName" }
+        }
+        if ($createdNetwork) {
+            try {
+                docker network rm $networkName
+                if ($LASTEXITCODE -ne 0) { throw 'docker network rm failed' }
+            }
+            catch { $cleanupWarnings += "Could not remove test network $networkName" }
+        }
+        foreach ($name in $savedEnv.Keys) {
+            if ($null -eq $savedEnv[$name]) {
+                Remove-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue
+            }
+            else {
+                Set-Item -LiteralPath "Env:$name" -Value $savedEnv[$name]
+            }
+        }
+        foreach ($warning in $cleanupWarnings) { Write-Warning $warning -WarningAction Continue }
+    }
+
+    python scripts/ci/check_trx.py --forbid-skipped (Join-Path $artifactRoot 'unit.trx')
+    if ($LASTEXITCODE -ne 0) { throw 'Unit TRX failed validation' }
+    python scripts/ci/check_trx.py --forbid-skipped (Join-Path $artifactRoot 'integration.trx')
+    if ($LASTEXITCODE -ne 0) { throw 'Integration TRX failed validation' }
+    $head = git rev-parse HEAD
+    if ($LASTEXITCODE -ne 0 -or $head -ne $baseline) { throw 'HEAD changed during the run' }
+    $workingTree = git status --porcelain
+    if ($LASTEXITCODE -ne 0 -or $workingTree) { throw 'Checkout changed during the run' }
+    Write-Output "Replay results: $artifactRoot"
 }
+```
+
+12 ноября 2026 года блок выше повторно выполнен на отдельном чистом checkout того же SHA. Оба тестовых прогона и проверки TRX завершились с exit 0. Повтор дал 130 Unit и 82 Integration без ошибок и пропусков. После очистки временной БД и сети исходные значения всех трёх переменных подключения сохранились. Логи и TRX повтора находятся вне Git в `artifacts/test-results/story-1-11/replay-488dc27f3562488d98057ff80f65ed24/`.
+
+### Сравнение имён тестов в TRX
+
+Из корня репозитория, при наличии исторических TRX. Код сравнивает кратность пары «класс, полное имя случая» в каждой категории и показывает изменения по классам. Для сверки повторного запуска укажите его подкаталог `replay-*` в `new_root`.
+
+```powershell
+@'
+from collections import Counter
+from pathlib import Path
+import xml.etree.ElementTree as ET
+
+old_root = Path('_bmad-output/specs/spec-test-necessity-audit/audit-results/raw')
+new_root = Path('artifacts/test-results/story-1-11')
+ns = {'t': 'http://microsoft.com/schemas/VisualStudio/TeamTest/2010'}
+
+def cases(path):
+    root = ET.parse(path).getroot()
+    classes = {
+        test.attrib['id']: test.find('t:TestMethod', ns).attrib['className']
+        for test in root.findall('./t:TestDefinitions/t:UnitTest', ns)
+    }
+    return Counter(
+        (classes[result.attrib['testId']], result.attrib['testName'])
+        for result in root.findall('./t:Results/t:UnitTestResult', ns)
+    )
+
+def by_class(cases):
+    counts = Counter()
+    for (class_name, _), count in cases.items():
+        counts[class_name] += count
+    return dict(sorted(counts.items()))
+
+for category in ('unit', 'integration'):
+    filename = f'{category}.trx'
+    if not (old_root / filename).is_file():
+        print(f'{category}: historical TRX unavailable, comparison skipped')
+        continue
+    old, new = cases(old_root / filename), cases(new_root / filename)
+    print(f'{category}: removed {by_class(old - new)}, added {by_class(new - old)}')
+'@ | python -
 ```
 
 ## Исторический аудит
