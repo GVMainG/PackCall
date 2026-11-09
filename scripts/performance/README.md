@@ -1,21 +1,102 @@
 # Измерения PackCall
 
-Массовые измерения не проходили приёмку стоимости. До пунктов 8.3–8.4 используйте
-малые сеансы; наличие рабочего драйвера не является доказательством бюджета overhead.
+## Исторический сеанс на 300 000 доставок
+
+Сеанс `15369c7c-df29-464e-9f99-cc8a9ee5f275` по профилю `windows-http-300k`
+выполнен на коммите `8397dd105dd2c68886b0a5fa3bbe4cb1a36b9ec6`.
+Исходные артефакты хранятся локально вне Git в
+`artifacts/performance/15369c7c-df29-464e-9f99-cc8a9ee5f275/`.
+
+- `manifest.json` фиксирует SHA в `commit` и один Worker в `participants`.
+- `profile.json` фиксирует `workers=1`, `settings.operator_mode=http` и
+  `settings.simulate_errors=false`. HTTP-запросы обслуживал локальный тестовый
+  email-оператор `PackCall.TestEmailOperator` в Docker-сервисе `http`.
+- `final.json` фиксирует 300 000 `Sent` (`sent`) и 0 `Failed` (`failed`).
+
+Интервал по монотонному полю `elapsed_start_s` событий driver в `lifecycle.jsonl`
+от `processing` до `draining` составил `1006.625 − 140.781 = 865.844 с`.
+Начало соответствует границе запроса запуска `elapsed_start_s` в
+`processing-epoch.json`.
+Метка `draining` показывает момент, когда driver при опросе увидел, что все
+доставки в терминальных статусах и кампания в `Completed`. Точное время
+последнего `Sent` эта метка не фиксирует.
+
+Средняя скорость за измеренный интервал получена делением
+`300000 / 865.844 ≈ 346 доставок/с`. Часовая экстраполяция при той же скорости
+составляет `300000 / 865.844 × 3600 ≈ 1,25 млн доставок/ч`.
+Часового прогона на 1 млн доставок не было. Производительность 1 млн доставок/ч
+не сертифицирована.
+
+В `summary.json` поле `quality` содержит `partial`, а `detection.status` равно
+`insufficient_data`.
+Данных недостаточно для определения стабильного уровня скорости и выявления замедлений.
+
+Для воспроизведения исторического сценария запустите команду на чистом checkout
+коммита `8397dd105dd2c68886b0a5fa3bbe4cb1a36b9ec6`.
+
+```powershell
+python scripts/performance/run.py --profile windows-http-300k --workers 1
+```
+
+## Статус критериев MEAS
+
+Для входного baseline Story 2.1 нужны отдельные прогоны профиля
+`windows-http-300k` на теге `v0.5.0-beta.2`. На baseline проверяются MEAS-1…MEAS-4.
+
+| Критерий | Статус |
+| --- | --- |
+| MEAS-1 — два независимых Worker в общей сессии | На 300k не выполнен. В историческом сеансе работал один Worker. |
+| MEAS-2 — парные прогоны с выключенными и включёнными измерениями | На 300k не выполнен. Для baseline требуются пары off/on. |
+| MEAS-3 — бюджет накладных расходов | Без пар off/on не подтверждён. Бюджет проверяется на baseline. При разбросе off-прогонов >5% результат `inconclusive`, требуется повторный прогон. |
+| MEAS-4 — проверка privacy и формата артефактов | Требует ревью артефактов baseline. |
+| MEAS-5 — новый профиль на 1 млн доставок | Ожидает отдельного 1M-сеанса. Этот прогон относится только к MEAS-5. |
+
+Если бюджет MEAS-3 на baseline не выполнен, старт `beta.3` блокируется до
+успешного повторного прогона или решения владельца, зафиксированного в ADR.
+Бюджет MEAS-3 и профиль на 1 млн доставок описаны в
+[ADR 0003](../../docs/adr/0003-telegram-modes-1m-profile.md).
+
+Небольшие smoke-прогоны проверяют работу драйвера и сборщиков. Для приёмки
+MEAS-1 и MEAS-2 нужны данные 300k-baseline.
 
 ## Команды
 
-Требуются Windows, работающий Docker Desktop с Linux containers, Python 3.11+,
-.NET SDK 10+ для локальных тестов, минимум 4 GiB свободного места (preflight floor,
-не оценка достаточности места для полного сеанса). До измерения вручную отключите
-sleep Windows и зафиксируйте фоновую нагрузку; driver настройки питания не меняет.
+Выполняйте команды PowerShell из корня репозитория. Для офлайн-анализа нужны
+Python 3.11+ и зависимости из `requirements.txt`.
 
 ```powershell
-python scripts/performance/run.py --profile small-http --count 30
-python scripts/performance/run.py --profile small-http --count 60 --workers 2
-python scripts/performance/analyze.py --session artifacts/performance/<session-id>
-python scripts/performance/stop.py --session artifacts/performance/<session-id>
-python scripts/performance/cleanup.py --session artifacts/performance/<session-id>
+python -m pip install -r scripts/performance/requirements.txt
+```
+
+Для запуска сеансов дополнительно нужны Windows, Git, .NET SDK 10+ и работающий
+Docker Desktop с Linux-контейнерами. Driver проверяет минимум 4 GiB свободного
+места перед запуском. Полный сеанс может потребовать больше места. До измерения
+вручную отключите переход Windows в спящий режим и зафиксируйте фоновую нагрузку.
+
+Пример малого сеанса с двумя Worker. Driver выводит путь к папке после завершения.
+После успешного прогона можно проанализировать его и удалить его Docker-ресурсы.
+
+```powershell
+$smokeSession = python scripts/performance/run.py --profile small-http --count 60 --workers 2
+if ($LASTEXITCODE -ne 0) { throw 'Не удалось выполнить smoke-прогон' }
+$manifest = Get-Content -Raw -LiteralPath (Join-Path $smokeSession 'manifest.json') -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+if ($manifest.workload_status -ne 'completed') {
+    throw "Статус сеанса $($manifest.workload_status). Docker-ресурсы сеанса сохранены."
+}
+python scripts/performance/analyze.py --session "$smokeSession"
+if ($LASTEXITCODE -ne 0) { throw 'Ошибка анализа. Docker-ресурсы сеанса сохранены.' }
+python scripts/performance/cleanup.py --session "$smokeSession"
+```
+
+Для остановки активного сеанса из другого окна PowerShell найдите его контейнеры.
+Введите UUID из метки `packcall.performance.session` выбранного сеанса. Пример
+использует каталог по умолчанию `artifacts/performance`.
+
+```powershell
+docker ps --filter 'label=packcall.performance.session' --format 'table {{.Names}}\t{{.Labels}}'
+$activeSessionId = [guid](Read-Host 'UUID активного сеанса')
+$activeSession = Join-Path 'artifacts/performance' $activeSessionId
+python scripts/performance/stop.py --session "$activeSession"
 ```
 
 `run` создаёт отдельные project, volume, images и единственную кампанию. API публикуется
@@ -24,7 +105,7 @@ python scripts/performance/cleanup.py --session artifacts/performance/<session-i
 описание генерируется из `session.compose_profile` во временной папке; в артефактах
 остаются только allowlisted inventory и registry ресурсов с session labels.
 Release Dockerfiles переиспользуются без dev override. `profile.json` фиксируется
-перед API start; изменения этого файла во время обработки прерывают сеанс.
+перед запросом запуска кампании. Изменения этого файла во время обработки прерывают сеанс.
 
 Ready barrier ожидает файлы API и всех workers, затем сравнивает фактические worker
 settings с manifest. `clock-initial.json`/`clock-final.json` сохраняют offset и RTT/2
@@ -37,21 +118,41 @@ final DB/journal/repeat aggregates. 120 s без прогресса дают sta
 и незавершённой кампании — completion_stalled. Driver не исправляет статусы и не
 перезапускает worker. Workload status и telemetry status независимы.
 
-Ctrl+C или `stop` сохраняют файлы и volume. `cleanup` проверяет labels всех известных
-контейнеров и volume до удаления, артефакты сохраняет. Повторный run всегда создаёт
-новый session UUID. Не используйте dev compose project для этого workflow.
+Ctrl+C или `stop` сохраняют файлы и volume. `cleanup` проверяет метки и удаляет
+контейнеры и volume выбранного сеанса. Артефакты, Docker-сеть и образы сохраняются.
+Повторный run всегда создаёт новый session UUID. Не используйте dev compose project
+для этого workflow.
 
-Подготовка без отправок (проверка 6.2):
+Эта команда проверяет подготовку 300k-кампании без отправок.
 
 ```powershell
-python scripts/performance/run.py --profile windows-http-300k --prepare-only
+$preparedSession = python scripts/performance/run.py --profile windows-http-300k --prepare-only
+if ($LASTEXITCODE -ne 0) { throw 'Не удалось подготовить сеанс' }
+Get-Content -Raw -LiteralPath (Join-Path $preparedSession 'initial.json') -ErrorAction Stop
 ```
 
-Она создаёт 300000 Waiting в Draft, не создаёт worker и не вызывает start. Полный
-`run --profile windows-http-300k` оставлен для отдельного разрешённого этапа 8.4
-после off/on проверки 8.3; здесь он не выполнялся.
+Команда создаёт 300 000 доставок в статусе `Waiting` в кампании `Draft`
+и завершает подготовку до запуска Worker и кампании. CLI `run.py` запускает
+обработку со включённым сбором измерений. Для пар off/on нужен протокол Story 2.1.
+
+После проверки `initial.json` при необходимости удалите Docker-ресурсы этого сеанса.
+
+```powershell
+python scripts/performance/cleanup.py --session "$preparedSession"
+```
 
 ## Офлайн-анализ
+
+Для примера нужны сохранённые артефакты исторического сеанса по указанному пути.
+`analyze` перезаписывает производные отчёты в папке сеанса. Чтобы сохранить
+исторические отчёты, запустите анализ на копии.
+
+```powershell
+$historicalSession = Resolve-Path -LiteralPath 'artifacts/performance/15369c7c-df29-464e-9f99-cc8a9ee5f275' -ErrorAction Stop
+$analysisSession = Join-Path ([System.IO.Path]::GetTempPath()) ("packcall-perf-" + [guid]::NewGuid())
+Copy-Item -LiteralPath $historicalSession.Path -Destination $analysisSession -Recurse -ErrorAction Stop
+python scripts/performance/analyze.py --session "$analysisSession"
+```
 
 `analyze` читает сохранённые JSONL и initial/final snapshots, создаёт summary JSON,
 series CSV, resource-series CSV, HTML и SVG без CDN и без БД. Plotting реализован
@@ -80,7 +181,6 @@ lifecycle и metric definitions. `examples/` содержит только си�
 Ошибки возвращают фиксированный код, без значений входного документа.
 
 ```powershell
-python -m pip install -r scripts/performance/requirements.txt
 python -m pytest tests/tools/performance -q
 ```
 
@@ -127,8 +227,8 @@ dropped; disk error или невозможность reservation прекращ
 
 Объём удерживаемых данных ограничен: три буфера по 1 MiB, один текущий буфер,
 active/closed массивы максимум 512 гистограмм по 191 элементу, словари и метаданные.
-Это конструктивная граница; накладные расходы всего процесса проверяются отдельно
-в 8.3. При shutdown очередь сбрасывается в пределах 5 s и оставшегося бюджета host.
+Накладные расходы всего процесса проверяются на baseline по MEAS-3.
+При shutdown очередь сбрасывается в пределах 5 s и оставшегося бюджета host.
 
 SIGKILL может потерять текущее открытое окно, три ожидающих записи и текущую
 запись writer. Без задержек типичная потеря — текущее 10-s окно; при overflow нет
