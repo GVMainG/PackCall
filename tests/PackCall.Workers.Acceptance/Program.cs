@@ -21,9 +21,14 @@ builder.Services.AddDeliveryProcessing(PackCall.Infrastructure.Hosting.TestOpera
 builder.Services.AddSingleton(new WorkerIdentity(id));
 var settings = TestOperatorSettings.Parse(builder.Configuration);
 builder.Services.RemoveAll<IMessageSender>();
-builder.Services.AddSingleton<IMessageSender>(sp => new BarrierSender(sp.GetRequiredService<IServiceScopeFactory>(),
-    sp.GetRequiredService<WorkerIdentity>(), settings.Mode == TestSenderMode.Http
-        ? new HttpTestEmailSender(settings) : new MockEmailSender(new OperatorRandom())));
+IMessageSender CreateSender() => settings.Mode == TestSenderMode.Http
+    ? new HttpTestEmailSender(settings) : new MockEmailSender(new OperatorRandom());
+var sm6Case = Environment.GetEnvironmentVariable("SM6_CASE");
+if (sm6Case is null)
+    builder.Services.AddSingleton<IMessageSender>(sp => new BarrierSender(sp.GetRequiredService<IServiceScopeFactory>(),
+        sp.GetRequiredService<WorkerIdentity>(), CreateSender()));
+else
+    Sm6Controls.Register(builder.Services, sm6Case, CreateSender);
 builder.Services.AddSchemaGate();
 builder.Services.Configure<DeliveryWorkerOptions>(o => {
     o.Parallelism = 1; o.BatchSize = 1; o.LockDuration = TimeSpan.FromSeconds(20);

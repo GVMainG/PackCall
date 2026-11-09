@@ -1,0 +1,53 @@
+x-packcall: &packcall
+  PACKCALL_ENVIRONMENT: test
+  TEST_SENDER_MODE: inprocess
+  TEST_SIMULATE_ERRORS: "false"
+  TEST_OPERATOR_URL: http://http:8000/
+  TEST_OPERATOR_TIMEOUT_SECONDS: "3"
+  ConnectionStrings__Postgres: "Host=db;Database=sm6;Username=sm6;Password=${SM6_DB_PASSWORD:?}"
+
+services:
+  db:
+    image: postgres:18.6-alpine3.24
+    environment:
+      POSTGRES_DB: sm6
+      POSTGRES_USER: sm6
+      POSTGRES_PASSWORD: ${SM6_DB_PASSWORD:?}
+    volumes: ["data:/var/lib/postgresql"]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "sm6", "-d", "sm6"]
+      interval: 1s
+      timeout: 3s
+      retries: 40
+
+  migrator:
+    build: {context: ../../../.., dockerfile: src/PackCall.Migrator/Dockerfile}
+    environment: *packcall
+    depends_on: {db: {condition: service_healthy}}
+
+  api:
+    build: {context: ../../../.., dockerfile: src/PackCall.Api/Dockerfile}
+    environment:
+      <<: *packcall
+      ASPNETCORE_HTTP_PORTS: 8080
+    ports: ["127.0.0.1::8080"]
+    depends_on: {migrator: {condition: service_completed_successfully}}
+
+  probe:
+    build: {context: ../../../.., dockerfile: tests/acceptance/workers/coordination/Dockerfile}
+    environment: *packcall
+    volumes: ["${SM6_CONTROL:?}:/control"]
+    profiles: ["tools"]
+
+  http:
+    image: python:3.12.10-slim
+    command: ["python", "-u", "/fixture.py"]
+    volumes: ["./http_fixture.py:/fixture.py:ro", "${SM6_CONTROL:?}:/control"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=1)"]
+      interval: 1s
+      timeout: 3s
+      retries: 40
+
+volumes:
+  data:
