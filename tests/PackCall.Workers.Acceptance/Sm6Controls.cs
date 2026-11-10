@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using PackCall.Core.Diagnostics;
 using PackCall.Core.Entities;
 using PackCall.Core.Sending;
 using PackCall.Core.Services;
@@ -22,7 +23,8 @@ sealed class Sm6Controls
 
     public static void Register(IServiceCollection services, string scenario, Func<IMessageSender> createSender)
     {
-        if (scenario is not ("timeout" or "exception" or "cancellation" or "mismatch" or "rejection"))
+        if (scenario is not ("timeout" or "exception" or "cancellation" or "mismatch" or "rejection"
+            or "worker-loss" or "recovery" or "stale-result"))
             throw new InvalidOperationException("Unknown SM-6 scenario");
 
         services.AddSingleton(new Sm6Controls(scenario));
@@ -33,21 +35,35 @@ sealed class Sm6Controls
     }
 
     // Recovery keeps running while capture waits, exposing the released row in Waiting.
-    public bool CanCapture => Volatile.Read(ref _attempts) == 0 || Exists("allow-recapture");
+    public bool CanCapture => (Scenario != "recovery" && Volatile.Read(ref _attempts) == 0) || Exists("allow-recapture");
+    public bool HoldResult => Scenario is "worker-loss" or "recovery";
+    public int LastAttempt => Scenario is "rejection" or "worker-loss" or "recovery" or "stale-result" ? 1 : 2;
 
     public int StartAttempt() => Interlocked.Increment(ref _attempts);
 
-    public async Task WaitForAttemptAsync(int attempt, CancellationToken ct)
+    public async Task WaitForAsync(string file, CancellationToken ct)
     {
-        while (!Exists($"allow-attempt-{attempt}"))
+        while (!Exists(file))
             await Task.Delay(25, ct);
         ct.ThrowIfCancellationRequested();
     }
 
     public void Record(int attempt, Guid deliveryId, string phase, string? outcome = null, bool leaseCancelled = false)
+        => Write($"attempt-{attempt}-{phase}.json", new { attempt, deliveryId, phase, outcome, leaseCancelled });
+
+    public void RecordCapture(IReadOnlyList<Delivery> captured)
     {
-        var path = Path.Combine(DirectoryPath, $"attempt-{attempt}-{phase}.json");
-        File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(new { attempt, deliveryId, phase, outcome, leaseCancelled }));
+        if (Scenario == "worker-loss" && captured.Count > 0)
+            Write("captured-delivery.json", captured.Single());
+    }
+
+    public void RecordStaleResult(Guid deliveryId, Outcome outcome)
+        => Write("processing.json", new { deliveryId, outcome = outcome.ToString() });
+
+    private void Write(string file, object data)
+    {
+        var path = Path.Combine(DirectoryPath, file);
+        File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(data, JsonOptions.Value));
         File.Move(path + ".tmp", path);
     }
 
@@ -56,10 +72,15 @@ sealed class Sm6Controls
 
 sealed class CaptureBarrier(DeliveryProcessingService inner, Sm6Controls controls) : IDeliveryProcessingService
 {
-    public Task<IReadOnlyList<Delivery>> CaptureBatchAsync(int batchSize, string workerId, TimeSpan lockDuration, CancellationToken ct) =>
-        controls.CanCapture
-            ? inner.CaptureBatchAsync(batchSize, workerId, lockDuration, ct)
-            : Task.FromResult<IReadOnlyList<Delivery>>([]);
+    public async Task<IReadOnlyList<Delivery>> CaptureBatchAsync(int batchSize, string workerId, TimeSpan lockDuration, CancellationToken ct)
+    {
+        if (!controls.CanCapture)
+            return [];
+
+        var captured = await inner.CaptureBatchAsync(batchSize, workerId, lockDuration, ct);
+        controls.RecordCapture(captured);
+        return captured;
+    }
 
     public Task ProcessAsync(Delivery delivery, CancellationToken ct) => inner.ProcessAsync(delivery, ct);
     public Task<int> ReleaseExpiredLocksAsync(CancellationToken ct) => inner.ReleaseExpiredLocksAsync(ct);
@@ -73,13 +94,12 @@ sealed class Sm6Sender(Sm6Controls controls, IMessageSender inner) : IMessageSen
     {
         var attempt = controls.StartAttempt();
         controls.Record(attempt, request.DeliveryId, "entered");
-        var lastAttempt = controls.Scenario == "rejection" ? 1 : 2;
-        if (attempt > lastAttempt)
+        if (attempt > controls.LastAttempt)
             throw new InvalidOperationException("Unexpected extra SM-6 operator attempt");
 
         try
         {
-            await controls.WaitForAttemptAsync(attempt, ct);
+            await controls.WaitForAsync($"allow-attempt-{attempt}", ct);
         }
         catch (OperationCanceledException)
         {
@@ -101,6 +121,8 @@ sealed class Sm6Sender(Sm6Controls controls, IMessageSender inner) : IMessageSen
             throw;
         }
         controls.Record(attempt, request.DeliveryId, "finished", result.IsSuccess ? "accepted" : result.Error);
+        if (controls.HoldResult)
+            await controls.WaitForAsync("allow-result", ct);
         return result;
     }
 

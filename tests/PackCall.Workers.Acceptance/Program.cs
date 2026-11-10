@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using PackCall.Core;
+using PackCall.Core.Diagnostics;
 using PackCall.Core.Entities;
 using PackCall.Core.Services;
 using PackCall.Core.Sending;
@@ -31,7 +32,7 @@ else
     Sm6Controls.Register(builder.Services, sm6Case, CreateSender);
 builder.Services.AddSchemaGate();
 builder.Services.Configure<DeliveryWorkerOptions>(o => {
-    o.Parallelism = 1; o.BatchSize = 1; o.LockDuration = TimeSpan.FromSeconds(20);
+    o.Parallelism = 1; o.BatchSize = 1; o.LockDuration = TimeSpan.FromSeconds(sm6Case == "recovery" ? 60 : 20);
     o.RecoveryInterval = TimeSpan.FromMilliseconds(100); o.IdleDelay = TimeSpan.FromMilliseconds(100);
 });
 var stale = Environment.GetEnvironmentVariable("STALE_FILE");
@@ -42,7 +43,10 @@ if (stale is not null)
 {
     var delivery = JsonSerializer.Deserialize<Delivery>(File.ReadAllText(stale), JsonOptions.Value)!;
     using var scope = host.Services.CreateScope();
+    using var observation = sm6Case == "stale-result" ? new ProcessingObservation() : null;
     await scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>().ProcessAsync(delivery, CancellationToken.None);
+    if (observation is not null)
+        host.Services.GetRequiredService<Sm6Controls>().RecordStaleResult(delivery.Id, observation.Outcome);
     Console.WriteLine("Stale ProcessAsync reached production repository with uncancelled token");
     await host.StopAsync();
 }

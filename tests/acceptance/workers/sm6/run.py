@@ -1,4 +1,4 @@
-"""Run SM-6 scenario A against an isolated Compose project."""
+"""Run SM-6 scenario A and provide the shared isolated Compose stand."""
 import json
 import os
 import platform
@@ -126,22 +126,22 @@ class Stand:
         except OSError:
             return False
 
+    def start_probe(self, scenario, *args):
+        worker = f"{self.project}-{scenario}"
+        self.compose("run", *args, "--no-deps", "--name", worker, "-e", f"IDENTITY={worker}",
+                     "-e", f"SM6_CASE={scenario}", "probe")
+        return worker
+
     def snapshot(self, campaign_id):
         return json.loads(self.sql(f"""
             SELECT json_build_object(
                 'db_now', clock_timestamp(),
                 'campaign_status', (SELECT status FROM campaigns WHERE id = '{campaign_id}'),
                 'deliveries', coalesce((
-                    SELECT json_agg(row_to_json(d)) FROM (
-                        SELECT id, delivery_status, worker_id, lock_expires_at, updated_at, completed_at
-                        FROM deliveries WHERE campaign_id = '{campaign_id}'
-                    ) d
+                    SELECT json_agg(d ORDER BY d.id) FROM deliveries d WHERE d.campaign_id = '{campaign_id}'
                 ), '[]'::json),
                 'journal', coalesce((
-                    SELECT json_agg(row_to_json(j) ORDER BY j.id) FROM (
-                        SELECT id, delivery_id, previous_status, new_status, worker_id, occurred_at, operator_result
-                        FROM delivery_status_journal WHERE campaign_id = '{campaign_id}'
-                    ) j
+                    SELECT json_agg(j ORDER BY j.id) FROM delivery_status_journal j WHERE j.campaign_id = '{campaign_id}'
                 ), '[]'::json)
             )
         """))
@@ -189,9 +189,7 @@ def run_case(stand, scenario, mode, outcome):
     folder.mkdir()
     campaign_id = UUID(stand.api("campaigns", {"name": f"SM-6 A {scenario}", "messageText": scenario})["id"])
     stand.api(f"campaigns/{campaign_id}/start", {})
-    worker = f"{stand.project}-{scenario}"
-    stand.compose("run", "-d", "--no-deps", "--name", worker, "-e", f"IDENTITY={worker}",
-                  "-e", f"SM6_CASE={scenario}", "-e", f"TEST_SENDER_MODE={mode}", "probe")
+    worker = stand.start_probe(scenario, "-d", "-e", f"TEST_SENDER_MODE={mode}")
 
     first = marker(folder, 1, "entered")
     captured = stand.snapshot(campaign_id)
@@ -275,7 +273,16 @@ def run_case(stand, scenario, mode, outcome):
             "terminal": "Sent" if terminal == SENT else "Failed", "campaign": "Completed"}
 
 
-def main():
+def run_a(stand, report):
+    for scenario, mode, outcome in SCENARIOS:
+        report["current_case"] = scenario
+        report["cases"][scenario] = run_case(stand, scenario, mode, outcome)
+    require(len(report["cases"]) == 5, "Expected four unknown outcomes and one confirmed rejection")
+    report.pop("current_case")
+    report.update(false_sent=0, false_failed=0)
+
+
+def run_stand(suite, run_cases):
     def git(*args):
         return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
 
@@ -283,7 +290,7 @@ def main():
     require(hasattr(tarfile, "data_filter"), "Python with tarfile.data_filter is required")
     commit = git("rev-parse", "HEAD")
     run_id = uuid4().hex[:12]
-    output = ROOT / "artifacts" / "acceptance" / "sm6-a" / run_id
+    output = ROOT / "artifacts" / "acceptance" / suite / run_id
     (output / "control").mkdir(parents=True)
     report = {"commit": commit, "started_utc": datetime.now(timezone.utc).isoformat(),
               "python": platform.python_version(), "cases": {}}
@@ -307,11 +314,7 @@ def main():
                 report["compose"] = stand.command(["docker", "compose", "version", "--short"])
                 stand.start()
                 report["postgres"] = stand.sql("SHOW server_version")
-                for scenario, mode, outcome in SCENARIOS:
-                    report["current_case"] = scenario
-                    report["cases"][scenario] = run_case(stand, scenario, mode, outcome)
-                require(len(report["cases"]) == 5, "Expected four unknown outcomes and one confirmed rejection")
-                report.pop("current_case")
+                run_cases(stand, report)
             except Exception:
                 if log_error := stand.collect_logs():
                     report["log_error"] = log_error
@@ -323,7 +326,7 @@ def main():
                 except Exception as error:
                     report["cleanup"] = stand.redact(str(error))
             require(report["cleanup"] == "passed", report["cleanup"])
-        report.update(result="passed", false_sent=0, false_failed=0)
+        report.update(result="passed")
     except Exception as error:
         report.update(result="failed", error=stand.redact(str(error)) if stand else str(error))
         raise RuntimeError(report["error"]) from None
@@ -332,4 +335,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run_stand("sm6-a", run_a)
