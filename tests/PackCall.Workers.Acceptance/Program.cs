@@ -1,7 +1,9 @@
+using System.Data.Common;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using PackCall.Core;
 using PackCall.Core.Diagnostics;
 using PackCall.Core.Entities;
@@ -36,6 +38,10 @@ builder.Services.Configure<DeliveryWorkerOptions>(o => {
     o.RecoveryInterval = TimeSpan.FromMilliseconds(100); o.IdleDelay = TimeSpan.FromMilliseconds(100);
 });
 var stale = Environment.GetEnvironmentVariable("STALE_FILE");
+var completionUpdates = sm6Case == "stale-result" && stale is not null ? new CompletionUpdateObserver() : null;
+if (completionUpdates is not null)
+    builder.Services.ConfigureDbContext<AppDbContext>(
+        options => options.AddInterceptors(completionUpdates), ServiceLifetime.Singleton);
 if (stale is null) builder.Services.AddHostedService<DeliveryWorker>();
 using var host = builder.Build();
 await host.StartAsync();
@@ -43,14 +49,28 @@ if (stale is not null)
 {
     var delivery = JsonSerializer.Deserialize<Delivery>(File.ReadAllText(stale), JsonOptions.Value)!;
     using var scope = host.Services.CreateScope();
-    using var observation = sm6Case == "stale-result" ? new ProcessingObservation() : null;
+    using var observation = completionUpdates is not null ? new ProcessingObservation() : null;
     await scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>().ProcessAsync(delivery, CancellationToken.None);
-    if (observation is not null)
-        host.Services.GetRequiredService<Sm6Controls>().RecordStaleResult(delivery.Id, observation.Outcome);
+    if (observation is not null && completionUpdates is not null)
+        host.Services.GetRequiredService<Sm6Controls>().RecordStaleResult(
+            delivery.Id, observation.Outcome, completionUpdates.AffectedRows);
     Console.WriteLine("Stale ProcessAsync reached production repository with uncancelled token");
     await host.StopAsync();
 }
 else await host.WaitForShutdownAsync();
+
+sealed class CompletionUpdateObserver : DbCommandInterceptor
+{
+    public List<int> AffectedRows { get; } = [];
+
+    public override ValueTask<int> NonQueryExecutedAsync(DbCommand command, CommandExecutedEventData eventData,
+        int result, CancellationToken cancellationToken = default)
+    {
+        if (command.CommandText.Contains("UPDATE deliveries ", StringComparison.OrdinalIgnoreCase))
+            AffectedRows.Add(result);
+        return ValueTask.FromResult(result);
+    }
+}
 
 sealed class BarrierSender(IServiceScopeFactory scopes, WorkerIdentity identity, IMessageSender inner) : IMessageSender, IDisposable
 {

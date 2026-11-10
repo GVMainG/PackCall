@@ -10,6 +10,7 @@ using PackCall.Core.Services;
 sealed class Sm6Controls
 {
     private int _attempts;
+    private bool _firstRecoveryPassRecorded;
 
     private Sm6Controls(string scenario)
     {
@@ -36,7 +37,6 @@ sealed class Sm6Controls
 
     // Recovery keeps running while capture waits, exposing the released row in Waiting.
     public bool CanCapture => (Scenario != "recovery" && Volatile.Read(ref _attempts) == 0) || Exists("allow-recapture");
-    public bool HoldResult => Scenario is "worker-loss" or "recovery";
     public int LastAttempt => Scenario is "rejection" or "worker-loss" or "recovery" or "stale-result" ? 1 : 2;
 
     public int StartAttempt() => Interlocked.Increment(ref _attempts);
@@ -57,8 +57,17 @@ sealed class Sm6Controls
             Write("captured-delivery.json", captured.Single());
     }
 
-    public void RecordStaleResult(Guid deliveryId, Outcome outcome)
-        => Write("processing.json", new { deliveryId, outcome = outcome.ToString() });
+    public void RecordFirstRecoveryPass(int released)
+    {
+        if (Scenario != "recovery" || _firstRecoveryPassRecorded)
+            return;
+
+        Write("first-recovery-pass.json", new { released });
+        _firstRecoveryPassRecorded = true;
+    }
+
+    public void RecordStaleResult(Guid deliveryId, Outcome outcome, IReadOnlyList<int> affectedRows)
+        => Write("processing.json", new { deliveryId, outcome = outcome.ToString(), affectedRows });
 
     private void Write(string file, object data)
     {
@@ -83,7 +92,14 @@ sealed class CaptureBarrier(DeliveryProcessingService inner, Sm6Controls control
     }
 
     public Task ProcessAsync(Delivery delivery, CancellationToken ct) => inner.ProcessAsync(delivery, ct);
-    public Task<int> ReleaseExpiredLocksAsync(CancellationToken ct) => inner.ReleaseExpiredLocksAsync(ct);
+
+    public async Task<int> ReleaseExpiredLocksAsync(CancellationToken ct)
+    {
+        var released = await inner.ReleaseExpiredLocksAsync(ct);
+        controls.RecordFirstRecoveryPass(released);
+        return released;
+    }
+
     public Task<bool> CompleteCampaignIfFinishedAsync(Guid campaignId, CancellationToken ct) =>
         inner.CompleteCampaignIfFinishedAsync(campaignId, ct);
 }
@@ -121,7 +137,10 @@ sealed class Sm6Sender(Sm6Controls controls, IMessageSender inner) : IMessageSen
             throw;
         }
         controls.Record(attempt, request.DeliveryId, "finished", result.IsSuccess ? "accepted" : result.Error);
-        if (controls.HoldResult)
+        // Only SIGKILL ends the first Worker's held result, even after its lease token cancels.
+        if (controls.Scenario == "worker-loss")
+            await Task.Delay(Timeout.InfiniteTimeSpan, CancellationToken.None);
+        else if (controls.Scenario == "recovery")
             await controls.WaitForAsync("allow-result", ct);
         return result;
     }

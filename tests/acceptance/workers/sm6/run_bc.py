@@ -67,24 +67,20 @@ def run_cases(stand, report):
     require(not killed["state"]["Running"] and killed["state"]["ExitCode"] == 137
             and not killed["state"]["OOMKilled"], "Original Worker did not exit after SIGKILL")
 
+    successor = stand.start_probe("recovery", "-d")
+    first_pass_path = recovery_folder / "first-recovery-pass.json"
+    first_pass = wait_for(lambda: read_json(first_pass_path) if first_pass_path.exists() else None,
+                          "Successor's first completed recovery pass")
     before_expiry = snapshot(stand, campaign_id, original_folder, "killed-before-expiry")
+    require(first_pass == {"released": 0}, "Successor recovered a delivery on its first pass")
     check_active_lease(before_expiry, original_worker)
     same_state(held, before_expiry)
 
-    def observed_expiry():
-        state = stand.snapshot(campaign_id)
-        same_state(before_expiry, state)
-        return state if datetime.fromisoformat(state["db_now"]) >= expiry else None
-
-    expired = wait_for(observed_expiry, "PostgreSQL clock reaching the original expiry")
-    save(original_folder / "expired.json", expired)
     captured = read_json(original_folder / "captured-delivery.json")
     require(captured["Id"] == delivery_id and captured["CampaignId"] == str(campaign_id)
             and captured["WorkerId"] == original_worker and captured["DeliveryStatus"] == IN_PROGRESS
             and datetime.fromisoformat(captured["LockExpiresAt"].replace("Z", "+00:00")) == expiry,
-            "Original Worker snapshot does not match the expired delivery")
-
-    successor = stand.start_probe("recovery", "-d")
+            "Original Worker snapshot does not match the original lease")
 
     def recovered_waiting():
         state = stand.snapshot(campaign_id)
@@ -99,7 +95,8 @@ def run_cases(stand, report):
     transitions.append((IN_PROGRESS, WAITING, None))
     workers.append(None)
     assert_journal(recovered, delivery_id, transitions, workers)
-    require(datetime.fromisoformat(row["updated_at"]) >= expiry
+    require(datetime.fromisoformat(recovered["db_now"]) >= expiry
+            and datetime.fromisoformat(row["updated_at"]) >= expiry
             and datetime.fromisoformat(recovered["journal"][-1]["occurred_at"]) >= expiry,
             "Recovery occurred before expiry")
 
@@ -115,21 +112,27 @@ def run_cases(stand, report):
     workers.append(successor)
     assert_journal(before_stale, delivery_id, transitions, workers)
     report["cases"]["B"] = {"result": "passed", "killed_exit_code": 137, "expired": True,
+                            "released_before_expiry": first_pass["released"],
                             "recovered_status": "Waiting", "recaptured_by": successor}
     print("PASS B: Worker killed, PostgreSQL lease expired, delivery recovered and recaptured", flush=True)
 
     report["current_case"] = "C"
-    stale_worker = stand.start_probe("stale-result", "-e", "STALE_FILE=/control/worker-loss/captured-delivery.json")
-    after_stale = snapshot(stand, campaign_id, stale_folder, "after")
+    stale_worker = stand.start_probe("stale-result", "-d", "-e",
+                                     "STALE_FILE=/control/worker-loss/captured-delivery.json")
+    stand.command(["docker", "wait", stale_worker], timeout=40)
     stale_process = process(stand, stale_worker)
     save(stale_folder / "process.json", stale_process)
-    require(not stale_process["state"]["Running"] and stale_process["state"]["ExitCode"] == 0
+    after_stale = snapshot(stand, campaign_id, stale_folder, "after")
+    exit_code = stale_process["state"]["ExitCode"]
+    require(exit_code == 0, f"One-shot stale Worker exited with code {exit_code}")
+    require(not stale_process["state"]["Running"]
             and stale_process["container_id"] != killed["container_id"],
             "Stale snapshot was not processed by a separate one-shot Worker process")
     check_attempt(marker(stale_folder, 1, "finished"), delivery_id, 1, "accepted")
     processing = read_json(stale_folder / "processing.json")
-    require(processing == {"deliveryId": delivery_id, "outcome": "StaleResult"},
+    require(processing["deliveryId"] == delivery_id and processing["outcome"] == "StaleResult",
             "ProcessAsync did not observe rejection by TryCompleteAsync")
+    require(processing["affectedRows"] == [0], "Expected one PostgreSQL delivery UPDATE affecting zero rows")
     check_active_lease(after_stale, successor)
     same_state(before_stale, after_stale)
 
@@ -156,6 +159,7 @@ def run_cases(stand, report):
                 == {"attempt-1-entered.json", "attempt-1-finished.json"},
                 f"Unexpected operator attempts in {folder.name}")
     report["cases"]["C"] = {"result": "passed", "processing_outcome": "StaleResult",
+                            "update_affected_rows": processing["affectedRows"],
                             "row_and_journal_unchanged": True, "terminal_entries": 1, "campaign": "Completed"}
     report.pop("current_case")
     print("PASS C: stale result rejected, row and journal unchanged, one terminal entry, campaign Completed", flush=True)
