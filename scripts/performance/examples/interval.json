@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "session_id": "00000000-0000-4000-8000-000000000001",
+  "instance_id": "00000000-0000-4000-8000-000000000002",
+  "source": "worker",
+  "sequence": 0,
+  "start_utc": "2026-10-31T17:00:00Z",
+  "end_utc": "2026-10-31T17:00:10Z",
+  "duration_s": 10,
+  "elapsed_start_s": 0,
+  "elapsed_end_s": 10,
+  "quality": "complete",
+  "metrics": {
+    "terminal.sent.delta": {
+      "kind": "delta",
+      "unit": "deliveries",
+      "value": 3,
+      "missing_reason": null
+    }
+  }
+}

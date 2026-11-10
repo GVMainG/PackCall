@@ -1,0 +1,50 @@
+  Определение проектов для восстановления...
+  Все проекты обновлены для восстановления.
+C:\Program Files\dotnet\sdk\11.0.100-rc.2.26504.105\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: Вы используете предварительную версию .NET. Дополнительные сведения см. на странице https://aka.ms/dotnet-support-policy [C:\Users\GV\source\repos\PackCall\PackCall.Core.Test\PackCall.Core.Test.csproj]
+C:\Program Files\dotnet\sdk\11.0.100-rc.2.26504.105\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: Вы используете предварительную версию .NET. Дополнительные сведения см. на странице https://aka.ms/dotnet-support-policy [C:\Users\GV\source\repos\PackCall\src\PackCall.Worker\PackCall.Worker.csproj]
+C:\Program Files\dotnet\sdk\11.0.100-rc.2.26504.105\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: Вы используете предварительную версию .NET. Дополнительные сведения см. на странице https://aka.ms/dotnet-support-policy [C:\Users\GV\source\repos\PackCall\src\PackCall.Api\PackCall.Api.csproj]
+C:\Program Files\dotnet\sdk\11.0.100-rc.2.26504.105\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: Вы используете предварительную версию .NET. Дополнительные сведения см. на странице https://aka.ms/dotnet-support-policy [C:\Users\GV\source\repos\PackCall\src\PackCall.Infrastructure\PackCall.Infrastructure.csproj]
+  PackCall.Core -> C:\Users\GV\source\repos\PackCall\src\PackCall.Core\bin\Debug\net10.0\PackCall.Core.dll
+  PackCall.Infrastructure -> C:\Users\GV\source\repos\PackCall\src\PackCall.Infrastructure\bin\Debug\net10.0\PackCall.Infrastructure.dll
+  PackCall.Worker -> C:\Users\GV\source\repos\PackCall\src\PackCall.Worker\bin\Debug\net10.0\PackCall.Worker.dll
+  PackCall.Api -> C:\Users\GV\source\repos\PackCall\src\PackCall.Api\bin\Debug\net10.0\PackCall.Api.dll
+  PackCall.Core.Test -> C:\Users\GV\source\repos\PackCall\PackCall.Core.Test\bin\Debug\net10.0\PackCall.Core.Test.dll
+Тестовый запуск для C:\Users\GV\source\repos\PackCall\PackCall.Core.Test\bin\Debug\net10.0\PackCall.Core.Test.dll (.NETCoreApp,Version=v10.0)
+Общее количество тестовых файлов (1), соответствующих указанному шаблону.
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.SchemaGate_WaitsForExactHistory_RejectsUnknown_ObservesCancellation [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.Result_StaleLease_DoesNotChangeRowOrJournal [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.Result_StorageErrorOrCancellation_DetachesBeforeSqlFailure [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.Result_CompletesBeforeExpiry_RecoveryWaitingOnCommitCannotRequeueTerminal [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.Result_ConcurrentSql_RespectsWinnerAndTimeAfterLock [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.ConfirmedOperatorResultsAreTerminal [SKIP]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.SchemaGate_WaitsForExactHistory_RejectsUnknown_ObservesCancellation [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.Result_StaleLease_DoesNotChangeRowOrJournal [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.LateHttpResponseAfterLeaseLossAndCancellationCannotOverwriteNewOwner [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.StatusUpdates_CannotOverwriteConcurrentPauseOrCompletion [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.Result_StorageErrorOrCancellation_DetachesBeforeSqlFailure [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.Result_CompletesBeforeExpiry_RecoveryWaitingOnCommitCannotRequeueTerminal [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.Result_ConcurrentSql_RespectsWinnerAndTimeAfterLock [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.ConfirmedOperatorResultsAreTerminal [1 ms]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.Capture_UsesOneDatabaseTimestamp_RecoveryPreservesLeaseReplacedWhileWaiting [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.Result_ActiveLease_CompletesWithJournal [SKIP]
+[xUnit.net 00:00:03.74]     PackCall.Core.Test.CampaignPausePostgresTests.ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker [SKIP]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.OperatorErrorsPreserveLeaseWithoutTerminalJournal [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.MeasurementRecoveryCommitSurvivesJournalFailure [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.Capture_UsesOneDatabaseTimestamp_RecoveryPreservesLeaseReplacedWhileWaiting [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.MeasurementMatchesRealPostgresAndHttpIncludingUnknownCommit [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.PauseOnLastDelivery_ResumeCompletesWithoutSendingAgain [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.HttpPauseAndResume_ReturnStatesAndRejectInvalidOperations [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.Result_ActiveLease_CompletesWithJournal [1 ms]
+  Пропущен PackCall.Core.Test.CampaignPausePostgresTests.ReleaseCapture_CannotReleaseNewLeaseEvenForTheSameWorker [1 ms]
+Файл результатов: C:\Users\GV\source\repos\PackCall\tests\reorganization-evidence\baseline\baseline.trx
+
+Пройден!   : не пройдено     0, пройдено   131, пропущено    17, всего   148, длительность 3 s. - PackCall.Core.Test.dll (net10.0)

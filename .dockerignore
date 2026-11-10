@@ -26,8 +26,6 @@ README.md
 
 # Development-only AI tooling
 .agents/
-_bmad/
-_bmad-output/
 AGENTS.md
 !**/.gitignore
 !.git/HEAD

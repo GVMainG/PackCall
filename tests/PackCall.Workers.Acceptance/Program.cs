@@ -1,8 +1,11 @@
+using System.Data.Common;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using PackCall.Core;
+using PackCall.Core.Diagnostics;
 using PackCall.Core.Entities;
 using PackCall.Core.Services;
 using PackCall.Core.Sending;
@@ -21,15 +24,24 @@ builder.Services.AddDeliveryProcessing(PackCall.Infrastructure.Hosting.TestOpera
 builder.Services.AddSingleton(new WorkerIdentity(id));
 var settings = TestOperatorSettings.Parse(builder.Configuration);
 builder.Services.RemoveAll<IMessageSender>();
-builder.Services.AddSingleton<IMessageSender>(sp => new BarrierSender(sp.GetRequiredService<IServiceScopeFactory>(),
-    sp.GetRequiredService<WorkerIdentity>(), settings.Mode == TestSenderMode.Http
-        ? new HttpTestEmailSender(settings) : new MockEmailSender(new OperatorRandom())));
+IMessageSender CreateSender() => settings.Mode == TestSenderMode.Http
+    ? new HttpTestEmailSender(settings) : new MockEmailSender(new OperatorRandom());
+var sm6Case = Environment.GetEnvironmentVariable("SM6_CASE");
+if (sm6Case is null)
+    builder.Services.AddSingleton<IMessageSender>(sp => new BarrierSender(sp.GetRequiredService<IServiceScopeFactory>(),
+        sp.GetRequiredService<WorkerIdentity>(), CreateSender()));
+else
+    Sm6Controls.Register(builder.Services, sm6Case, CreateSender);
 builder.Services.AddSchemaGate();
 builder.Services.Configure<DeliveryWorkerOptions>(o => {
-    o.Parallelism = 1; o.BatchSize = 1; o.LockDuration = TimeSpan.FromSeconds(20);
+    o.Parallelism = 1; o.BatchSize = 1; o.LockDuration = TimeSpan.FromSeconds(sm6Case == "recovery" ? 60 : 20);
     o.RecoveryInterval = TimeSpan.FromMilliseconds(100); o.IdleDelay = TimeSpan.FromMilliseconds(100);
 });
 var stale = Environment.GetEnvironmentVariable("STALE_FILE");
+var completionUpdates = sm6Case == "stale-result" && stale is not null ? new CompletionUpdateObserver() : null;
+if (completionUpdates is not null)
+    builder.Services.ConfigureDbContext<AppDbContext>(
+        options => options.AddInterceptors(completionUpdates), ServiceLifetime.Singleton);
 if (stale is null) builder.Services.AddHostedService<DeliveryWorker>();
 using var host = builder.Build();
 await host.StartAsync();
@@ -37,11 +49,28 @@ if (stale is not null)
 {
     var delivery = JsonSerializer.Deserialize<Delivery>(File.ReadAllText(stale), JsonOptions.Value)!;
     using var scope = host.Services.CreateScope();
+    using var observation = completionUpdates is not null ? new ProcessingObservation() : null;
     await scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>().ProcessAsync(delivery, CancellationToken.None);
+    if (observation is not null && completionUpdates is not null)
+        host.Services.GetRequiredService<Sm6Controls>().RecordStaleResult(
+            delivery.Id, observation.Outcome, completionUpdates.AffectedRows);
     Console.WriteLine("Stale ProcessAsync reached production repository with uncancelled token");
     await host.StopAsync();
 }
 else await host.WaitForShutdownAsync();
+
+sealed class CompletionUpdateObserver : DbCommandInterceptor
+{
+    public List<int> AffectedRows { get; } = [];
+
+    public override ValueTask<int> NonQueryExecutedAsync(DbCommand command, CommandExecutedEventData eventData,
+        int result, CancellationToken cancellationToken = default)
+    {
+        if (command.CommandText.Contains("UPDATE deliveries ", StringComparison.OrdinalIgnoreCase))
+            AffectedRows.Add(result);
+        return ValueTask.FromResult(result);
+    }
+}
 
 sealed class BarrierSender(IServiceScopeFactory scopes, WorkerIdentity identity, IMessageSender inner) : IMessageSender, IDisposable
 {

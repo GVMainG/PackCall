@@ -1,0 +1,217 @@
+[
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/alternate.py",
+    "new": "tests/acceptance/operators/fixtures/alternate.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/config_matrix.py",
+    "new": "tests/acceptance/operators/config_matrix.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/delayed.py",
+    "new": "tests/acceptance/operators/fixtures/delayed.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/late_http.py",
+    "new": "tests/acceptance/operators/late_http.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/operator_contract.py",
+    "new": "tests/acceptance/operators/operator_contract.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/precedence.py",
+    "new": "tests/acceptance/operators/precedence.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/preflight.py",
+    "new": "tests/acceptance/operators/preflight.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/privacy.py",
+    "new": "tests/acceptance/operators/privacy.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/prod_compose.py",
+    "new": "tests/acceptance/operators/prod_compose.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/retention.py",
+    "new": "tests/acceptance/operators/retention.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/run.py",
+    "new": "tests/acceptance/operators/run.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/shutdown.py",
+    "new": "tests/acceptance/operators/shutdown.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-11-1-test-email-operator/test_harness_fixes.py",
+    "new": "tests/tools/operators/test_harness_fixes.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/compose-failure.py",
+    "new": "tests/acceptance/workers/lifecycle/compose-failure.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/configuration.py",
+    "new": "tests/acceptance/workers/lifecycle/configuration.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/images.py",
+    "new": "tests/acceptance/workers/lifecycle/images.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/lifecycle.py",
+    "new": "tests/acceptance/workers/lifecycle/lifecycle.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/shutdown-probes.py",
+    "new": "tests/acceptance/workers/lifecycle/shutdown-probes.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-1-worker/startup.py",
+    "new": "tests/acceptance/workers/lifecycle/startup.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/run.py",
+    "new": "tests/acceptance/workers/coordination/run.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "tests/acceptance/story-2-2-workers/verify.py",
+    "new": "tests/acceptance/workers/coordination/verify.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/analysis_math.py",
+    "new": "scripts/performance/analysis_math.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/analyze.py",
+    "new": "scripts/performance/analyze.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/build_contract.py",
+    "new": "scripts/performance/build_contract.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/cleanup.py",
+    "new": "scripts/performance/cleanup.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/collectors.py",
+    "new": "scripts/performance/collectors.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/contract.py",
+    "new": "scripts/performance/contract.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/control_smoke.py",
+    "new": "tests/acceptance/measurements/control_smoke.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/crash_smoke.py",
+    "new": "tests/acceptance/measurements/crash_smoke.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/postgres_tests.py",
+    "new": "scripts/performance/postgres_tests.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/reader.py",
+    "new": "scripts/performance/reader.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/resource_smoke.py",
+    "new": "tests/acceptance/measurements/resource_smoke.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/run.py",
+    "new": "scripts/performance/run.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/session.py",
+    "new": "scripts/performance/session.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/stall_smoke.py",
+    "new": "tests/acceptance/measurements/stall_smoke.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/stop.py",
+    "new": "scripts/performance/stop.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_analysis_math.py",
+    "new": "tests/tools/performance/test_analysis_math.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_analyze.py",
+    "new": "tests/tools/performance/test_analyze.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_collectors.py",
+    "new": "tests/tools/performance/test_collectors.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_contract.py",
+    "new": "tests/tools/performance/test_contract.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_postgres_repeat.py",
+    "new": "tests/acceptance/measurements/postgres_repeat.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/test_reader.py",
+    "new": "tests/tools/performance/test_reader.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  },
+  {
+    "old": "scripts/performance/two_worker_crash.py",
+    "new": "tests/acceptance/measurements/two_worker_crash.py",
+    "top_level_steps_and_all_ast_preserved_with_explicit_path_updates": true
+  }
+]

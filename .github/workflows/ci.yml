@@ -1,0 +1,212 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+    tags: ["v*", "!v0.5.0-beta.2"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  utf8_sources:
+    name: Strict UTF-8 sources
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test the CI gates themselves
+        run: python3 -m unittest discover -s tests/tools/ci -p "test_*.py" -v
+      - name: Check tracked C# sources are strict UTF-8
+        run: python3 scripts/ci/check_utf8_sources.py
+
+  build_and_unit:
+    name: Build and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Prepare artifact directory
+        if: always()
+        run: mkdir -p artifacts/test-results
+      - name: Build (Release)
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          dotnet build PackCall.slnx -c Release --nologo 2>&1 | tee artifacts/build.log
+      - name: Unit tests
+        shell: bash
+        run: |
+          mkdir -p artifacts/test-results
+          dotnet test tests/PackCall.Test/PackCall.Test.csproj -c Release --no-build --nologo \
+            --filter "Category=Unit" \
+            --logger "trx;LogFileName=unit.trx" \
+            --results-directory artifacts/test-results 2>&1 | tee artifacts/unit.log
+      - name: Assert unit tests actually ran without skips
+        run: python3 scripts/ci/check_trx.py --forbid-skipped artifacts/test-results/unit.trx
+      - name: Upload CI logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-logs-${{ github.sha }}-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 14
+          if-no-files-found: warn
+
+  integration:
+    name: Integration tests (PostgreSQL)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:18.6-alpine3.24
+        env:
+          POSTGRES_DB: packcall
+          POSTGRES_USER: packcall
+          POSTGRES_PASSWORD: packcall-ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U packcall -d packcall"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Prepare artifact directory
+        if: always()
+        run: mkdir -p artifacts/test-results
+      - name: Build (Release)
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          dotnet build PackCall.slnx -c Release --nologo 2>&1 | tee artifacts/build.log
+      - name: Apply EF migrations
+        shell: bash
+        env:
+          ConnectionStrings__Postgres: "Host=localhost;Port=5432;Database=packcall;Username=packcall;Password=packcall-ci"
+        run: dotnet run --project src/PackCall.Migrator -c Release --no-build 2>&1 | tee artifacts/migrate.log
+      - name: Integration tests
+        shell: bash
+        env:
+          PACKCALL_TEST_POSTGRES: "Host=localhost;Port=5432;Database=packcall;Username=packcall;Password=packcall-ci"
+        run: |
+          mkdir -p artifacts/test-results
+          dotnet test tests/PackCall.Test/PackCall.Test.csproj -c Release --no-build --nologo \
+            --filter "Category=Integration" \
+            --logger "trx;LogFileName=integration.trx" \
+            --results-directory artifacts/test-results 2>&1 | tee artifacts/integration.log
+      - name: Assert integration tests ran without skips
+        run: python3 scripts/ci/check_trx.py --forbid-skipped artifacts/test-results/integration.trx
+      - name: Upload integration diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-logs-${{ github.sha }}-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 14
+          if-no-files-found: warn
+
+  python_offline:
+    name: Python offline checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Prepare artifact directory
+        run: mkdir -p artifacts
+      - name: Install committed requirements
+        shell: bash
+        run: pip install -r scripts/performance/requirements.txt 2>&1 | tee artifacts/python-install.log
+      - name: Run offline performance tests
+        shell: bash
+        run: python -m pytest tests/tools/performance -q --tb=short --junitxml=artifacts/python-offline.xml 2>&1 | tee artifacts/python-offline.log
+      - name: Assert offline tests actually ran without skips
+        run: python3 scripts/ci/check_junit.py --forbid-skipped artifacts/python-offline.xml
+      - name: Upload offline check logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-offline-logs-${{ github.sha }}-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 14
+          if-no-files-found: warn
+
+  docker_build:
+    name: Docker image builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify TEST_SIMULATE_ERRORS defaults to false
+        env:
+          DOCKER_REGISTRY: ""
+          POSTGRES_DB: packcall
+          POSTGRES_USER: packcall
+          POSTGRES_PASSWORD: packcall
+          PACKCALL_ENVIRONMENT: test
+          TEST_SENDER_MODE: inprocess
+          TEST_SIMULATE_ERRORS: ""
+          TEST_OPERATOR_URL: ""
+          TEST_OPERATOR_TIMEOUT_SECONDS: "5"
+        run: |
+          flag=$(docker compose -f docker-compose.yml config --format json | jq -r '.services["packcall.worker"].environment.TEST_SIMULATE_ERRORS')
+          echo "TEST_SIMULATE_ERRORS=$flag"
+          test "$flag" = "false"
+      - name: Prepare artifact directory
+        if: always()
+        run: mkdir -p artifacts
+      - name: Build PackCall.Api
+        shell: bash
+        run: docker build -f src/PackCall.Api/Dockerfile -t packcall-api . 2>&1 | tee artifacts/docker-api.log
+      - name: Build PackCall.Worker
+        shell: bash
+        run: docker build -f src/PackCall.Worker/Dockerfile -t packcall-worker . 2>&1 | tee artifacts/docker-worker.log
+      - name: Build PackCall.Migrator
+        shell: bash
+        run: docker build -f src/PackCall.Migrator/Dockerfile -t packcall-migrator . 2>&1 | tee artifacts/docker-migrator.log
+      - name: Build PackCall.TestEmailOperator
+        shell: bash
+        run: docker build -f src/PackCall.TestEmailOperator/Dockerfile -t packcall-test-email-operator src/PackCall.TestEmailOperator 2>&1 | tee artifacts/docker-test-email-operator.log
+      - name: Upload Docker build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-build-logs-${{ github.sha }}-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 14
+          if-no-files-found: warn
+
+  # The aggregate checks every entry of `needs` through toJSON, so a forgotten
+  # dependency is caught only if it is listed in `needs` (the workflow-contract
+  # test enforces that every job is listed).
+  ci_required:
+    name: CI required
+    if: always()
+    needs: [utf8_sources, build_and_unit, integration, python_offline, docker_build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify every required job succeeded
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          echo "required job results:"
+          echo "$NEEDS"
+          echo "$NEEDS" | jq -e 'to_entries | all(.value.result == "success")' > /dev/null \
+            || { echo "::error::a required job did not succeed"; exit 1; }

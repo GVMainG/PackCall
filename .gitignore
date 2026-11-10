@@ -362,24 +362,34 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Project-local Codex configuration and skills
-.codex/
+# Project-local DSH configuration and skills
+/.dsh/
 
-# BMAD personal settings
-/_bmad/config.user.toml
-/_bmad
-/_bmad-output
-/.agents
-/agents.md
+# BMAD planning artifacts are local only; their index history was cleaned in 4238d74
+/_bmad-output/
 
-/tests/*
-!/tests/PackCall.Worker.Probe/
-!/tests/PackCall.Workers.Acceptance/
-!/tests/acceptance/
-/tests/acceptance/*
-!/tests/acceptance/story-2-2-workers/
-!/tests/acceptance/story-11-1-test-email-operator/
+
 # Acceptance outputs remain local
 /tests/**/__pycache__/
 /tests/**/control/
 /tests/**/run-*/
+
+/.agents
+/_bmad
+
+!/tests/reorganization-evidence/**/*.log
+
+# --- Documentation and evidence are versioned proof (Story 1.1) ---
+# docs/** must stay committable: generic rules above (artifacts/, *.log) must not swallow
+# evidence. Planning artifacts stay local; artifacts/ and _bmad-output/ above stay ignored.
+!/docs/**
+
+# Secret-bearing file types must not become committable through the docs/ re-include (NFR-4).
+# Keep this block after !/docs/**: the last matching pattern wins.
+/docs/**/*.pfx
+/docs/**/*.pem
+/docs/**/*.key
+/docs/**/*.p12
+/docs/**/*.snk
+# Python tooling caches
+.pytest_cache/

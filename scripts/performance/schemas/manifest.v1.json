@@ -1,0 +1,337 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "session_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "profile": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_.:-]{1,160}$"
+    },
+    "commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40,64}$"
+    },
+    "dirty": {
+      "type": "boolean"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "settings_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "effective_settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parallelism": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "batch_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lock_duration_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "recovery_interval_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "idle_delay_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "error_delay_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "http_timeout_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "simulate_errors": {
+          "type": "boolean"
+        },
+        "operator_mode": {
+          "enum": [
+            "http",
+            "mock"
+          ]
+        },
+        "environment": {
+          "enum": [
+            "test"
+          ]
+        },
+        "interval_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "process_sample_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "queue_sample_s": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "parallelism",
+        "batch_size",
+        "lock_duration_s",
+        "recovery_interval_s",
+        "idle_delay_s",
+        "error_delay_s",
+        "http_timeout_s",
+        "simulate_errors",
+        "operator_mode",
+        "environment",
+        "interval_s",
+        "process_sample_s",
+        "queue_sample_s"
+      ]
+    },
+    "image_digests": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_.:-]{1,160}$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      }
+    },
+    "tool_versions": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_.:-]{1,160}$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_.:-]{1,160}$"
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "enum": [
+            "wsl2",
+            "hyperv",
+            "unknown"
+          ]
+        },
+        "os": {
+          "const": "windows"
+        },
+        "resources": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_.:-]{1,160}$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "unit": {
+                "enum": [
+                  "bytes",
+                  "cores"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "available",
+                  "unlimited",
+                  "unsupported"
+                ]
+              }
+            },
+            "required": [
+              "value",
+              "unit",
+              "status"
+            ]
+          }
+        }
+      },
+      "required": [
+        "backend",
+        "os",
+        "resources"
+      ]
+    },
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "load": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "deliveries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "message_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "email_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "replenishment": {
+          "const": false
+        }
+      },
+      "required": [
+        "deliveries",
+        "message_bytes",
+        "email_bytes",
+        "replenishment"
+      ]
+    },
+    "planned_roles": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "worker",
+          "api",
+          "driver",
+          "postgres",
+          "http"
+        ]
+      }
+    },
+    "participants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "instance_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "enum": [
+              "worker",
+              "api",
+              "driver",
+              "postgres",
+              "http"
+            ]
+          },
+          "worker_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256
+          },
+          "boot_utc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "instance_id",
+          "role",
+          "worker_id",
+          "boot_utc"
+        ]
+      }
+    },
+    "start_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "stop_utc": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "stop_reason": {
+      "enum": [
+        null,
+        "completed",
+        "aborted",
+        "stalled",
+        "completion_stalled",
+        "preflight_failed"
+      ]
+    },
+    "workload_status": {
+      "enum": [
+        "preparing",
+        "running",
+        "completed",
+        "aborted",
+        "stalled",
+        "completion_stalled"
+      ]
+    },
+    "telemetry_status": {
+      "enum": [
+        "collecting",
+        "complete",
+        "partial",
+        "failed"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "session_id",
+    "profile",
+    "commit",
+    "dirty",
+    "source_sha256",
+    "settings_sha256",
+    "effective_settings",
+    "image_digests",
+    "tool_versions",
+    "environment",
+    "campaign_id",
+    "load",
+    "planned_roles",
+    "participants",
+    "start_utc",
+    "stop_utc",
+    "stop_reason",
+    "workload_status",
+    "telemetry_status"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

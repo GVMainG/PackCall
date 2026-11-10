@@ -1,0 +1,12 @@
+[
+  {
+    "mutation": "\"Category\", \"Unit\"",
+    "rejected": true,
+    "reason": "Trait does not match path"
+  },
+  {
+    "mutation": "\"Module\", \"Workers\"",
+    "rejected": true,
+    "reason": "Trait does not match path"
+  }
+]

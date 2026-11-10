@@ -7,7 +7,7 @@ services:
     environment: &packcall-environment
       PACKCALL_ENVIRONMENT: ${PACKCALL_ENVIRONMENT:?PACKCALL_ENVIRONMENT must be set}
       TEST_SENDER_MODE: ${TEST_SENDER_MODE:?TEST_SENDER_MODE must be set}
-      TEST_SIMULATE_ERRORS: ${TEST_SIMULATE_ERRORS:?TEST_SIMULATE_ERRORS must be set}
+      TEST_SIMULATE_ERRORS: ${TEST_SIMULATE_ERRORS:-false}
       TEST_OPERATOR_URL: ${TEST_OPERATOR_URL?TEST_OPERATOR_URL must be set (empty allowed for inprocess)}
       TEST_OPERATOR_TIMEOUT_SECONDS: ${TEST_OPERATOR_TIMEOUT_SECONDS:?TEST_OPERATOR_TIMEOUT_SECONDS must be set}
       ConnectionStrings__Postgres: Host=packcall.db;Port=5432;Database=${POSTGRES_DB:?POSTGRES_DB must be set};Username=${POSTGRES_USER:?POSTGRES_USER must be set};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
