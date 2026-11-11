@@ -56,8 +56,13 @@ def analyze(directory):
     clock_quality="unknown"
     probes=[root/"clock-initial.json",root/"clock-final.json"]
     if all(path.exists() for path in probes):
-        measurements=[item for path in probes for item in json.loads(path.read_text()).values()]
-        clock_quality="verified" if all("offset_s" in item and abs(item["offset_s"])+item["uncertainty_s"]<=1 for item in measurements) else "uncertain"
+        groups = [{key: value for key, value in json.loads(path.read_text()).items() if key != "schema_version"}
+                  for path in probes]
+        clock_quality = "verified" if all(groups) and all(
+            isinstance(item, dict) and {"offset_s", "uncertainty_s"} <= item.keys()
+            and abs(item["offset_s"]) + item["uncertainty_s"] <= 1
+            for group in groups for item in group.values()
+        ) else "uncertain"
     unions=[]; used=set()
     for index,item in enumerate(raw_histograms):
         if index in used: continue

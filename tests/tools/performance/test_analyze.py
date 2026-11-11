@@ -19,7 +19,9 @@ class OfflineTests(unittest.TestCase):
             record=json.loads((ROOT/"examples/interval.json").read_text())
             directory=root/"processes"/record["instance_id"];directory.mkdir(parents=True)
             files={root/"manifest.json":manifest,root/"initial.json":{"sent":0,"failed":0},root/"final.json":{"sent":3,"failed":0},
-                   directory/"process.json":{"instance_id":record["instance_id"]},directory/"stopped.json":{"telemetry_status":"complete"}}
+                   directory/"process.json":{"instance_id":record["instance_id"]},directory/"stopped.json":{"telemetry_status":"complete"},
+                   root/"clock-initial.json":{"worker0":{"offset_s":0.1,"uncertainty_s":0.1}},
+                   root/"clock-final.json":{"schema_version":1,"worker0":{"offset_s":0.1,"uncertainty_s":0.1}}}
             for path,value in files.items():path.write_text(json.dumps(value))
             interval=directory/"intervals-000000.jsonl";interval.write_text(json.dumps(record)+"\n")
             before={path:path.read_bytes() for path in [*files,interval]}
@@ -27,6 +29,7 @@ class OfflineTests(unittest.TestCase):
                 first=analyze(root); first_bytes=(root/"summary.json").read_bytes()
                 second=analyze(root)
             self.assertEqual(0,first["reconciliation_difference"])
+            self.assertEqual("verified",first["clock_quality"])
             self.assertEqual(first,second)
             self.assertEqual(first_bytes,(root/"summary.json").read_bytes())
             self.assertTrue((root/"charts/volume.svg").exists())

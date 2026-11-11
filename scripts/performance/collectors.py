@@ -150,7 +150,7 @@ def host_snapshot():
             "host.disk_io": scalar(None, "bytes", "cumulative", "unsupported")}, {}
 
 
-def collector_rss():
+def collector_rss(*, peak=False):
     if os.name != "nt": return None
     class Counters(ctypes.Structure):
         _fields_ = [("cb", ctypes.c_ulong), ("faults", ctypes.c_ulong)] + [(name, ctypes.c_size_t) for name in ("peak", "working", "page_pool_peak", "page_pool", "nonpage_peak", "nonpage", "pagefile", "pagefile_peak")]
@@ -160,7 +160,7 @@ def collector_rss():
     ctypes.windll.psapi.GetProcessMemoryInfo.argtypes = [ctypes.c_void_p, ctypes.POINTER(Counters), ctypes.c_ulong]
     handle = ctypes.windll.kernel32.GetCurrentProcess()
     if not ctypes.windll.psapi.GetProcessMemoryInfo(handle, ctypes.byref(counters), counters.cb): return None
-    return counters.working
+    return counters.peak if peak else counters.working
 
 
 class ScheduledCollector:

@@ -5,7 +5,7 @@ from pathlib import Path
 from contract import ContractError, validate
 
 
-def read_prefix(paths, kind="interval"):
+def read_prefix(paths, kind="interval", *, contiguous=True):
     records, seen, last, quality = [], {}, {}, set()
     for path in sorted(map(Path, paths)):
         checksum_file = path.parent / ("runtime-checksums.json" if path.name.startswith("runtime-") else "checksums.json")
@@ -43,7 +43,9 @@ def read_prefix(paths, kind="interval"):
                     previous = last[instance]
                     if record["sequence"] <= previous["sequence"]:
                         raise ContractError("sequence_reset_within_instance")
-                    if record["sequence"] != previous["sequence"] + 1 or record["elapsed_start_s"] > previous["elapsed_end_s"] + 1e-6:
+                    if record["sequence"] != previous["sequence"] + 1 or (
+                        contiguous and record["elapsed_start_s"] > previous["elapsed_end_s"] + 1e-6
+                    ):
                         quality.add("gap")
                     if record["elapsed_start_s"] < previous["elapsed_end_s"] - 1e-6:
                         raise ContractError("overlapping_windows")
