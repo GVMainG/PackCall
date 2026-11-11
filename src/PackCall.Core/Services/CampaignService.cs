@@ -10,12 +10,12 @@ public sealed class CampaignService : ICampaignService
     private const int FormationBatchSize = 500;
     private readonly ICampaingRepository _campaignRepository;
     private readonly IDeliveryRepository _deliveryRepository;
-    private readonly IRecipientRepository _recipientRepository;
+    private readonly IContactRepository _recipientRepository;
 
     public CampaignService(
         ICampaingRepository campaignRepository,
         IDeliveryRepository deliveryRepository,
-        IRecipientRepository recipientRepository)
+        IContactRepository recipientRepository)
     {
         _campaignRepository = campaignRepository;
         _deliveryRepository = deliveryRepository;
@@ -156,13 +156,13 @@ public sealed class CampaignService : ICampaignService
         return _deliveryRepository.GetStatusCountsAsync(campaignId, ct);
     }
 
-    public Task<Recipient?> GetRecipientAsync(Guid recipientId, CancellationToken ct)
+    public Task<Contact?> GetRecipientAsync(Guid recipientId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         return _recipientRepository.GetAsync(recipientId, ct);
     }
 
-    public async Task<Recipient> CreateRecipientAsync(string email, CancellationToken ct)
+    public async Task<Contact> CreateRecipientAsync(string email, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         if (string.IsNullOrWhiteSpace(email))
@@ -179,7 +179,7 @@ public sealed class CampaignService : ICampaignService
 
         ct.ThrowIfCancellationRequested();
         var now = DateTime.UtcNow;
-        return await _recipientRepository.CreateAsync(new Recipient
+        return await _recipientRepository.CreateAsync(new Contact
         {
             Id = Guid.NewGuid(),
             Email = normalizedEmail,
@@ -188,7 +188,7 @@ public sealed class CampaignService : ICampaignService
         }, ct);
     }
 
-    public Task<PageResult<Recipient>> GetRecipientsAsync(int pageNumber, int pageSize, CancellationToken ct)
+    public Task<PageResult<Contact>> GetRecipientsAsync(int pageNumber, int pageSize, CancellationToken ct)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
         ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
@@ -212,7 +212,7 @@ public sealed class CampaignService : ICampaignService
         return _deliveryRepository.GetPage(campaignId, pageNumber, pageSize, ct);
     }
 
-    public async Task<PageResult<Recipient>> GetRecipientsAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct)
+    public async Task<PageResult<Contact>> GetRecipientsAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
         ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
@@ -223,13 +223,13 @@ public sealed class CampaignService : ICampaignService
 
         ct.ThrowIfCancellationRequested();
 
-        var recipients = deliveries.Select(delivery => delivery.Recipient)
+        var recipients = deliveries.Select(delivery => delivery.Contact)
             .DistinctBy(recipient => recipient.Id)
             .OrderBy(recipient => recipient.Id)
             .ToList();
         var items = recipients.Skip(checked((pageNumber - 1) * pageSize)).Take(pageSize).ToList();
 
-        return new PageResult<Recipient>(items, recipients.Count);
+        return new PageResult<Contact>(items, recipients.Count);
     }
 
     private async Task<Campaign> GetRequiredCampaignAsync(Guid campaignId, CancellationToken ct)

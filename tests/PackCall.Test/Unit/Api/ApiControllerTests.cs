@@ -11,7 +11,7 @@ namespace PackCall.Core.Test;
 public class ApiControllerTests
 {
     private readonly FakeDeliveryRepository _deliveries = new();
-    private readonly FakeRecipientRepository _recipients = new();
+    private readonly FakeContactRepository _recipients = new();
     private readonly ICampaignService _service;
 
     public ApiControllerTests()
@@ -35,14 +35,14 @@ public class ApiControllerTests
         var campaignId = await _service.CreateCampaignAsync("Кампания", "Текст", CancellationToken.None);
         var delivery = Assert.Single(_deliveries.Items);
         Assert.Equal(campaignId, delivery.CampaignId);
-        Assert.Equal(recipient.Id, delivery.RecipientId);
-        Assert.Equal(recipient.Email, delivery.RecipientEmail);
+        Assert.Equal(recipient.Id, delivery.ContactId);
+        Assert.Equal(recipient.Email, delivery.AddressSnapshot);
     }
 
     [Fact]
     public async Task CampaignEndpoints_CreateReadAndPatchPreserveOtherField()
     {
-        _recipients.Items.Add(new Recipient { Id = Guid.NewGuid(), Email = "user@example.com" });
+        _recipients.Items.Add(new Contact { Id = Guid.NewGuid(), Email = "user@example.com" });
         var controller = new CampaignsController(_service);
 
         var created = await controller.CreateCampaign(
@@ -76,7 +76,7 @@ public class ApiControllerTests
         Assert.IsType<NotFoundResult>((await recipients.GetRecipient(Guid.NewGuid(), CancellationToken.None)).Result);
 
         _recipients.Items.AddRange(Enumerable.Range(0, 3)
-            .Select(index => new Recipient { Id = Guid.NewGuid(), Email = $"user{index}@example.com" }));
+            .Select(index => new Contact { Id = Guid.NewGuid(), Email = $"user{index}@example.com" }));
         var page = await recipients.GetRecipients(2, 2, CancellationToken.None);
         var response = Assert.IsType<PageResponse<RecipientResponse>>(
             Assert.IsType<OkObjectResult>(page.Result).Value);

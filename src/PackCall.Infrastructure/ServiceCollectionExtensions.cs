@@ -26,7 +26,7 @@ namespace PackCall.Infrastructure
 
         private static IServiceCollection AddRepositories(this IServiceCollection services) => services
             .AddScoped<ICampaingRepository, CampaignRepository>()
-            .AddScoped<IRecipientRepository, RecipientRepository>()
+            .AddScoped<IContactRepository, ContactRepository>()
             .AddScoped<IDeliveryRepository, DeliveryRepository>();
 
         public static IServiceCollection AddCampaignManagement(this IServiceCollection services) => services

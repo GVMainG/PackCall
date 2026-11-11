@@ -11,11 +11,11 @@ internal static class ResponseMapping
         ToOffset(campaign.StartedAt), ToOffset(campaign.CompletedAt));
 
     public static DeliveryResponse ToResponse(this Delivery delivery) => new(
-        delivery.Id, delivery.CampaignId, delivery.RecipientId, delivery.RecipientEmail,
+        delivery.Id, delivery.CampaignId, delivery.ContactId, delivery.AddressSnapshot ?? string.Empty,
         delivery.DeliveryStatus, ToOffset(delivery.CreatedAt), ToOffset(delivery.UpdatedAt),
         ToOffset(delivery.CompletedAt), delivery.WorkerId, ToOffset(delivery.LockExpiresAt));
 
-    public static RecipientResponse ToResponse(this Recipient recipient) => new(
+    public static RecipientResponse ToResponse(this Contact recipient) => new(
         recipient.Id, recipient.Email, ToOffset(recipient.CreatedAt), ToOffset(recipient.UpdatedAt));
 
     public static DeliveryStatisticsResponse ToResponse(this DeliveryStatusCounts counts) => new(

@@ -80,11 +80,11 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
     }
 }
 
-internal sealed class FakeRecipientRepository : IRecipientRepository
+internal sealed class FakeContactRepository : IContactRepository
 {
-    public List<Recipient> Items { get; } = new();
+    public List<Contact> Items { get; } = new();
 
-    public Task<Recipient> CreateAsync(Recipient recipient, CancellationToken ct)
+    public Task<Contact> CreateAsync(Contact recipient, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         if (Items.Any(item => string.Equals(item.Email, recipient.Email, StringComparison.OrdinalIgnoreCase)))
@@ -93,19 +93,19 @@ internal sealed class FakeRecipientRepository : IRecipientRepository
         return Task.FromResult(recipient);
     }
 
-    public Task<Recipient?> GetByEmailAsync(string email, CancellationToken ct) =>
+    public Task<Contact?> GetByEmailAsync(string email, CancellationToken ct) =>
         Task.FromResult(Items.FirstOrDefault(recipient =>
             string.Equals(recipient.Email, email, StringComparison.OrdinalIgnoreCase)));
 
-    public Task<IReadOnlyList<Recipient>> GetBatchAsync(int offset, int batchSize, CancellationToken ct) =>
-        Task.FromResult<IReadOnlyList<Recipient>>(Items.DistinctBy(recipient => recipient.Id)
+    public Task<IReadOnlyList<Contact>> GetBatchAsync(int offset, int batchSize, CancellationToken ct) =>
+        Task.FromResult<IReadOnlyList<Contact>>(Items.DistinctBy(recipient => recipient.Id)
             .OrderBy(recipient => recipient.Id).Skip(offset).Take(batchSize).ToList());
 
-    public Task<Recipient?> GetAsync(Guid id, CancellationToken ct) =>
+    public Task<Contact?> GetAsync(Guid id, CancellationToken ct) =>
         Task.FromResult(Items.FirstOrDefault(recipient => recipient.Id == id));
 
-    public Task<PageResult<Recipient>> GetPageAsync(int pageNumber, int pageSize, CancellationToken ct) =>
-        Task.FromResult(new PageResult<Recipient>(
+    public Task<PageResult<Contact>> GetPageAsync(int pageNumber, int pageSize, CancellationToken ct) =>
+        Task.FromResult(new PageResult<Contact>(
             Items.OrderBy(recipient => recipient.Id).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList(),
             Items.Count));
 }

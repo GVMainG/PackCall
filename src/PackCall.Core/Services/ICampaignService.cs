@@ -63,15 +63,15 @@ public interface ICampaignService
     Task<DeliveryStatusCounts> GetDeliveryStatusCountsAsync(Guid campaignId, CancellationToken ct);
 
     /// <summary>Возвращает получателя или null, если он не найден.</summary>
-    Task<Recipient?> GetRecipientAsync(Guid recipientId, CancellationToken ct);
+    Task<Contact?> GetRecipientAsync(Guid recipientId, CancellationToken ct);
 
     /// <summary>Добавляет получателя в аудиторию будущих кампаний.</summary>
     /// <exception cref="ArgumentException">Email пуст или некорректен.</exception>
     /// <exception cref="DomainException">Получатель с таким email уже существует.</exception>
-    Task<Recipient> CreateRecipientAsync(string email, CancellationToken ct);
+    Task<Contact> CreateRecipientAsync(string email, CancellationToken ct);
 
     /// <summary>Возвращает страницу всех получателей в порядке Id.</summary>
-    Task<PageResult<Recipient>> GetRecipientsAsync(int pageNumber, int pageSize, CancellationToken ct);
+    Task<PageResult<Contact>> GetRecipientsAsync(int pageNumber, int pageSize, CancellationToken ct);
 
     /// <summary>Возвращает страницу кампаний в порядке Id и общее число кампаний.</summary>
     /// <exception cref="ArgumentOutOfRangeException">Номер или размер страницы меньше 1.</exception>
@@ -85,5 +85,5 @@ public interface ICampaignService
     /// <summary>Возвращает страницу уникальных получателей кампании в порядке Id и их общее число.</summary>
     /// <remarks>Для отсутствующей кампании возвращается пустая страница.</remarks>
     /// <exception cref="ArgumentOutOfRangeException">Номер или размер страницы меньше 1.</exception>
-    Task<PageResult<Recipient>> GetRecipientsAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct);
+    Task<PageResult<Contact>> GetRecipientsAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct);
 }

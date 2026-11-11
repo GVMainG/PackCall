@@ -16,17 +16,24 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
 
         await using var context = await contextFactory.CreateDbContextAsync(ct);
         // Новые экземпляры с теми же Id и FK исключают загрузку в контекст графа
-        // Campaign/Recipient и удержание уже сохранённых доставок в памяти запроса.
+        // Campaign/Contact и удержание уже сохранённых доставок в памяти запроса.
         var rows = deliveries.Select(delivery => Delivery.Create(
-            delivery.CampaignId, delivery.RecipientId, delivery.RecipientEmail,
+            delivery.CampaignId, delivery.ContactId, delivery.AddressSnapshot ?? throw new InvalidOperationException("New delivery requires an address snapshot."),
             delivery.CreatedAt, delivery.Id));
+        foreach (var campaign in deliveries.GroupBy(d => d.CampaignId))
+        {
+            if (!await context.CampaignChannels.AnyAsync(c => c.CampaignId == campaign.Key && c.Channel == "email", ct))
+                context.CampaignChannels.Add(new CampaignChannel { CampaignId = campaign.Key, Channel = "email" });
+            context.CampaignContacts.AddRange(campaign.Select(d => d.ContactId).Distinct()
+                .Select(id => new CampaignContact { CampaignId = campaign.Key, ContactId = id }));
+        }
         await context.Deliveries.AddRangeAsync(rows, ct);
         await context.SaveChangesAsync(ct);
     }
 
     public async Task<IEnumerable<Delivery>> Get(Guid id, CancellationToken ct) =>
         await dbContext.Deliveries
-            .Include(delivery => delivery.Recipient)
+            .Include(delivery => delivery.Contact).ThenInclude(contact => contact.Channels)
             .Where(delivery => delivery.Id == id)
             .ToListAsync(ct);
 
@@ -35,7 +42,7 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         Expression<Func<Delivery, bool>> predicate,
         CancellationToken ct) =>
         await dbContext.Deliveries
-            .Include(delivery => delivery.Recipient)
+            .Include(delivery => delivery.Contact).ThenInclude(contact => contact.Channels)
             .Where(delivery => delivery.CampaignId == campaignId)
             .Where(predicate)
             .ToListAsync(ct);
@@ -48,7 +55,7 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
     {
         var skip = GetSkip(pageNumber, pageSize);
         var query = dbContext.Deliveries
-            .Include(delivery => delivery.Recipient)
+            .Include(delivery => delivery.Contact).ThenInclude(contact => contact.Channels)
             .Where(delivery => delivery.CampaignId == campaignId)
             .OrderBy(delivery => delivery.Id);
 
@@ -95,6 +102,9 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
                     INNER JOIN campaigns AS campaign ON campaign.id = delivery.campaign_id
                     WHERE delivery.delivery_status = {{waiting}}
                       AND campaign.status = {{campaignInProgress}}
+                      AND delivery.channel = 'email'
+                      AND delivery.address_snapshot IS NOT NULL
+                      AND delivery.address_snapshot !~ '^[[:space:]]*$'
                     ORDER BY delivery.id
                     LIMIT {{batchSize}}
                     FOR UPDATE OF delivery SKIP LOCKED

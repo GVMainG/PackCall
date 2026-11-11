@@ -9,7 +9,7 @@ namespace PackCall.Core.Repositorys
         Task AddBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct);
         Task<IEnumerable<Delivery>> Get(Guid id, CancellationToken ct);
         /// <summary>
-        /// Фильтрует доставки указанной кампании в хранилище, загружая также Recipient.
+        /// Фильтрует доставки указанной кампании в хранилище, загружая также Contact.
         /// Выражение должно допускать перевод в SQL.
         /// </summary>
         Task<IEnumerable<Delivery>> Get(Guid campaignId, Expression<Func<Delivery, bool>> predicate, CancellationToken ct);

@@ -72,6 +72,100 @@ namespace PackCall.Infrastructure.Migrations
                     b.ToTable("campaigns", (string)null);
                 });
 
+            modelBuilder.Entity("PackCall.Core.Entities.CampaignChannel", b =>
+                {
+                    b.Property<Guid>("CampaignId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("campaign_id");
+
+                    b.Property<string>("Channel")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("channel");
+
+                    b.HasKey("CampaignId", "Channel");
+
+                    b.ToTable("campaign_channels", (string)null);
+                });
+
+            modelBuilder.Entity("PackCall.Core.Entities.CampaignContact", b =>
+                {
+                    b.Property<Guid>("CampaignId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("campaign_id");
+
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("contact_id");
+
+                    b.HasKey("CampaignId", "ContactId");
+
+                    b.HasIndex("ContactId");
+
+                    b.ToTable("campaign_contacts", (string)null);
+                });
+
+            modelBuilder.Entity("PackCall.Core.Entities.Contact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("display_name");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_contacts_id");
+
+                    b.ToTable("contacts", (string)null);
+                });
+
+            modelBuilder.Entity("PackCall.Core.Entities.ContactChannel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("address");
+
+                    b.Property<string>("Channel")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("channel");
+
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("contact_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Channel", "Address")
+                        .IsUnique()
+                        .HasDatabaseName("ix_contact_channels_channel_address");
+
+                    b.HasIndex("ContactId", "Channel")
+                        .IsUnique();
+
+                    b.ToTable("contact_channels", (string)null);
+                });
+
             modelBuilder.Entity("PackCall.Core.Entities.Delivery", b =>
                 {
                     b.Property<Guid>("Id")
@@ -79,13 +173,28 @@ namespace PackCall.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("AddressSnapshot")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("address_snapshot");
+
                     b.Property<Guid>("CampaignId")
                         .HasColumnType("uuid")
                         .HasColumnName("campaign_id");
 
+                    b.Property<string>("Channel")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("channel");
+
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("completed_at");
+
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("contact_id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -99,16 +208,6 @@ namespace PackCall.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("lock_expires_at");
 
-                    b.Property<string>("RecipientEmail")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("recipient_email");
-
-                    b.Property<Guid>("RecipientId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("recipient_id");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
@@ -121,53 +220,24 @@ namespace PackCall.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_deliveries_id");
 
+                    b.HasIndex("ContactId");
+
                     b.HasIndex("CreatedAt")
                         .HasDatabaseName("ix_deliveries_created_at");
 
                     b.HasIndex("DeliveryStatus")
                         .HasDatabaseName("ix_deliveries_status");
 
-                    b.HasIndex("RecipientId");
-
-                    b.HasIndex("CampaignId", "RecipientId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_deliveries_campaign_recipient");
+                    b.HasIndex("CampaignId", "Channel");
 
                     b.HasIndex("DeliveryStatus", "LockExpiresAt")
                         .HasDatabaseName("ix_deliveries_status_lock_expires_at");
 
-                    b.ToTable("deliveries", (string)null);
-                });
-
-            modelBuilder.Entity("PackCall.Core.Entities.Recipient", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("email");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("pk_recipients_id");
-
-                    b.HasIndex("Email")
+                    b.HasIndex("CampaignId", "ContactId", "Channel")
                         .IsUnique()
-                        .HasDatabaseName("ix_recipients_email");
+                        .HasDatabaseName("ix_deliveries_campaign_contact_channel");
 
-                    b.ToTable("recipients", (string)null);
+                    b.ToTable("deliveries", (string)null);
                 });
 
             modelBuilder.Entity("PackCall.Infrastructure.Journaling.DeliveryStatusJournalRecord", b =>
@@ -221,6 +291,41 @@ namespace PackCall.Infrastructure.Migrations
                     b.ToTable("delivery_status_journal", (string)null);
                 });
 
+            modelBuilder.Entity("PackCall.Core.Entities.CampaignChannel", b =>
+                {
+                    b.HasOne("PackCall.Core.Entities.Campaign", null)
+                        .WithMany()
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PackCall.Core.Entities.CampaignContact", b =>
+                {
+                    b.HasOne("PackCall.Core.Entities.Campaign", null)
+                        .WithMany()
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PackCall.Core.Entities.Contact", null)
+                        .WithMany()
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PackCall.Core.Entities.ContactChannel", b =>
+                {
+                    b.HasOne("PackCall.Core.Entities.Contact", "Contact")
+                        .WithMany("Channels")
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contact");
+                });
+
             modelBuilder.Entity("PackCall.Core.Entities.Delivery", b =>
                 {
                     b.HasOne("PackCall.Core.Entities.Campaign", "Campaign")
@@ -230,16 +335,28 @@ namespace PackCall.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_deliveries_campaigns");
 
-                    b.HasOne("PackCall.Core.Entities.Recipient", "Recipient")
+                    b.HasOne("PackCall.Core.Entities.Contact", "Contact")
                         .WithMany("Deliveries")
-                        .HasForeignKey("RecipientId")
+                        .HasForeignKey("ContactId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_deliveries_recipients");
+                        .HasConstraintName("fk_deliveries_contacts");
+
+                    b.HasOne("PackCall.Core.Entities.CampaignChannel", null)
+                        .WithMany()
+                        .HasForeignKey("CampaignId", "Channel")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PackCall.Core.Entities.CampaignContact", null)
+                        .WithMany()
+                        .HasForeignKey("CampaignId", "ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Campaign");
 
-                    b.Navigation("Recipient");
+                    b.Navigation("Contact");
                 });
 
             modelBuilder.Entity("PackCall.Core.Entities.Campaign", b =>
@@ -247,8 +364,10 @@ namespace PackCall.Infrastructure.Migrations
                     b.Navigation("Deliveries");
                 });
 
-            modelBuilder.Entity("PackCall.Core.Entities.Recipient", b =>
+            modelBuilder.Entity("PackCall.Core.Entities.Contact", b =>
                 {
+                    b.Navigation("Channels");
+
                     b.Navigation("Deliveries");
                 });
 #pragma warning restore 612, 618

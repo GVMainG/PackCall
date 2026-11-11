@@ -86,7 +86,7 @@ public abstract class PostgresTestBase : IAsyncLifetime
         await using var scope = _provider!.CreateAsyncScope();
         return await scope.ServiceProvider.GetRequiredService<AppDbContext>().Deliveries.AsNoTracking().SingleAsync(d => d.Id == id);
     }
-    private protected static string Snapshot(Delivery d) => JsonSerializer.Serialize(new { d.Id, d.CampaignId, d.RecipientId, d.RecipientEmail, d.CreatedAt, d.DeliveryStatus, d.UpdatedAt, d.CompletedAt, d.WorkerId, d.LockExpiresAt });
+    private protected static string Snapshot(Delivery d) => JsonSerializer.Serialize(new { d.Id, d.CampaignId, d.ContactId, d.AddressSnapshot, d.CreatedAt, d.DeliveryStatus, d.UpdatedAt, d.CompletedAt, d.WorkerId, d.LockExpiresAt });
     private protected async Task<string> Journal(Guid id, NpgsqlConnection? observer = null)
     {
         await using var owned = observer is null ? new NpgsqlConnection(_connectionString) : null;
@@ -111,7 +111,7 @@ public abstract class PostgresTestBase : IAsyncLifetime
         Assert.Equal("worker-A", entry.GetProperty("worker_id").GetString());
         Assert.Equal(stored.CompletedAt, entry.GetProperty("occurred_at").GetDateTimeOffset().UtcDateTime);
         Assert.Equal(original.CreatedAt, stored.CreatedAt);
-        Assert.Equal(original.RecipientEmail, stored.RecipientEmail);
+        Assert.Equal(original.AddressSnapshot, stored.AddressSnapshot);
         Assert.Equal(success ? "AcceptedByProvider" : "declined", entry.GetProperty("operator_result").GetString());
     }
 

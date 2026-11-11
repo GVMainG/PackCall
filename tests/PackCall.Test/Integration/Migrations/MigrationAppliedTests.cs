@@ -25,5 +25,6 @@ public sealed class MigrationAppliedTests
             ids.Add(reader.GetString(0));
 
         Assert.Contains("20261028193126_InitialCreate", ids);
+        Assert.Contains("20261113214910_ContactsChannels", ids);
     }
 }

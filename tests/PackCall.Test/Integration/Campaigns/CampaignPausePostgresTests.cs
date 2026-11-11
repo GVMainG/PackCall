@@ -29,6 +29,27 @@ namespace PackCall.Core.Test;
 public class CampaignPausePostgresTests : PostgresTestBase
 {
     [PostgresFact]
+    public async Task MultipleBatchesPersistAllEmailContactsAndOneCampaignChannel()
+    {
+        await using var scope = _provider!.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var contacts = Enumerable.Range(0, 501).Select(index => new Contact
+        {
+            Id = Guid.NewGuid(),
+            Email = $"batch{index}@example.test"
+        }).ToArray();
+        db.Contacts.AddRange(contacts);
+        await db.SaveChangesAsync();
+
+        var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
+        var campaignId = await campaigns.CreateCampaignAsync("Batch", "Message", CancellationToken.None);
+        var selected = await db.CampaignContacts.Where(c => c.CampaignId == campaignId).Select(c => c.ContactId).ToArrayAsync();
+        Assert.Equal(contacts.Select(c => c.Id).Order(), selected.Order());
+        Assert.Equal("email", await db.CampaignChannels.Where(c => c.CampaignId == campaignId).Select(c => c.Channel).SingleAsync());
+        Assert.Equal(501, await db.Deliveries.CountAsync(d => d.CampaignId == campaignId));
+    }
+
+    [PostgresFact]
     public async Task PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates()
     {
         var id = await CreateStartedCampaignAsync(4);

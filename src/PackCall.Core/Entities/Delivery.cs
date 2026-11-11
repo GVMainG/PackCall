@@ -10,12 +10,13 @@ public sealed class Delivery
 {
     public Guid Id { get; private set; }
     public Guid CampaignId { get; private set; }
-    public Guid RecipientId { get; private set; }
+    public Guid ContactId { get; private set; }
 
     /// <summary>
     /// Снимок адреса получателя на момент создания доставки.
     /// </summary>
-    public string RecipientEmail { get; private set; } = null!;
+    public string? AddressSnapshot { get; private set; }
+    public string Channel { get; private set; } = "email";
 
     public DeliveryStatus DeliveryStatus { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -33,7 +34,7 @@ public sealed class Delivery
     public DateTime? LockExpiresAt { get; private set; }
 
     public Campaign Campaign { get; private set; } = null!;
-    public Recipient Recipient { get; private set; } = null!;
+    public Contact Contact { get; private set; } = null!;
 
     private Delivery() { }
 
@@ -55,8 +56,8 @@ public sealed class Delivery
         {
             Id = deliveryId ?? Guid.NewGuid(),
             CampaignId = campaignId,
-            RecipientId = recipientId,
-            RecipientEmail = recipientEmail,
+            ContactId = recipientId,
+            AddressSnapshot = recipientEmail.Trim().ToLowerInvariant(),
             DeliveryStatus = DeliveryStatus.Waiting,
             CreatedAt = now,
             UpdatedAt = now
@@ -64,7 +65,7 @@ public sealed class Delivery
     }
 
     /// <summary>Создаёт доставку с привязкой к кампании и существующему получателю.</summary>
-    public static Delivery Create(Campaign campaign, Recipient recipient, DateTime now)
+    public static Delivery Create(Campaign campaign, Contact recipient, DateTime now)
     {
         ArgumentNullException.ThrowIfNull(campaign);
         ArgumentNullException.ThrowIfNull(recipient);
@@ -73,7 +74,7 @@ public sealed class Delivery
 
         var delivery = Create(campaign.Id, recipient.Id, recipient.Email, now);
         delivery.Campaign = campaign;
-        delivery.Recipient = recipient;
+        delivery.Contact = recipient;
         return delivery;
     }
 

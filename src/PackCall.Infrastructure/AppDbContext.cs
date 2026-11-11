@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PackCall.Core.Entities;
 using PackCall.Infrastructure.Journaling;
 
@@ -11,7 +11,10 @@ namespace PackCall.Infrastructure
         }
 
         public DbSet<Campaign> Campaigns { get; set; } = null!;
-        public DbSet<Recipient> Recipients { get; set; } = null!;
+        public DbSet<Contact> Contacts { get; set; } = null!;
+        public DbSet<ContactChannel> ContactChannels => Set<ContactChannel>();
+        public DbSet<CampaignContact> CampaignContacts => Set<CampaignContact>();
+        public DbSet<CampaignChannel> CampaignChannels => Set<CampaignChannel>();
         public DbSet<Delivery> Deliveries { get; set; } = null!;
         internal DbSet<DeliveryStatusJournalRecord> DeliveryStatusJournal => Set<DeliveryStatusJournalRecord>();
 
@@ -39,17 +42,33 @@ namespace PackCall.Infrastructure
                 entity.HasIndex(e => e.CreatedAt).HasDatabaseName("ix_campaigns_created_at");
             });
 
-            // Recipient configuration
-            modelBuilder.Entity<Recipient>(entity =>
-            {
-                entity.ToTable("recipients");
-                entity.HasKey(e => e.Id).HasName("pk_recipients_id");
-                entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.Email).HasColumnName("email").HasMaxLength(255).IsRequired();
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasColumnType("timestamp with time zone");
-                entity.Property(e => e.UpdatedAt).HasColumnName("updated_at").HasColumnType("timestamp with time zone");
-                entity.HasMany(e => e.Deliveries).WithOne(d => d.Recipient).HasForeignKey(d => d.RecipientId).OnDelete(DeleteBehavior.Cascade);
-                entity.HasIndex(e => e.Email).HasDatabaseName("ix_recipients_email").IsUnique();
+            modelBuilder.Entity<Contact>(e => {
+                e.ToTable("contacts"); e.HasKey(x => x.Id).HasName("pk_contacts_id");
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.DisplayName).HasColumnName("display_name").HasMaxLength(255);
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+                e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+            });
+            modelBuilder.Entity<ContactChannel>(e => {
+                e.ToTable("contact_channels"); e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.ContactId).HasColumnName("contact_id");
+                e.Property(x => x.Channel).HasColumnName("channel").HasMaxLength(32);
+                e.Property(x => x.Address).HasColumnName("address").HasMaxLength(255);
+                e.HasOne(x => x.Contact).WithMany(x => x.Channels).HasForeignKey(x => x.ContactId);
+                e.HasIndex(x => new { x.Channel, x.Address }).IsUnique().HasDatabaseName("ix_contact_channels_channel_address");
+                e.HasIndex(x => new { x.ContactId, x.Channel }).IsUnique();
+            });
+            modelBuilder.Entity<CampaignContact>(e => {
+                e.ToTable("campaign_contacts"); e.HasKey(x => new { x.CampaignId, x.ContactId });
+                e.Property(x => x.CampaignId).HasColumnName("campaign_id"); e.Property(x => x.ContactId).HasColumnName("contact_id");
+                e.HasOne<Campaign>().WithMany().HasForeignKey(x => x.CampaignId);
+                e.HasOne<Contact>().WithMany().HasForeignKey(x => x.ContactId);
+            });
+            modelBuilder.Entity<CampaignChannel>(e => {
+                e.ToTable("campaign_channels"); e.HasKey(x => new { x.CampaignId, x.Channel });
+                e.Property(x => x.CampaignId).HasColumnName("campaign_id"); e.Property(x => x.Channel).HasColumnName("channel").HasMaxLength(32);
+                e.HasOne<Campaign>().WithMany().HasForeignKey(x => x.CampaignId);
             });
 
             // Delivery configuration
@@ -59,8 +78,11 @@ namespace PackCall.Infrastructure
                 entity.HasKey(e => e.Id).HasName("pk_deliveries_id");
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.CampaignId).HasColumnName("campaign_id").IsRequired();
-                entity.Property(e => e.RecipientId).HasColumnName("recipient_id").IsRequired();
-                entity.Property(e => e.RecipientEmail).HasColumnName("recipient_email").HasMaxLength(255).IsRequired();
+                entity.Property(e => e.ContactId).HasColumnName("contact_id").IsRequired();
+                entity.Property(e => e.AddressSnapshot).HasColumnName("address_snapshot").HasMaxLength(255);
+                entity.Property(e => e.Channel).HasColumnName("channel").HasMaxLength(32).IsRequired();
+                entity.HasOne<CampaignContact>().WithMany().HasForeignKey(e => new { e.CampaignId, e.ContactId });
+                entity.HasOne<CampaignChannel>().WithMany().HasForeignKey(e => new { e.CampaignId, e.Channel });
                 entity.Property(e => e.DeliveryStatus).HasColumnName("delivery_status").IsRequired();
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasColumnType("timestamp with time zone").IsRequired();
                 entity.Property(e => e.UpdatedAt).HasColumnName("updated_at").HasColumnType("timestamp with time zone").IsRequired();
@@ -68,8 +90,8 @@ namespace PackCall.Infrastructure
                 entity.Property(e => e.WorkerId).HasColumnName("worker_id").HasMaxLength(255);
                 entity.Property(e => e.LockExpiresAt).HasColumnName("lock_expires_at").HasColumnType("timestamp with time zone");
                 entity.HasOne(e => e.Campaign).WithMany(c => c.Deliveries).HasForeignKey(e => e.CampaignId).HasConstraintName("fk_deliveries_campaigns").OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Recipient).WithMany(r => r.Deliveries).HasForeignKey(e => e.RecipientId).HasConstraintName("fk_deliveries_recipients").OnDelete(DeleteBehavior.Cascade);
-                entity.HasIndex(e => new { e.CampaignId, e.RecipientId }).HasDatabaseName("ix_deliveries_campaign_recipient").IsUnique();
+                entity.HasOne(e => e.Contact).WithMany(r => r.Deliveries).HasForeignKey(e => e.ContactId).HasConstraintName("fk_deliveries_contacts").OnDelete(DeleteBehavior.Cascade);
+                entity.HasIndex(e => new { e.CampaignId, e.ContactId, e.Channel }).HasDatabaseName("ix_deliveries_campaign_contact_channel").IsUnique();
                 entity.HasIndex(e => e.DeliveryStatus).HasDatabaseName("ix_deliveries_status");
                 entity.HasIndex(e => new { e.DeliveryStatus, e.LockExpiresAt }).HasDatabaseName("ix_deliveries_status_lock_expires_at");
                 entity.HasIndex(e => e.CreatedAt).HasDatabaseName("ix_deliveries_created_at");
