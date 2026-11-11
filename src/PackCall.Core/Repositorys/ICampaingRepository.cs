@@ -4,7 +4,7 @@ namespace PackCall.Core.Repositorys
 {
     public interface ICampaingRepository
     {
-        Task<IEnumerable<Campaign>> Get(Guid id, CancellationToken ct);
+        Task<Campaign?> Get(Guid id, CancellationToken ct);
         /// <summary>
         /// Возвращает страницу в порядке Id и общее число кампаний; нумерация с 1.
         /// </summary>

@@ -1,5 +1,4 @@
 using PackCall.Core.Entities;
-using System.Linq.Expressions;
 
 namespace PackCall.Core.Repositorys
 {
@@ -7,12 +6,7 @@ namespace PackCall.Core.Repositorys
     {
         /// <summary>Сохраняет порцию новых доставок без накопления отслеживаемых сущностей.</summary>
         Task AddBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct);
-        Task<IEnumerable<Delivery>> Get(Guid id, CancellationToken ct);
-        /// <summary>
-        /// Фильтрует доставки указанной кампании в хранилище, загружая также Contact.
-        /// Выражение должно допускать перевод в SQL.
-        /// </summary>
-        Task<IEnumerable<Delivery>> Get(Guid campaignId, Expression<Func<Delivery, bool>> predicate, CancellationToken ct);
+        Task<Delivery?> Get(Guid id, CancellationToken ct);
         /// <summary>Возвращает страницу в порядке Id и общее число доставок кампании; нумерация с 1.</summary>
         Task<PageResult<Delivery>> GetPage(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct);
         /// <summary>Подсчитывает доставки кампании по статусам в хранилище.</summary>

@@ -84,35 +84,23 @@ public sealed class Delivery
     /// Переводит доставку из "Отправляется" в конечный статус "Отправлено"
     /// после подтверждения приёма сообщения провайдером.
     /// </summary>
-    public void StatusFromInProgressToSent(DateTime now)
-    {
-        EnsureTransition(DeliveryStatus.Sent);
-        Complete(now);
-        DeliveryStatus = DeliveryStatus.Sent;
-    }
+    public void StatusFromInProgressToSent(DateTime now) => Complete(DeliveryStatus.Sent, now);
 
     /// <summary>
     /// Переводит доставку из "Отправляется" в конечный статус "Ошибка".
     /// </summary>
-    public void StatusFromInProgressToFailed(DateTime now)
-    {
-        EnsureTransition(DeliveryStatus.Failed);
-        Complete(now);
-        DeliveryStatus = DeliveryStatus.Failed;
-    }
+    public void StatusFromInProgressToFailed(DateTime now) => Complete(DeliveryStatus.Failed, now);
 
-    private void Complete(DateTime now)
+    private void Complete(DeliveryStatus target, DateTime now)
     {
+        if (!DeliveryStatusTransitions.CanTransition(DeliveryStatus, target))
+            throw new InvalidStatusTransitionException(nameof(Delivery), DeliveryStatus, target);
+
         CompletedAt = now;
         UpdatedAt = now;
         WorkerId = null;
         LockExpiresAt = null;
-    }
-
-    private void EnsureTransition(DeliveryStatus target)
-    {
-        if (!DeliveryStatusTransitions.CanTransition(DeliveryStatus, target))
-            throw new InvalidStatusTransitionException(nameof(Delivery), DeliveryStatus, target);
+        DeliveryStatus = target;
     }
 
     #endregion Смена статусов

@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using PackCall.Core;
 using PackCall.Core.Entities;
 using PackCall.Core.Repositorys;
-using System.Linq.Expressions;
 
 namespace PackCall.Infrastructure.Repositories;
 
@@ -31,21 +30,10 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         await context.SaveChangesAsync(ct);
     }
 
-    public async Task<IEnumerable<Delivery>> Get(Guid id, CancellationToken ct) =>
-        await dbContext.Deliveries
+    public Task<Delivery?> Get(Guid id, CancellationToken ct) =>
+        dbContext.Deliveries
             .Include(delivery => delivery.Contact).ThenInclude(contact => contact.Channels)
-            .Where(delivery => delivery.Id == id)
-            .ToListAsync(ct);
-
-    public async Task<IEnumerable<Delivery>> Get(
-        Guid campaignId,
-        Expression<Func<Delivery, bool>> predicate,
-        CancellationToken ct) =>
-        await dbContext.Deliveries
-            .Include(delivery => delivery.Contact).ThenInclude(contact => contact.Channels)
-            .Where(delivery => delivery.CampaignId == campaignId)
-            .Where(predicate)
-            .ToListAsync(ct);
+            .SingleOrDefaultAsync(delivery => delivery.Id == id, ct);
 
     public async Task<PageResult<Delivery>> GetPage(
         Guid campaignId,

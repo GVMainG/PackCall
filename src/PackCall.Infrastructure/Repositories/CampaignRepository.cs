@@ -7,11 +7,10 @@ namespace PackCall.Infrastructure.Repositories;
 
 public sealed class CampaignRepository(AppDbContext dbContext) : ICampaingRepository
 {
-    public async Task<IEnumerable<Campaign>> Get(Guid id, CancellationToken ct) =>
-        await dbContext.Campaigns
+    public Task<Campaign?> Get(Guid id, CancellationToken ct) =>
+        dbContext.Campaigns
             .AsNoTracking()
-            .Where(campaign => campaign.Id == id)
-            .ToListAsync(ct);
+            .SingleOrDefaultAsync(campaign => campaign.Id == id, ct);
 
     public async Task<PageResult<Campaign>> GetPage(
         int pageNumber,

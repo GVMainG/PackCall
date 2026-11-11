@@ -81,9 +81,4 @@ public interface ICampaignService
     /// <remarks>Для отсутствующей кампании возвращается пустая страница.</remarks>
     /// <exception cref="ArgumentOutOfRangeException">Номер или размер страницы меньше 1.</exception>
     Task<PageResult<Delivery>> GetDeliveriesAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct);
-
-    /// <summary>Возвращает страницу уникальных получателей кампании в порядке Id и их общее число.</summary>
-    /// <remarks>Для отсутствующей кампании возвращается пустая страница.</remarks>
-    /// <exception cref="ArgumentOutOfRangeException">Номер или размер страницы меньше 1.</exception>
-    Task<PageResult<Contact>> GetRecipientsAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct);
 }

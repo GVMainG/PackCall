@@ -88,109 +88,101 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     /// </summary>
     public async Task ProcessAsync(Delivery delivery, CancellationToken ct)
     {
-        var attempt = new Attempt();
+        var outcome = Outcome.TerminalPathComplete;
+        var applied = false;
         PerformanceMetrics.Count(Event.ServiceStarted);
         try
         {
-            await ProcessCoreAsync(delivery, ct, attempt);
-            if (ProcessingObservation.Current is { } observation) observation.Outcome = attempt.Outcome;
-            PerformanceMetrics.Count(Event.ProcessingFinished, attempt.Outcome);
+            ArgumentNullException.ThrowIfNull(delivery);
+            if (delivery.DeliveryStatus != DeliveryStatus.InProgress)
+                throw new DomainException(
+                    $"Обрабатывать можно только доставку в статусе \"Отправляется\". Текущий статус: {delivery.DeliveryStatus}.");
+
+            ct.ThrowIfCancellationRequested();
+
+            var previousStatus = delivery.DeliveryStatus;
+            var workerId = delivery.WorkerId;
+            var lockExpiresAt = delivery.LockExpiresAt;
+            var campaign = await GetCampaignAsync(delivery.CampaignId, ct);
+            if (campaign.Status == CampaignStatus.Paused)
+            {
+                outcome = Outcome.PausedNoRelease;
+                if (workerId is not null && lockExpiresAt is { } expiresAt)
+                {
+                    var releasedAt = DateTime.UtcNow;
+                    var released = await _deliveryRepository.ReleaseCapturedAsync(
+                        delivery.Id, workerId, expiresAt, releasedAt, ct);
+                    if (released is not null)
+                    {
+                        outcome = Outcome.PausedRelease;
+                        await AppendMeasuredAsync(new StatusChangeEntry(
+                            delivery.CampaignId, delivery.Id, DeliveryStatus.InProgress, DeliveryStatus.Waiting,
+                            workerId, releasedAt, OperatorResult: null), ct, Purpose.Pause);
+                    }
+                }
+                return;
+            }
+            if (campaign.Status != CampaignStatus.InProgress)
+                throw new DomainException("Обрабатывать доставки можно только у запущенной кампании.");
+
+            if (delivery.Channel != "email" || string.IsNullOrWhiteSpace(delivery.AddressSnapshot))
+                throw new DomainException("Доставка не имеет доступного email-снимка; отправка запрещена.");
+            var request = new SendRequest(
+                delivery.Id,
+                delivery.CampaignId,
+                delivery.ContactId,
+                delivery.AddressSnapshot,
+                campaign.MessageText);
+
+            ct.ThrowIfCancellationRequested();
+            var result = await MeasuredOperation.Run(Operation.OperatorCall,
+                () => _messageSender.SendAsync(request, _policy.SimulateErrors, ct),
+                value => value.IsSuccess ? Outcome.Accepted : Outcome.Rejected, Event.OperatorFinished, time: _time);
+
+            ct.ThrowIfCancellationRequested();
+
+            var now = DateTime.UtcNow;
+            if (result.IsSuccess)
+                delivery.StatusFromInProgressToSent(now);
+            else
+                delivery.StatusFromInProgressToFailed(now);
+
+            if (!await MeasuredOperation.Run(Operation.ResultPersist,
+                () => _deliveryRepository.TryCompleteAsync(delivery, workerId, lockExpiresAt, ct),
+                value => value ? Outcome.Applied : Outcome.NotApplied, Event.ResultFinished, time: _time))
+            {
+                outcome = Outcome.StaleResult;
+                return;
+            }
+            applied = true;
+            PerformanceMetrics.Count(Event.TerminalApplied,
+                delivery.DeliveryStatus == DeliveryStatus.Sent ? Outcome.Sent : Outcome.Failed);
+
+            ct.ThrowIfCancellationRequested();
+
+            await AppendMeasuredAsync(new StatusChangeEntry(
+                delivery.CampaignId,
+                delivery.Id,
+                previousStatus,
+                delivery.DeliveryStatus,
+                workerId,
+                now,
+                OperatorResult: result.Error ?? "AcceptedByProvider"), ct, Purpose.Terminal);
+
+            await CompleteCampaignIfFinishedAsync(delivery.CampaignId, ct);
         }
         catch (Exception exception)
         {
-            var outcome = exception is OperationCanceledException ? Outcome.Cancelled : Outcome.Error;
-            if (ProcessingObservation.Current is { } observation) observation.Outcome = outcome;
-            PerformanceMetrics.Count(Event.ProcessingFinished, outcome);
-            if (attempt.Applied) PerformanceMetrics.Count(Event.AfterTerminalApplied, outcome);
+            outcome = exception is OperationCanceledException ? Outcome.Cancelled : Outcome.Error;
             throw;
         }
-    }
-
-    private sealed class Attempt
-    {
-        public bool Applied;
-        public Outcome Outcome = Outcome.TerminalPathComplete;
-    }
-
-    private async Task ProcessCoreAsync(Delivery delivery, CancellationToken ct, Attempt attempt)
-    {
-        ArgumentNullException.ThrowIfNull(delivery);
-        if (delivery.DeliveryStatus != DeliveryStatus.InProgress)
-            throw new DomainException(
-                $"Обрабатывать можно только доставку в статусе \"Отправляется\". Текущий статус: {delivery.DeliveryStatus}.");
-
-        ct.ThrowIfCancellationRequested();
-
-        var previousStatus = delivery.DeliveryStatus;
-        var workerId = delivery.WorkerId;
-        var lockExpiresAt = delivery.LockExpiresAt;
-        var campaign = await GetCampaignAsync(delivery.CampaignId, ct);
-        if (campaign.Status == CampaignStatus.Paused)
+        finally
         {
-            attempt.Outcome = Outcome.PausedNoRelease;
-            if (workerId is not null && delivery.LockExpiresAt is { } expiresAt)
-            {
-                var releasedAt = DateTime.UtcNow;
-                var released = await _deliveryRepository.ReleaseCapturedAsync(
-                    delivery.Id, workerId, expiresAt, releasedAt, ct);
-                if (released is not null)
-                {
-                    attempt.Outcome = Outcome.PausedRelease;
-                    await AppendMeasuredAsync(new StatusChangeEntry(
-                        delivery.CampaignId, delivery.Id, DeliveryStatus.InProgress, DeliveryStatus.Waiting,
-                        workerId, releasedAt, OperatorResult: null), ct, Purpose.Pause);
-                }
-            }
-            return;
+            if (ProcessingObservation.Current is { } observation) observation.Outcome = outcome;
+            PerformanceMetrics.Count(Event.ProcessingFinished, outcome);
+            if (applied && outcome is Outcome.Cancelled or Outcome.Error)
+                PerformanceMetrics.Count(Event.AfterTerminalApplied, outcome);
         }
-        if (campaign.Status != CampaignStatus.InProgress)
-            throw new DomainException("Обрабатывать доставки можно только у запущенной кампании.");
-
-        if (delivery.Channel != "email" || string.IsNullOrWhiteSpace(delivery.AddressSnapshot))
-            throw new DomainException("Доставка не имеет доступного email-снимка; отправка запрещена.");
-        var request = new SendRequest(
-            delivery.Id,
-            delivery.CampaignId,
-            delivery.ContactId,
-            delivery.AddressSnapshot,
-            campaign.MessageText);
-
-        ct.ThrowIfCancellationRequested();
-        var result = await MeasuredOperation.Run(Operation.OperatorCall,
-            () => _messageSender.SendAsync(request, _policy.SimulateErrors, ct),
-            value => value.IsSuccess ? Outcome.Accepted : Outcome.Rejected, Event.OperatorFinished, time: _time);
-
-        ct.ThrowIfCancellationRequested();
-
-        var now = DateTime.UtcNow;
-        if (result.IsSuccess)
-            delivery.StatusFromInProgressToSent(now);
-        else
-            delivery.StatusFromInProgressToFailed(now);
-
-        if (!await MeasuredOperation.Run(Operation.ResultPersist,
-            () => _deliveryRepository.TryCompleteAsync(delivery, workerId, lockExpiresAt, ct),
-            value => value ? Outcome.Applied : Outcome.NotApplied, Event.ResultFinished, time: _time))
-        {
-            attempt.Outcome = Outcome.StaleResult;
-            return;
-        }
-        attempt.Applied = true;
-        PerformanceMetrics.Count(Event.TerminalApplied,
-            delivery.DeliveryStatus == DeliveryStatus.Sent ? Outcome.Sent : Outcome.Failed);
-
-        ct.ThrowIfCancellationRequested();
-
-        await AppendMeasuredAsync(new StatusChangeEntry(
-            delivery.CampaignId,
-            delivery.Id,
-            previousStatus,
-            delivery.DeliveryStatus,
-            workerId,
-            now,
-            OperatorResult: result.Error ?? "AcceptedByProvider"), ct, Purpose.Terminal);
-
-        await CompleteCampaignIfFinishedAsync(delivery.CampaignId, ct);
     }
 
     /// <summary>
@@ -242,9 +234,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     {
         ct.ThrowIfCancellationRequested();
 
-        var campaigns = await _campaignRepository.Get(campaignId, ct);
-        var campaign = campaigns.SingleOrDefault()
-            ?? throw new KeyNotFoundException($"Кампания {campaignId} не найдена.");
+        var campaign = await GetCampaignAsync(campaignId, ct);
         if (campaign.Status != CampaignStatus.InProgress)
             return false;
 
@@ -268,8 +258,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
 
     private async Task<Campaign> GetCampaignAsync(Guid campaignId, CancellationToken ct)
     {
-        var campaigns = await _campaignRepository.Get(campaignId, ct);
-        return campaigns.SingleOrDefault()
+        return await _campaignRepository.Get(campaignId, ct)
             ?? throw new KeyNotFoundException($"Кампания {campaignId} не найдена.");
     }
 }

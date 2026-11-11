@@ -37,12 +37,14 @@ public static class PerformanceMetrics
 
     public static void Count(Event metric, Outcome outcome = Outcome.Success, long value = 1, Purpose purpose = Purpose.None)
     {
+        if (!Events.Enabled) return;
         try { Events.Add(value, new("metric", (int)metric), new("outcome", (int)outcome), new("purpose", (int)purpose)); }
         catch { /* Diagnostics must not affect delivery results. */ }
     }
 
     public static void Duration(Operation operation, Outcome outcome, double milliseconds, Purpose purpose = Purpose.None)
     {
+        if (!Durations.Enabled) return;
         try { Durations.Record(milliseconds, new("metric", (int)operation), new("outcome", (int)outcome), new("purpose", (int)purpose)); }
         catch { /* Includes failures from third-party listeners. */ }
     }

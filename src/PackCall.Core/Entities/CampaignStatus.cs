@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace PackCall.Core.Entities;
 
 public enum CampaignStatus
@@ -13,20 +15,20 @@ public enum CampaignStatus
 /// <summary>Допустимые переходы статусов кампании.</summary>
 public static class CampaignStatusTransitions
 {
-    private static readonly IReadOnlyDictionary<CampaignStatus, IReadOnlySet<CampaignStatus>> Allowed =
-        new Dictionary<CampaignStatus, IReadOnlySet<CampaignStatus>>
-        {
-            [CampaignStatus.Draft] = new HashSet<CampaignStatus> { CampaignStatus.Forming, CampaignStatus.InProgress },
-            [CampaignStatus.Forming] = new HashSet<CampaignStatus> { CampaignStatus.Draft },
-            [CampaignStatus.InProgress] = new HashSet<CampaignStatus> { CampaignStatus.Completed, CampaignStatus.Paused },
-            [CampaignStatus.Paused] = new HashSet<CampaignStatus> { CampaignStatus.InProgress },
-            [CampaignStatus.Completed] = new HashSet<CampaignStatus>(),
-            [CampaignStatus.Failed] = new HashSet<CampaignStatus>()
-        };
+    private static readonly ReadOnlySet<CampaignStatus> DraftTargets = [CampaignStatus.Forming, CampaignStatus.InProgress];
+    private static readonly ReadOnlySet<CampaignStatus> FormingTargets = [CampaignStatus.Draft];
+    private static readonly ReadOnlySet<CampaignStatus> InProgressTargets = [CampaignStatus.Completed, CampaignStatus.Paused];
+    private static readonly ReadOnlySet<CampaignStatus> PausedTargets = [CampaignStatus.InProgress];
 
     public static bool CanTransition(CampaignStatus from, CampaignStatus to) =>
-        Allowed.TryGetValue(from, out var targets) && targets.Contains(to);
+        GetAllowedTargets(from).Contains(to);
 
-    public static IReadOnlySet<CampaignStatus> GetAllowedTargets(CampaignStatus from) =>
-        Allowed.TryGetValue(from, out var targets) ? targets : new HashSet<CampaignStatus>();
+    public static IReadOnlySet<CampaignStatus> GetAllowedTargets(CampaignStatus from) => from switch
+    {
+        CampaignStatus.Draft => DraftTargets,
+        CampaignStatus.Forming => FormingTargets,
+        CampaignStatus.InProgress => InProgressTargets,
+        CampaignStatus.Paused => PausedTargets,
+        _ => ReadOnlySet<CampaignStatus>.Empty
+    };
 }

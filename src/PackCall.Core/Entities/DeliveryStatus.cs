@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace PackCall.Core.Entities;
 
 public enum DeliveryStatus
@@ -14,23 +16,17 @@ public enum DeliveryStatus
 /// </summary>
 public static class DeliveryStatusTransitions
 {
-    private static readonly IReadOnlyDictionary<DeliveryStatus, IReadOnlySet<DeliveryStatus>> Allowed =
-        new Dictionary<DeliveryStatus, IReadOnlySet<DeliveryStatus>>
-        {
-            [DeliveryStatus.Waiting] = new HashSet<DeliveryStatus> { DeliveryStatus.InProgress },
-            [DeliveryStatus.InProgress] = new HashSet<DeliveryStatus>
-            {
-                DeliveryStatus.Sent,
-                DeliveryStatus.Failed,
-                DeliveryStatus.Waiting
-            },
-            [DeliveryStatus.Sent] = new HashSet<DeliveryStatus>(),
-            [DeliveryStatus.Failed] = new HashSet<DeliveryStatus>()
-        };
+    private static readonly ReadOnlySet<DeliveryStatus> WaitingTargets = [DeliveryStatus.InProgress];
+    private static readonly ReadOnlySet<DeliveryStatus> InProgressTargets =
+        [DeliveryStatus.Sent, DeliveryStatus.Failed, DeliveryStatus.Waiting];
 
     public static bool CanTransition(DeliveryStatus from, DeliveryStatus to) =>
-        Allowed.TryGetValue(from, out var targets) && targets.Contains(to);
+        GetAllowedTargets(from).Contains(to);
 
-    public static IReadOnlySet<DeliveryStatus> GetAllowedTargets(DeliveryStatus from) =>
-        Allowed.TryGetValue(from, out var targets) ? targets : new HashSet<DeliveryStatus>();
+    public static IReadOnlySet<DeliveryStatus> GetAllowedTargets(DeliveryStatus from) => from switch
+    {
+        DeliveryStatus.Waiting => WaitingTargets,
+        DeliveryStatus.InProgress => InProgressTargets,
+        _ => ReadOnlySet<DeliveryStatus>.Empty
+    };
 }

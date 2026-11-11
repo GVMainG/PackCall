@@ -140,14 +140,13 @@ public sealed class CampaignService : ICampaignService
     public async Task<Campaign?> GetCampaignAsync(Guid campaignId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        var campaigns = await _campaignRepository.Get(campaignId, ct);
-        return campaigns.SingleOrDefault();
+        return await _campaignRepository.Get(campaignId, ct);
     }
 
     public async Task<Delivery?> GetDeliveryAsync(Guid deliveryId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        return (await _deliveryRepository.Get(deliveryId, ct)).SingleOrDefault();
+        return await _deliveryRepository.Get(deliveryId, ct);
     }
 
     public Task<DeliveryStatusCounts> GetDeliveryStatusCountsAsync(Guid campaignId, CancellationToken ct)
@@ -210,26 +209,6 @@ public sealed class CampaignService : ICampaignService
         ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
         ct.ThrowIfCancellationRequested();
         return _deliveryRepository.GetPage(campaignId, pageNumber, pageSize, ct);
-    }
-
-    public async Task<PageResult<Contact>> GetRecipientsAsync(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct)
-    {
-        ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
-        ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
-
-        ct.ThrowIfCancellationRequested();
-
-        var deliveries = await _deliveryRepository.Get(campaignId, _ => true, ct);
-
-        ct.ThrowIfCancellationRequested();
-
-        var recipients = deliveries.Select(delivery => delivery.Contact)
-            .DistinctBy(recipient => recipient.Id)
-            .OrderBy(recipient => recipient.Id)
-            .ToList();
-        var items = recipients.Skip(checked((pageNumber - 1) * pageSize)).Take(pageSize).ToList();
-
-        return new PageResult<Contact>(items, recipients.Count);
     }
 
     private async Task<Campaign> GetRequiredCampaignAsync(Guid campaignId, CancellationToken ct)

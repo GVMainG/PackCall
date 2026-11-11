@@ -3,7 +3,6 @@ using PackCall.Core.Exceptions;
 using PackCall.Core.Journaling;
 using PackCall.Core.Repositorys;
 using PackCall.Core.Sending;
-using System.Linq.Expressions;
 
 namespace PackCall.Core.Test;
 
@@ -23,12 +22,10 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
     public Action? OnGet { get; set; }
     public Action? OnTryUpdateStatus { get; set; }
 
-    public Task<IEnumerable<Campaign>> Get(Guid id, CancellationToken ct)
+    public Task<Campaign?> Get(Guid id, CancellationToken ct)
     {
         OnGet?.Invoke();
-        return Task.FromResult(_store.TryGetValue(id, out var campaign)
-            ? new[] { campaign }.AsEnumerable()
-            : Enumerable.Empty<Campaign>());
+        return Task.FromResult(_store.GetValueOrDefault(id));
     }
 
     public Task<PageResult<Campaign>> GetPage(int pageNumber, int pageSize, CancellationToken ct)
@@ -134,11 +131,8 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
     public void RemoveByCampaign(Guid campaignId) =>
         _store.RemoveAll(delivery => delivery.CampaignId == campaignId);
 
-    public Task<IEnumerable<Delivery>> Get(Guid id, CancellationToken ct) =>
-        Task.FromResult(_store.Where(d => d.Id == id).ToList().AsEnumerable());
-
-    public Task<IEnumerable<Delivery>> Get(Guid campaignId, Expression<Func<Delivery, bool>> predicate, CancellationToken ct) =>
-        Task.FromResult(_store.AsQueryable().Where(d => d.CampaignId == campaignId).Where(predicate).ToList().AsEnumerable());
+    public Task<Delivery?> Get(Guid id, CancellationToken ct) =>
+        Task.FromResult(_store.SingleOrDefault(d => d.Id == id));
 
     public Task<PageResult<Delivery>> GetPage(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct)
     {

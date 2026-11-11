@@ -50,7 +50,7 @@ public class DeliveryResultLeasePostgresTests : PostgresTestBase
         var now = DateTime.UtcNow;
         var old = Assert.Single(await oldRepository.CaptureBatchAsync(1, "worker-A", TimeSpan.FromSeconds(state == "expired" ? 0.05 : 30), CancellationToken.None));
         // Проверяем отслеживаемый снимок и последующий SaveChanges того же контекста.
-        old = Assert.Single(await oldRepository.Get(old.Id, CancellationToken.None));
+        old = Assert.IsType<Delivery>(await oldRepository.Get(old.Id, CancellationToken.None));
         var sending = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var release = new TaskCompletionSource<SendResult>(TaskCreationOptions.RunContinuationsAsynchronously);
         _sender.AsyncHandler = (_, _) => { sending.TrySetResult(); return release.Task; };
@@ -119,7 +119,7 @@ public class DeliveryResultLeasePostgresTests : PostgresTestBase
         await using var observer = new NpgsqlConnection(_connectionString);
         await observer.OpenAsync();
         var captured = Assert.Single(await repository.CaptureBatchAsync(1, "worker-A", TimeSpan.FromMinutes(2), CancellationToken.None));
-        var tracked = Assert.Single(await repository.Get(captured.Id, CancellationToken.None));
+        var tracked = Assert.IsType<Delivery>(await repository.Get(captured.Id, CancellationToken.None));
         Assert.Equal(EntityState.Unchanged, context.Entry(tracked).State);
         var before = Snapshot(tracked);
         var history = await Journal(tracked.Id, observer);
@@ -215,7 +215,7 @@ public class DeliveryResultLeasePostgresTests : PostgresTestBase
         await using var observer = new NpgsqlConnection(_connectionString);
         await observer.OpenAsync();
         var original = Assert.Single(await ra.CaptureBatchAsync(1, "worker-A", TimeSpan.FromSeconds(mode == "double" ? 60 : 4), CancellationToken.None));
-        var second = Assert.Single(await rb.Get(original.Id, CancellationToken.None));
+        var second = Assert.IsType<Delivery>(await rb.Get(original.Id, CancellationToken.None));
         var before = Snapshot(original);
         var history = await Journal(original.Id, observer);
         await using var transaction = await blocker.BeginTransactionAsync();

@@ -116,7 +116,7 @@ public sealed class DeliveryMeasurementTests
     {
         using var collector = Collector();
         var fixture = await Create(true);
-        var campaign = (await fixture.Campaigns.Get(fixture.Delivery.CampaignId, default)).Single();
+        var campaign = Assert.IsType<Campaign>(await fixture.Campaigns.Get(fixture.Delivery.CampaignId, default));
         campaign.StatusFromInProgressToPaused(DateTime.UtcNow);
         if (missingOwner) fixture.Delivery.SetCapturedForTest(null!, DateTime.UtcNow.AddMinutes(1));
         await fixture.Service.ProcessAsync(fixture.Delivery, default);

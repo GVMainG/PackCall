@@ -25,4 +25,34 @@ public sealed class DeliveryStatusContractTests
     [InlineData(CampaignStatus.Failed, -1)]
     public void CampaignStatusIntValuesMatch(CampaignStatus status, int value) =>
         Assert.Equal(value, (int)status);
+
+    [Theory]
+    [InlineData(DeliveryStatus.Waiting, DeliveryStatus.InProgress)]
+    [InlineData(DeliveryStatus.InProgress, DeliveryStatus.Sent, DeliveryStatus.Failed, DeliveryStatus.Waiting)]
+    [InlineData(DeliveryStatus.Sent)]
+    [InlineData(DeliveryStatus.Failed)]
+    [InlineData((DeliveryStatus)99)]
+    public void DeliveryTransitionsMatchContract(DeliveryStatus from, params DeliveryStatus[] targets)
+    {
+        Assert.Equal(targets, DeliveryStatusTransitions.GetAllowedTargets(from).ToArray());
+        foreach (var to in Enum.GetValues<DeliveryStatus>())
+            Assert.Equal(targets.Contains(to), DeliveryStatusTransitions.CanTransition(from, to));
+        Assert.False(DeliveryStatusTransitions.CanTransition(from, (DeliveryStatus)99));
+    }
+
+    [Theory]
+    [InlineData(CampaignStatus.Draft, CampaignStatus.Forming, CampaignStatus.InProgress)]
+    [InlineData(CampaignStatus.Forming, CampaignStatus.Draft)]
+    [InlineData(CampaignStatus.InProgress, CampaignStatus.Completed, CampaignStatus.Paused)]
+    [InlineData(CampaignStatus.Paused, CampaignStatus.InProgress)]
+    [InlineData(CampaignStatus.Completed)]
+    [InlineData(CampaignStatus.Failed)]
+    [InlineData((CampaignStatus)99)]
+    public void CampaignTransitionsMatchContract(CampaignStatus from, params CampaignStatus[] targets)
+    {
+        Assert.Equal(targets, CampaignStatusTransitions.GetAllowedTargets(from).ToArray());
+        foreach (var to in Enum.GetValues<CampaignStatus>())
+            Assert.Equal(targets.Contains(to), CampaignStatusTransitions.CanTransition(from, to));
+        Assert.False(CampaignStatusTransitions.CanTransition(from, (CampaignStatus)99));
+    }
 }

@@ -143,8 +143,8 @@ public class CampaignPausePostgresTests : PostgresTestBase
         await using var second = _provider!.CreateAsyncScope();
         var firstRepository = first.ServiceProvider.GetRequiredService<ICampaingRepository>();
         var secondRepository = second.ServiceProvider.GetRequiredService<ICampaingRepository>();
-        var paused = (await firstRepository.Get(id, CancellationToken.None)).Single();
-        var completed = (await secondRepository.Get(id, CancellationToken.None)).Single();
+        var paused = Assert.IsType<Campaign>(await firstRepository.Get(id, CancellationToken.None));
+        var completed = Assert.IsType<Campaign>(await secondRepository.Get(id, CancellationToken.None));
         paused.StatusFromInProgressToPaused(DateTime.UtcNow);
         completed.StatusFromInProgressToCompleted(DateTime.UtcNow);
 
@@ -153,7 +153,7 @@ public class CampaignPausePostgresTests : PostgresTestBase
             secondRepository.TryUpdateStatusAsync(completed, CampaignStatus.InProgress, CancellationToken.None));
 
         Assert.Single(results, updated => updated);
-        var current = (await firstRepository.Get(id, CancellationToken.None)).Single();
+        var current = Assert.IsType<Campaign>(await firstRepository.Get(id, CancellationToken.None));
         Assert.Equal(results[0] ? CampaignStatus.Paused : CampaignStatus.Completed, current.Status);
         Assert.False(await firstRepository.TryUpdateStatusAsync(results[0] ? completed : paused,
             CampaignStatus.InProgress, CancellationToken.None));
@@ -176,7 +176,7 @@ public class CampaignPausePostgresTests : PostgresTestBase
         var current = Assert.Single(await repository.CaptureBatchAsync(1, "worker-1", TimeSpan.FromSeconds(90), CancellationToken.None));
 
         Assert.Null(await repository.ReleaseCapturedAsync(previous.Id, "worker-1", previous.LockExpiresAt!.Value, later, CancellationToken.None));
-        var stored = Assert.Single(await repository.Get(current.Id, CancellationToken.None));
+        var stored = Assert.IsType<Delivery>(await repository.Get(current.Id, CancellationToken.None));
         Assert.Equal(DeliveryStatus.InProgress, stored.DeliveryStatus);
         Assert.Equal(current.LockExpiresAt, stored.LockExpiresAt);
 
