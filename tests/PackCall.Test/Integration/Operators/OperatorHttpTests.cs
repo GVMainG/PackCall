@@ -72,6 +72,24 @@ public class OperatorHttpTests
     }
 
     [Fact]
+    public async Task ResponseSizeLimitDistinguishesValidJsonFromOversizedJson()
+    {
+        const string accepted = "{\"result\":\"accepted\",\"code\":\"AcceptedByProvider\"}";
+        await using var server = await OperatorServer.Start(async context =>
+        {
+            using var body = await JsonDocument.ParseAsync(context.Request.Body);
+            var length = body.RootElement.GetProperty("simulate_errors").GetBoolean() ? 4097 : 4096;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync(accepted.PadRight(length));
+        });
+        using var sender = server.Sender();
+
+        Assert.True((await sender.SendAsync(TestOperatorTests.Request, false, default)).IsSuccess);
+        await Assert.ThrowsAsync<TestOperatorProtocolException>(() =>
+            sender.SendAsync(TestOperatorTests.Request, true, default));
+    }
+
+    [Fact]
     public async Task ResponseLimitTimeoutAndExternalCancellation()
     {
         await using (var server = await OperatorServer.Start(c => c.Response.WriteAsync(new string('x',4097))))

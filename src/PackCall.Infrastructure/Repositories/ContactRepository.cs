@@ -37,30 +37,24 @@ public sealed class ContactRepository(AppDbContext dbContext) : IContactReposito
     {
         ArgumentOutOfRangeException.ThrowIfNegative(offset);
         ArgumentOutOfRangeException.ThrowIfLessThan(batchSize, 1);
-        return await dbContext.Contacts.AsNoTracking().Include(contact => contact.Channels).Where(contact => contact.Channels.Any(channel => channel.Channel == "email"))
+        return await EmailContacts().Include(contact => contact.Channels)
             .OrderBy(recipient => recipient.Id)
             .Skip(offset).Take(batchSize).ToListAsync(ct);
     }
 
     public Task<Contact?> GetAsync(Guid id, CancellationToken ct) =>
-        dbContext.Contacts.AsNoTracking().Include(contact => contact.Channels).Where(contact => contact.Channels.Any(channel => channel.Channel == "email")).SingleOrDefaultAsync(recipient => recipient.Id == id, ct);
+        EmailContacts().Include(contact => contact.Channels).SingleOrDefaultAsync(recipient => recipient.Id == id, ct);
 
     public async Task<PageResult<Contact>> GetPageAsync(int pageNumber, int pageSize, CancellationToken ct)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
-        ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
-        int skip;
-        try
-        {
-            skip = checked((pageNumber - 1) * pageSize);
-        }
-        catch (OverflowException exception)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageNumber), exception);
-        }
-        var query = dbContext.Contacts.AsNoTracking().Include(contact => contact.Channels).Where(contact => contact.Channels.Any(channel => channel.Channel == "email")).OrderBy(recipient => recipient.Id);
+        var skip = Pagination.GetOffset(pageNumber, pageSize);
+        var query = EmailContacts();
         var totalCount = await query.CountAsync(ct);
-        var items = await query.Skip(skip).Take(pageSize).ToListAsync(ct);
+        var items = await query.Include(contact => contact.Channels)
+            .OrderBy(recipient => recipient.Id).Skip(skip).Take(pageSize).ToListAsync(ct);
         return new PageResult<Contact>(items, totalCount);
     }
+
+    private IQueryable<Contact> EmailContacts() =>
+        dbContext.Contacts.AsNoTracking().Where(contact => contact.Channels.Any(channel => channel.Channel == "email"));
 }

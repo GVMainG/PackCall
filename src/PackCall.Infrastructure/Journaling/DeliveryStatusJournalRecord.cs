@@ -20,8 +20,6 @@ internal sealed class DeliveryStatusJournalRecord
 
     public static DeliveryStatusJournalRecord FromEntry(StatusChangeEntry entry)
     {
-        ArgumentNullException.ThrowIfNull(entry);
-
         return new DeliveryStatusJournalRecord
         {
             CampaignId = entry.CampaignId,

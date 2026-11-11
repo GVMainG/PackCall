@@ -50,6 +50,29 @@ public class CampaignPausePostgresTests : PostgresTestBase
     }
 
     [PostgresFact]
+    public async Task DeliveryPagePreservesSnapshotAndRejectsOffsetOverflow()
+    {
+        var campaignId = await CreateStartedCampaignAsync(3);
+        await using var scope = _provider!.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var repository = scope.ServiceProvider.GetRequiredService<IDeliveryRepository>();
+        var expected = await db.Deliveries.AsNoTracking().Where(d => d.CampaignId == campaignId)
+            .OrderBy(d => d.Id).ToArrayAsync();
+
+        var page = await repository.GetPage(campaignId, 2, 2, CancellationToken.None);
+        var delivery = Assert.Single(page.Items);
+        Assert.Equal(3, page.TotalCount);
+        Assert.Equal(expected[2].Id, delivery.Id);
+        Assert.Equal(expected[2].AddressSnapshot, delivery.AddressSnapshot);
+        Assert.Empty(db.ChangeTracker.Entries());
+
+        var error = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            repository.GetPage(campaignId, int.MaxValue, 2, CancellationToken.None));
+        Assert.Equal("pageNumber", error.Message);
+        Assert.IsType<OverflowException>(error.InnerException);
+    }
+
+    [PostgresFact]
     public async Task PauseDuringBatch_AllowsCurrentSendReleasesTailAndResumesWithoutDuplicates()
     {
         var id = await CreateStartedCampaignAsync(4);

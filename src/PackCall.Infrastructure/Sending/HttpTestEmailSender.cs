@@ -10,6 +10,7 @@ namespace PackCall.Infrastructure.Sending;
 // HttpClient's diagnostic wrapper; no request URL or payload is emitted by this adapter.
 public sealed class HttpTestEmailSender : IMessageSender, IDisposable
 {
+    private const int MaximumResponseBytes = 4096;
     private readonly HttpMessageInvoker _client;
     private readonly Uri _endpoint;
     private readonly TimeSpan _timeout;
@@ -50,15 +51,9 @@ public sealed class HttpTestEmailSender : IMessageSender, IDisposable
                 || !string.Equals(response.Content.Headers.ContentType?.MediaType, "application/json", StringComparison.OrdinalIgnoreCase))
                 throw new TestOperatorProtocolException();
             await using var stream = await response.Content.ReadAsStreamAsync(deadline.Token);
-            var bytes = new byte[4097];
-            var count = 0;
-            while (count < bytes.Length)
-            {
-                var read = await stream.ReadAsync(bytes.AsMemory(count), deadline.Token);
-                if (read == 0) break;
-                count += read;
-            }
-            if (count > 4096) throw new TestOperatorProtocolException();
+            var bytes = new byte[MaximumResponseBytes + 1];
+            var count = await stream.ReadAtLeastAsync(bytes, bytes.Length, throwOnEndOfStream: false, cancellationToken: deadline.Token);
+            if (count > MaximumResponseBytes) throw new TestOperatorProtocolException();
             using var json = JsonDocument.Parse(bytes.AsMemory(0, count));
             var root = json.RootElement;
             if (root.ValueKind != JsonValueKind.Object || root.EnumerateObject().Count() != 2

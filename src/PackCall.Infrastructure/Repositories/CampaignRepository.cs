@@ -17,10 +17,10 @@ public sealed class CampaignRepository(AppDbContext dbContext) : ICampaingReposi
         int pageSize,
         CancellationToken ct)
     {
-        var skip = GetSkip(pageNumber, pageSize);
-        var query = dbContext.Campaigns.OrderBy(campaign => campaign.Id);
+        var skip = Pagination.GetOffset(pageNumber, pageSize);
+        var query = dbContext.Campaigns.AsNoTracking();
         var totalCount = await query.CountAsync(ct);
-        var items = await query.Skip(skip).Take(pageSize).ToListAsync(ct);
+        var items = await query.OrderBy(campaign => campaign.Id).Skip(skip).Take(pageSize).ToListAsync(ct);
 
         return new PageResult<Campaign>(items, totalCount);
     }
@@ -64,20 +64,5 @@ public sealed class CampaignRepository(AppDbContext dbContext) : ICampaingReposi
             .ExecuteDeleteAsync(ct);
 
         return deleted > 0;
-    }
-
-    private static int GetSkip(int pageNumber, int pageSize)
-    {
-        ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
-        ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
-
-        try
-        {
-            return checked((pageNumber - 1) * pageSize);
-        }
-        catch (OverflowException exception)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageNumber), exception);
-        }
     }
 }

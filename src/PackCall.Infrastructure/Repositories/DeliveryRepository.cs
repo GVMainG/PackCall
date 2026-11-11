@@ -31,9 +31,7 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
     }
 
     public Task<Delivery?> Get(Guid id, CancellationToken ct) =>
-        dbContext.Deliveries
-            .Include(delivery => delivery.Contact).ThenInclude(contact => contact.Channels)
-            .SingleOrDefaultAsync(delivery => delivery.Id == id, ct);
+        dbContext.Deliveries.SingleOrDefaultAsync(delivery => delivery.Id == id, ct);
 
     public async Task<PageResult<Delivery>> GetPage(
         Guid campaignId,
@@ -41,14 +39,11 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         int pageSize,
         CancellationToken ct)
     {
-        var skip = GetSkip(pageNumber, pageSize);
-        var query = dbContext.Deliveries
-            .Include(delivery => delivery.Contact).ThenInclude(contact => contact.Channels)
-            .Where(delivery => delivery.CampaignId == campaignId)
-            .OrderBy(delivery => delivery.Id);
+        var skip = Pagination.GetOffset(pageNumber, pageSize);
+        var query = dbContext.Deliveries.AsNoTracking().Where(delivery => delivery.CampaignId == campaignId);
 
         var totalCount = await query.CountAsync(ct);
-        var items = await query.Skip(skip).Take(pageSize).ToListAsync(ct);
+        var items = await query.OrderBy(delivery => delivery.Id).Skip(skip).Take(pageSize).ToListAsync(ct);
 
         return new PageResult<Delivery>(items, totalCount);
     }
@@ -205,19 +200,4 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
                 (delivery.DeliveryStatus == DeliveryStatus.Waiting ||
                  delivery.DeliveryStatus == DeliveryStatus.InProgress),
             ct);
-
-    private static int GetSkip(int pageNumber, int pageSize)
-    {
-        ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
-        ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
-
-        try
-        {
-            return checked((pageNumber - 1) * pageSize);
-        }
-        catch (OverflowException exception)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageNumber), exception);
-        }
-    }
 }
