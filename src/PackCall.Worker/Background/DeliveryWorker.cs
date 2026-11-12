@@ -42,6 +42,7 @@ public sealed class DeliveryWorker : BackgroundService
         _logger.Information("Фоновый обработчик доставок запущен. WorkerId={WorkerId}, Parallelism={Parallelism}, BatchSize={BatchSize}",
             _workerId, _options.Parallelism, _options.BatchSize);
 
+        // Восстановление идёт отдельно, чтобы возврат просроченных доставок не ждал конца отправки пакета.
         var processing = Enumerable.Range(0, _options.Parallelism)
             .Select(lane => RunLoopAsync(lane, stoppingToken));
         await Task.WhenAll(processing.Append(RunLoopAsync(processingLane: null, stoppingToken)));
@@ -53,6 +54,7 @@ public sealed class DeliveryWorker : BackgroundService
         {
             try
             {
+                // Свой scope на итерацию даёт каждой параллельной задаче отдельный DbContext.
                 await using var scope = _scopeFactory.CreateAsyncScope();
                 var processor = scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
                 if (processingLane is null)
@@ -115,6 +117,7 @@ public sealed class DeliveryWorker : BackgroundService
                 return;
             }
 
+            // Сокращаем остаток на время запроса к БД и запас перед истечением закрепления.
             var safetyMargin = TimeSpan.FromTicks(Math.Min(TimeSpan.FromSeconds(5).Ticks,
                 _options.LockDuration.Ticks / 10));
             var remaining = await MeasuredOperation.Run(Operation.LeaseCheck, async () =>
@@ -131,6 +134,7 @@ public sealed class DeliveryWorker : BackgroundService
                 return;
             }
 
+            // Запрашиваем отмену обработки при остановке воркера или исчерпании оставшегося времени.
             using var leaseCancellation = CancellationTokenSource.CreateLinkedTokenSource(ct);
             leaseCancellation.CancelAfter(remaining);
             try

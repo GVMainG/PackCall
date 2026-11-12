@@ -101,11 +101,13 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
             ct.ThrowIfCancellationRequested();
 
             var previousStatus = delivery.DeliveryStatus;
+            // Сохраняем владельца и срок захвата: терминальный переход очистит оба поля.
             var workerId = delivery.WorkerId;
             var lockExpiresAt = delivery.LockExpiresAt;
             var campaign = await GetCampaignAsync(delivery.CampaignId, ct);
             if (campaign.Status == CampaignStatus.Paused)
             {
+                // На паузе возвращаем доставку в очередь, если владелец и срок захвата ещё совпадают.
                 outcome = Outcome.PausedNoRelease;
                 if (workerId is not null && lockExpiresAt is { } expiresAt)
                 {
@@ -147,6 +149,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
             else
                 delivery.StatusFromInProgressToFailed(now);
 
+            // Пока оператор отвечал, закрепление могло истечь и перейти к другому обработчику.
             if (!await MeasuredOperation.Run(Operation.ResultPersist,
                 () => _deliveryRepository.TryCompleteAsync(delivery, workerId, lockExpiresAt, ct),
                 value => value ? Outcome.Applied : Outcome.NotApplied, Event.ResultFinished, time: _time))

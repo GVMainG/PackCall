@@ -102,6 +102,7 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
     public async Task<ActionResult<CampaignResponse>> ResumeCampaign(Guid id, CancellationToken ct)
     {
         await campaigns.ResumeCampaignAsync(id, ct);
+        // Читаем сохранённый статус: например, возобновление может сразу завершить кампанию.
         var campaign = await campaigns.GetCampaignAsync(id, ct)
             ?? throw new KeyNotFoundException("Кампания не найдена.");
         return Ok(campaign.ToResponse());
@@ -123,6 +124,7 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
     public async Task<ActionResult<PageResponse<DeliveryResponse>>> GetDeliveries(
         Guid id, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20, CancellationToken ct = default)
     {
+        // Отсутствующая кампания даёт 404, а существующая без доставок — пустую страницу.
         if (await campaigns.GetCampaignAsync(id, ct) is null)
             return NotFound();
 

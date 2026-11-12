@@ -26,6 +26,7 @@ internal static class ResponseMapping
         new(page.Items.Select(map).ToList(), pageNumber, pageSize, page.TotalCount,
             page.TotalCount / pageSize + (page.TotalCount % pageSize == 0 ? 0 : 1));
 
+    // Значения модели уже заданы в UTC. SpecifyKind помечает их без пересчёта часов.
     private static DateTimeOffset ToOffset(DateTime value) =>
         new(DateTime.SpecifyKind(value, DateTimeKind.Utc));
 

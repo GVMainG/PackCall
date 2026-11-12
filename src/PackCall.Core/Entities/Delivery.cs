@@ -57,6 +57,7 @@ public sealed class Delivery
             Id = deliveryId ?? Guid.NewGuid(),
             CampaignId = campaignId,
             ContactId = recipientId,
+            // Изменения контакта после формирования кампании не меняют адрес этой доставки.
             AddressSnapshot = recipientEmail.Trim().ToLowerInvariant(),
             DeliveryStatus = DeliveryStatus.Waiting,
             CreatedAt = now,

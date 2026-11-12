@@ -5,6 +5,7 @@ using Serilog;
 
 namespace PackCall.Api.Middleware;
 
+// Преобразует ожидаемые ошибки операций в ProblemDetails, а остальные оставляет обработчику ASP.NET Core.
 internal sealed class ApiExceptionHandler(Serilog.ILogger logger) : IExceptionHandler
 {
     private readonly Serilog.ILogger _logger = logger.ForContext<ApiExceptionHandler>();

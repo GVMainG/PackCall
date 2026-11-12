@@ -10,6 +10,7 @@ internal sealed class DeliveryStatusJournal(IDbContextFactory<AppDbContext> cont
     {
         ArgumentNullException.ThrowIfNull(entry);
 
+        // Отдельный контекст сохраняет запись журнала без накопленных изменений репозитория.
         await using var context = await contextFactory.CreateDbContextAsync(ct);
         context.DeliveryStatusJournal.Add(DeliveryStatusJournalRecord.FromEntry(entry));
         await context.SaveChangesAsync(ct);

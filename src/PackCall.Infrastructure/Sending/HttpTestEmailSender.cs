@@ -51,6 +51,7 @@ public sealed class HttpTestEmailSender : IMessageSender, IDisposable
                 || !string.Equals(response.Content.Headers.ContentType?.MediaType, "application/json", StringComparison.OrdinalIgnoreCase))
                 throw new TestOperatorProtocolException();
             await using var stream = await response.Content.ReadAsStreamAsync(deadline.Token);
+            // Дополнительный байт позволяет отличить ответ ровно по лимиту от превышения лимита.
             var bytes = new byte[MaximumResponseBytes + 1];
             var count = await stream.ReadAtLeastAsync(bytes, bytes.Length, throwOnEndOfStream: false, cancellationToken: deadline.Token);
             if (count > MaximumResponseBytes) throw new TestOperatorProtocolException();
@@ -60,6 +61,7 @@ public sealed class HttpTestEmailSender : IMessageSender, IDisposable
                 || !root.TryGetProperty("result", out var result) || result.ValueKind != JsonValueKind.String
                 || !root.TryGetProperty("code", out var code) || code.ValueKind != JsonValueKind.String)
                 throw new TestOperatorProtocolException();
+            // Только явный ответ оператора даёт основание выставить Sent или Failed.
             var outcome = (result.GetString(), code.GetString()) switch
             {
                 ("accepted", "AcceptedByProvider") => SendResult.Success(),

@@ -5,6 +5,7 @@ using PackCall.Core.Repositorys;
 
 namespace PackCall.Infrastructure.Repositories;
 
+// Здесь PostgreSQL координирует захват, возврат и фиксацию результата между несколькими воркерами.
 public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory<AppDbContext> contextFactory) : IDeliveryRepository
 {
     public async Task AddBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct)
@@ -77,6 +78,8 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         var inProgress = (int)DeliveryStatus.InProgress;
         var campaignInProgress = (int)CampaignStatus.InProgress;
 
+        // SKIP LOCKED позволяет воркерам брать непересекающиеся пакеты без ожидания чужих блокировок.
+        // Срок закрепления отсчитывается после блокировки всего пакета.
         return await dbContext.Deliveries
             .FromSqlInterpolated($$"""
                 WITH candidates AS MATERIALIZED (
@@ -118,6 +121,7 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         var waiting = (int)DeliveryStatus.Waiting;
         var inProgress = (int)DeliveryStatus.InProgress;
 
+        // При восстановлении проверяем срок повторно после блокировки строки.
         return await dbContext.Deliveries
             .FromSqlInterpolated($$"""
                 WITH locked AS MATERIALIZED (

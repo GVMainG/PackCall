@@ -25,6 +25,7 @@ public sealed class SchemaGate(IDbContextFactory<AppDbContext> factory, IHostApp
                     if (known.Length == 0)
                         throw new InvalidOperationException("Нет известных миграций схемы.");
                     var applied = (await db.Database.GetAppliedMigrationsAsync(ct)).Order().ToArray();
+                    // Отстающую схему можно дождаться, а неизвестная миграция означает несовместимость с этой сборкой.
                     if (applied.Except(known).Any())
                         throw new InvalidOperationException("Схема содержит неизвестные миграции.");
                     if (applied.SequenceEqual(known))

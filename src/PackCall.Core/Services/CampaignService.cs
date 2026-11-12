@@ -5,6 +5,7 @@ using System.Net.Mail;
 
 namespace PackCall.Core.Services;
 
+// Управляет жизненным циклом кампании и формирует очередь доставок для её аудитории.
 public sealed class CampaignService : ICampaignService
 {
     private const int FormationBatchSize = 500;
@@ -26,11 +27,13 @@ public sealed class CampaignService : ICampaignService
     {
         ct.ThrowIfCancellationRequested();
         var campaign = Campaign.Create(name, messageText);
+        // Кампанию можно запустить только после записи последнего пакета доставок.
         campaign.StatusFromDraftToForming();
         await _campaignRepository.Create(campaign, ct);
 
         try
         {
+            // Пакеты ограничивают объём контактов и доставок в памяти одного запроса.
             var offset = 0;
             while (true)
             {
@@ -57,6 +60,7 @@ public sealed class CampaignService : ICampaignService
         {
             try
             {
+                // Отмена запроса не должна прерывать удаление уже сохранённой части кампании.
                 await _campaignRepository.Delete(campaign.Id, CancellationToken.None);
             }
             catch (Exception cleanupError)
@@ -118,6 +122,7 @@ public sealed class CampaignService : ICampaignService
         campaign.StatusFromPausedToInProgress(DateTime.UtcNow);
         await SaveStatusChangeAsync(campaign, previousStatus, ct);
 
+        // Если последние отправки завершились на паузе, после возобновления воркеру уже нечего захватывать.
         if (!await _deliveryRepository.HasPendingDeliveriesAsync(campaignId, ct))
         {
             campaign.StatusFromInProgressToCompleted(DateTime.UtcNow);
@@ -132,6 +137,7 @@ public sealed class CampaignService : ICampaignService
             await _campaignRepository.TryUpdateStatusAsync(campaign, previousStatus, ct))
             return;
 
+        // При гонке считаем переход успешным, если другой запрос уже установил нужный статус.
         var current = await GetRequiredCampaignAsync(campaign.Id, ct);
         if (current.Status != campaign.Status)
             throw new DomainException("Статус кампании изменился другим запросом. Повторите операцию.");
