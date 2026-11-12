@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using PackCall.Core;
-using System.Diagnostics;
 using PackCall.Core.Entities;
 using PackCall.Core.Services;
 using ILogger = Serilog.ILogger;
@@ -34,8 +33,7 @@ public sealed class DeliveryWorker : BackgroundService
                 ["Параметры DeliveryWorker некорректны: Parallelism 1..64, BatchSize не менее 1, LockDuration не менее 10 секунд, " +
                  "все интервалы положительны, LockDuration + RecoveryInterval не более 2 минут."]);
 
-        var host = Environment.MachineName;
-        _workerId = identity?.Id ?? $"{host[..Math.Min(host.Length, 200)]}-{Guid.NewGuid():N}";
+        _workerId = identity?.Id ?? WorkerIdentity.CreateId();
         _timeProvider = timeProvider ?? TimeProvider.System;
     }
 
@@ -45,11 +43,11 @@ public sealed class DeliveryWorker : BackgroundService
             _workerId, _options.Parallelism, _options.BatchSize);
 
         var processing = Enumerable.Range(0, _options.Parallelism)
-            .Select(lane => ProcessLoopAsync(lane, stoppingToken));
-        await Task.WhenAll(processing.Append(RecoveryLoopAsync(stoppingToken)));
+            .Select(lane => RunLoopAsync(lane, stoppingToken));
+        await Task.WhenAll(processing.Append(RunLoopAsync(processingLane: null, stoppingToken)));
     }
 
-    private async Task ProcessLoopAsync(int lane, CancellationToken ct)
+    private async Task RunLoopAsync(int? processingLane, CancellationToken ct)
     {
         while (!ct.IsCancellationRequested)
         {
@@ -57,8 +55,17 @@ public sealed class DeliveryWorker : BackgroundService
             {
                 await using var scope = _scopeFactory.CreateAsyncScope();
                 var processor = scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
-                var captured = await processor.CaptureBatchAsync(_options.BatchSize, _workerId, _options.LockDuration, ct);
+                if (processingLane is null)
+                {
+                    var released = await processor.ReleaseExpiredLocksAsync(ct);
+                    if (released > 0)
+                        _logger.Information("Возвращено просроченных доставок: {Count}", released);
 
+                    await Task.Delay(_options.RecoveryInterval, ct);
+                    continue;
+                }
+
+                var captured = await processor.CaptureBatchAsync(_options.BatchSize, _workerId, _options.LockDuration, ct);
                 if (captured.Count == 0)
                 {
                     await Task.Delay(_options.IdleDelay, ct);
@@ -77,8 +84,12 @@ public sealed class DeliveryWorker : BackgroundService
             }
             catch (Exception exception)
             {
-                _logger.Error(exception, "Ошибка обработки доставок. WorkerId={WorkerId}, Lane={Lane}",
-                    _workerId, lane);
+                if (processingLane is { } lane)
+                    _logger.Error(exception, "Ошибка обработки доставок. WorkerId={WorkerId}, Lane={Lane}",
+                        _workerId, lane);
+                else
+                    _logger.Error(exception, "Ошибка возврата просроченных доставок");
+
                 await DelayAfterErrorAsync(ct);
             }
         }
@@ -145,32 +156,6 @@ public sealed class DeliveryWorker : BackgroundService
         {
             if (!enteredService) PerformanceMetrics.Count(Event.ProcessingFinished, outcome);
             PerformanceMetrics.Duration(Operation.ProcessingTotal, outcome, _timeProvider.GetElapsedTime(start).TotalMilliseconds);
-        }
-    }
-
-    private async Task RecoveryLoopAsync(CancellationToken ct)
-    {
-        while (!ct.IsCancellationRequested)
-        {
-            try
-            {
-                await using var scope = _scopeFactory.CreateAsyncScope();
-                var processor = scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
-                var released = await processor.ReleaseExpiredLocksAsync(ct);
-                if (released > 0)
-                    _logger.Information("Возвращено просроченных доставок: {Count}", released);
-
-                await Task.Delay(_options.RecoveryInterval, ct);
-            }
-            catch (OperationCanceledException) when (ct.IsCancellationRequested)
-            {
-                break;
-            }
-            catch (Exception exception)
-            {
-                _logger.Error(exception, "Ошибка возврата просроченных доставок");
-                await DelayAfterErrorAsync(ct);
-            }
         }
     }
 

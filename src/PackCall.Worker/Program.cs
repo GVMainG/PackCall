@@ -9,8 +9,7 @@ try
     var builder = Host.CreateApplicationBuilder(args);
     PackCallHosting.LoadConfiguration(builder.Configuration, builder.Environment.EnvironmentName, args);
     var operatorSettings = TestOperatorSettings.Parse(builder.Configuration);
-    var hostName = Environment.MachineName;
-    var workerId = $"{hostName[..Math.Min(hostName.Length, 200)]}-{Guid.NewGuid():N}";
+    var workerId = WorkerIdentity.CreateId();
     builder.Services.AddPackCallLogging(builder.Configuration, "PackCall.Worker", workerId);
     builder.Services.AddSingleton(new WorkerIdentity(workerId));
     builder.Services.AddStorage(PackCallHosting.ConnectionString(builder.Configuration));
