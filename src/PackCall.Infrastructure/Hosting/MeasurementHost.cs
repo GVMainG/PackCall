@@ -83,7 +83,7 @@ public sealed class MeasurementHost : IHostedService, IDisposable
             _runtimeTask = SampleRuntimeAsync();
             _started = true;
         }
-        catch { /* Driver detects absence of the ready file; application behaviour is preserved. */ }
+        catch { /* Сценарий замера обнаружит отсутствие файла готовности, а приложение продолжит работу. */ }
         return Task.CompletedTask;
     }
 
@@ -105,7 +105,7 @@ public sealed class MeasurementHost : IHostedService, IDisposable
             while (!_sampling.IsCancellationRequested)
             {
                 _runtimeWriter.TryEnqueue(_runtime.Collect());
-                // Delay from completion: never catch up after a slow sample.
+                // Отсчитываем паузу после завершения замера, чтобы медленный замер не вызвал серию запусков подряд.
                 await Task.Delay(TimeSpan.FromSeconds(5), _sampling.Token);
             }
         }
@@ -140,7 +140,7 @@ public sealed class MeasurementHost : IHostedService, IDisposable
                 dropped_intervals = _writer.Dropped
             }));
         }
-        catch { _writing.Cancel(); /* No completed marker if the shutdown budget expires. */ }
+        catch { _writing.Cancel(); /* При превышении срока завершения файл-маркер не создаётся. */ }
     }
 
     public void Dispose()

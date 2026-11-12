@@ -1,6 +1,6 @@
 namespace PackCall.Core.Diagnostics;
 
-/// <summary>Attempt-local outcome propagation without changing ProcessAsync's public contract.</summary>
+/// <summary>Передаёт исход текущей попытки без изменения публичного контракта ProcessAsync.</summary>
 public sealed class ProcessingObservation : IDisposable
 {
     private static readonly AsyncLocal<ProcessingObservation?> Slot = new();

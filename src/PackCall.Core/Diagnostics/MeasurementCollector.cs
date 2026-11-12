@@ -11,7 +11,7 @@ public sealed record MeasurementWindow(Guid SessionId, Guid InstanceId, long Seq
     long DroppedMeasurements, IReadOnlyDictionary<SeriesKey, CounterWindow> Counters,
     IReadOnlyDictionary<SeriesKey, HistogramWindow> Histograms);
 
-/// <summary>Single lock makes record/window-close linearizable. No I/O or timers on this path.</summary>
+/// <summary>Общая блокировка упорядочивает запись метрик и закрытие интервала. Здесь нет ввода-вывода и таймеров.</summary>
 public sealed class MeasurementCollector : IDisposable
 {
     public const int MaximumSeries = 512;

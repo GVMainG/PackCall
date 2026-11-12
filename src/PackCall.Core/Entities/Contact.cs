@@ -8,7 +8,7 @@ public sealed class Contact
     public DateTime? UpdatedAt { get; set; }
     public ICollection<ContactChannel> Channels { get; set; } = new List<ContactChannel>();
     public ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
-    // Transitional email projection; never stored as a second address.
+    // Временное свойство для совместимости. Адрес берётся из канала и отдельно не хранится.
     [NotMapped]
     public string Email
     {

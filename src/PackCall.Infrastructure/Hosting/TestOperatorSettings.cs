@@ -37,7 +37,7 @@ public sealed record TestOperatorSettings(TestSenderMode Mode, bool SimulateErro
             if (timeout is not null && (!double.TryParse(timeout, NumberStyles.Float, CultureInfo.InvariantCulture, out seconds)
                 || !double.IsFinite(seconds) || seconds <= 0 || seconds > 30)) throw Invalid("TEST_OPERATOR_TIMEOUT_SECONDS");
         }
-        return new(mode, simulate, url, // CancelAfter uses whole milliseconds. Round up instead of truncating a valid positive deadline to zero.
+        return new(mode, simulate, url, // CancelAfter использует целые миллисекунды. Округляем вверх, чтобы положительный тайм-аут не стал нулевым.
             TimeSpan.FromMilliseconds(Math.Max(1, Math.Ceiling(seconds * 1000))));
     }
 }

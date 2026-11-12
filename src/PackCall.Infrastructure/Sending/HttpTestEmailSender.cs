@@ -6,8 +6,8 @@ using PackCall.Infrastructure.Hosting;
 
 namespace PackCall.Infrastructure.Sending;
 
-// HttpMessageInvoker over SocketsHttpHandler avoids HttpClientFactory logging and
-// HttpClient's diagnostic wrapper; no request URL or payload is emitted by this adapter.
+// HttpMessageInvoker поверх SocketsHttpHandler обходит журналирование HttpClientFactory и диагностику HttpClient.
+// Адаптер не выводит URL запроса или его содержимое.
 public sealed class HttpTestEmailSender : IMessageSender, IDisposable
 {
     private const int MaximumResponseBytes = 4096;

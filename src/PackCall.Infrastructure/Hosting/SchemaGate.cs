@@ -4,7 +4,7 @@ using Serilog;
 
 namespace PackCall.Infrastructure.Hosting;
 
-/// <summary>Read-only startup barrier, after ConsoleLifetime and before any hosted service starts.</summary>
+/// <summary>Проверяет схему без записи в БД после инициализации ConsoleLifetime и до запуска служб хоста.</summary>
 public sealed class SchemaGate(IDbContextFactory<AppDbContext> factory, IHostApplicationLifetime lifetime,
     ILogger logger) : IHostedLifecycleService
 {
@@ -37,7 +37,7 @@ public sealed class SchemaGate(IDbContextFactory<AppDbContext> factory, IHostApp
                 }
                 catch (Exception ex) when (ex is Npgsql.NpgsqlException or TimeoutException)
                 {
-                    // Do not log database exception details: connection parameters can contain secrets.
+                    // Не пишем детали ошибки БД в журнал, поскольку параметры подключения могут содержать секреты.
                     logger.Warning("Ожидание доступности БД для проверки схемы");
                 }
                 await Task.Delay(TimeSpan.FromSeconds(2), ct);

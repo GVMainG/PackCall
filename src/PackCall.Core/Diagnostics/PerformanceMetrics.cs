@@ -26,7 +26,7 @@ public enum Event
     AfterTerminalApplied, Cancellation
 }
 
-/// <summary>Only bounded enum labels. Callback failures must not escape to application code.</summary>
+/// <summary>Значения меток ограничены перечислениями. Ошибки обработчиков метрик не прерывают работу приложения.</summary>
 public static class PerformanceMetrics
 {
     public const string MeterName = "PackCall.Performance";
@@ -39,13 +39,13 @@ public static class PerformanceMetrics
     {
         if (!Events.Enabled) return;
         try { Events.Add(value, new("metric", (int)metric), new("outcome", (int)outcome), new("purpose", (int)purpose)); }
-        catch { /* Diagnostics must not affect delivery results. */ }
+        catch { /* Диагностика не должна влиять на результат доставки. */ }
     }
 
     public static void Duration(Operation operation, Outcome outcome, double milliseconds, Purpose purpose = Purpose.None)
     {
         if (!Durations.Enabled) return;
         try { Durations.Record(milliseconds, new("metric", (int)operation), new("outcome", (int)outcome), new("purpose", (int)purpose)); }
-        catch { /* Includes failures from third-party listeners. */ }
+        catch { /* Сюда входят ошибки сторонних подписчиков на метрики. */ }
     }
 }

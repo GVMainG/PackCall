@@ -1,6 +1,6 @@
 namespace PackCall.Core.Diagnostics;
 
-/// <summary>Explicit opt-in. No configuration/environment dump is ever exported.</summary>
+/// <summary>Сбор включается явно. Содержимое конфигурации и переменные окружения не экспортируются.</summary>
 public sealed record MeasurementOptions
 {
     public bool Enabled { get; init; }

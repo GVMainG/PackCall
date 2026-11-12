@@ -1,6 +1,6 @@
 namespace PackCall.Core;
 
-/// <summary>Database time used only for the conservative lease budget before sending.</summary>
+/// <summary>Время БД используется только для расчёта оставшегося срока закрепления с запасом перед отправкой.</summary>
 public interface ILeaseClock
 {
     Task<DateTime> GetUtcNowAsync(CancellationToken ct);

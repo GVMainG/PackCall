@@ -3,7 +3,7 @@ using PackCall.Core.Entities;
 
 namespace PackCall.Core.Diagnostics;
 
-/// <summary>Transient weak references; never stored in entities or exported as identifiers.</summary>
+/// <summary>Временные слабые ссылки не хранятся в сущностях и не экспортируются как идентификаторы.</summary>
 public static class CaptureTiming
 {
     private sealed record Stamp(TimeProvider Time, long Timestamp);

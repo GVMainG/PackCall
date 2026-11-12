@@ -4,7 +4,7 @@ using System.Threading.Channels;
 
 namespace PackCall.Core.Diagnostics;
 
-/// <summary>Bounded single-consumer writer. All disk activity is off the business path.</summary>
+/// <summary>Одна фоновая задача пишет метрики из ограниченной очереди, чтобы обработка доставок не ждала диск.</summary>
 public sealed class MeasurementFileWriter
 {
     public const int MaximumRecordBytes = 1024 * 1024;
@@ -70,7 +70,7 @@ public sealed class MeasurementFileWriter
                 if (!Reserve(record.Length + 1)) throw new IOException("measurement_session_limit");
                 await stream.WriteAsync(record, ct);
                 await stream.WriteAsync(new byte[] { 10 }, ct);
-                await stream.FlushAsync(ct); // OS-cache durability only; deliberately not fsync.
+                await stream.FlushAsync(ct); // Сбрасываем данные в кеш ОС без принудительной записи на диск через fsync.
             }
             if (stream is not null)
             {
@@ -91,8 +91,8 @@ public sealed class MeasurementFileWriter
         }
     }
 
-    // Per-session cross-process reservation. Failure to obtain the lock loses telemetry,
-    // never blocks delivery processing and never deletes earlier files.
+    // Процессы резервируют место из общего лимита сессии. Если блокировку получить не удалось,
+    // новые метрики теряются, а обработка доставок продолжается и прежние файлы сохраняются.
     private bool Reserve(int bytes)
     {
         FileStream? acquired = null;

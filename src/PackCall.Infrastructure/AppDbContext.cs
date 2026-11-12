@@ -22,7 +22,7 @@ namespace PackCall.Infrastructure
         {
             base.OnModelCreating(modelBuilder);
 
-            // Campaign configuration
+            // Сопоставление кампании с таблицей
             modelBuilder.Entity<Campaign>(entity =>
             {
                 entity.ToTable("campaigns");
@@ -71,7 +71,7 @@ namespace PackCall.Infrastructure
                 e.HasOne<Campaign>().WithMany().HasForeignKey(x => x.CampaignId);
             });
 
-            // Delivery configuration
+            // Сопоставление доставки с таблицей
             modelBuilder.Entity<Delivery>(entity =>
             {
                 entity.ToTable("deliveries");
