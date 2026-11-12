@@ -9,10 +9,19 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     PackCallHosting.LoadConfiguration(builder.Configuration, builder.Environment.EnvironmentName, args);
-    var operatorSettings = TestOperatorSettings.Parse(builder.Configuration);
+    TestOperatorSettings.Parse(builder.Configuration);
     builder.Services.AddPackCallLogging(builder.Configuration, "PackCall.Api");
 
-    RegisterServices(builder);
+    builder.Services.AddControllers().AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    builder.Services.AddOpenApi();
+    builder.Services.AddProblemDetails();
+    builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+
+    builder.Services.AddStorage(PackCallHosting.ConnectionString(builder.Configuration));
+    builder.Services.AddCampaignManagement();
+    builder.Services.AddSchemaGate();
+    builder.Services.AddPerformanceMeasurement(builder.Configuration, "api");
 
     var app = builder.Build();
 
@@ -39,22 +48,3 @@ catch (Exception exception)
     Console.Error.WriteLine($"PackCall.Api startup/run failed ({exception.GetType().Name}).");
     return 1;
 }
-
-# region Методы
-
-static void RegisterServices(WebApplicationBuilder builder)
-{
-    builder.Services.AddControllers().AddJsonOptions(options =>
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-
-    builder.Services.AddOpenApi();
-    builder.Services.AddProblemDetails();
-    builder.Services.AddExceptionHandler<ApiExceptionHandler>();
-
-    builder.Services.AddStorage(PackCallHosting.ConnectionString(builder.Configuration));
-    builder.Services.AddCampaignManagement();
-    builder.Services.AddSchemaGate();
-    builder.Services.AddPerformanceMeasurement(builder.Configuration, "api");
-}
-
-#endregion Методы

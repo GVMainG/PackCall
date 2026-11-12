@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using PackCall.Core.Exceptions;
-using Serilog;
 
 namespace PackCall.Api.Middleware;
 
@@ -13,12 +12,14 @@ internal sealed class ApiExceptionHandler(Serilog.ILogger logger) : IExceptionHa
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        var status = exception switch
+        var (status, title) = exception switch
         {
-            KeyNotFoundException => StatusCodes.Status404NotFound,
-            ArgumentException => StatusCodes.Status400BadRequest,
-            DomainException or InvalidOperationException => StatusCodes.Status409Conflict,
-            _ => 0
+            KeyNotFoundException => (StatusCodes.Status404NotFound, "Ресурс не найден"),
+            ArgumentException => (StatusCodes.Status400BadRequest, "Некорректный запрос"),
+            RecipientAlreadyExistsException => (StatusCodes.Status409Conflict, "Получатель с таким email уже существует"),
+            DomainException or InvalidOperationException =>
+                (StatusCodes.Status409Conflict, "Операция недоступна в текущем состоянии"),
+            _ => (0, null)
         };
         if (status == 0)
             return false;
@@ -29,13 +30,7 @@ internal sealed class ApiExceptionHandler(Serilog.ILogger logger) : IExceptionHa
         await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
         {
             Status = status,
-            Title = status switch
-            {
-                400 => "Некорректный запрос",
-                404 => "Ресурс не найден",
-                409 when exception is RecipientAlreadyExistsException => "Получатель с таким email уже существует",
-                _ => "Операция недоступна в текущем состоянии"
-            },
+            Title = title,
             Instance = httpContext.Request.Path
         }, cancellationToken);
         return true;

@@ -73,40 +73,24 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<CampaignResponse>> StartCampaign(Guid id, CancellationToken ct)
-    {
-        await campaigns.StartCampaignAsync(id, ct);
-        var campaign = await campaigns.GetCampaignAsync(id, ct)
-            ?? throw new KeyNotFoundException("Кампания не найдена.");
-        return Ok(campaign.ToResponse());
-    }
+    public Task<ActionResult<CampaignResponse>> StartCampaign(Guid id, CancellationToken ct) =>
+        ApplyTransitionAsync(campaigns.StartCampaignAsync, id, ct);
 
     /// <summary>Приостанавливает запущенную кампанию; начатые отправки могут завершиться. Повторный запрос безопасен.</summary>
     [HttpPost("{id:guid}/pause")]
     [ProducesResponseType(typeof(CampaignResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<CampaignResponse>> PauseCampaign(Guid id, CancellationToken ct)
-    {
-        await campaigns.PauseCampaignAsync(id, ct);
-        var campaign = await campaigns.GetCampaignAsync(id, ct)
-            ?? throw new KeyNotFoundException("Кампания не найдена.");
-        return Ok(campaign.ToResponse());
-    }
+    public Task<ActionResult<CampaignResponse>> PauseCampaign(Guid id, CancellationToken ct) =>
+        ApplyTransitionAsync(campaigns.PauseCampaignAsync, id, ct);
 
     /// <summary>Возобновляет приостановленную кампанию. Повторный запрос для запущенной кампании безопасен.</summary>
     [HttpPost("{id:guid}/resume")]
     [ProducesResponseType(typeof(CampaignResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<CampaignResponse>> ResumeCampaign(Guid id, CancellationToken ct)
-    {
-        await campaigns.ResumeCampaignAsync(id, ct);
-        // Читаем сохранённый статус: например, возобновление может сразу завершить кампанию.
-        var campaign = await campaigns.GetCampaignAsync(id, ct)
-            ?? throw new KeyNotFoundException("Кампания не найдена.");
-        return Ok(campaign.ToResponse());
-    }
+    public Task<ActionResult<CampaignResponse>> ResumeCampaign(Guid id, CancellationToken ct) =>
+        ApplyTransitionAsync(campaigns.ResumeCampaignAsync, id, ct);
 
     /// <summary>Удаляет кампанию, если она не обрабатывается и не приостановлена.</summary>
     [HttpDelete("{id:guid}")]
@@ -130,5 +114,15 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
 
         var page = await campaigns.GetDeliveriesAsync(id, pageNumber, pageSize, ct);
         return Ok(page.ToResponse(pageNumber, pageSize, delivery => delivery.ToResponse()));
+    }
+
+    private async Task<ActionResult<CampaignResponse>> ApplyTransitionAsync(
+        Func<Guid, CancellationToken, Task> transition, Guid id, CancellationToken ct)
+    {
+        await transition(id, ct);
+        // Читаем сохранённый статус: например, возобновление может сразу завершить кампанию.
+        var campaign = await campaigns.GetCampaignAsync(id, ct)
+            ?? throw new KeyNotFoundException("Кампания не найдена.");
+        return Ok(campaign.ToResponse());
     }
 }
