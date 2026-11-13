@@ -103,6 +103,7 @@ def migrate(evidence):
           AND l.locktype = 'relation' ORDER BY a.pid, l.relation, l.mode
     """
     tables = ("campaigns", "deliveries", "recipients")
+    blocked = set()
     with ThreadPoolExecutor(max_workers=4) as pool:
         migration = pool.submit(docker, "run", "--rm", "--network", NETWORK,
                                 *runtime_env("candidate"), "packcall-rehearsal-candidate:migrator")
@@ -113,6 +114,10 @@ def migrate(evidence):
                 if current:
                     samples.write(current + "\n")
                     samples.flush()
+                    for row in current.splitlines():
+                        _, _, application, relation, _, granted, blockers = row.split("|")
+                        if application == "story23-probe" and granted == "f" and blockers != "{}":
+                            blocked.add(relation)
                 if waiting_reads is None and "|AccessExclusiveLock|t|" in current:
                     waiting_reads = [pool.submit(probe_read, table) for table in tables]
                 time.sleep(0.1)
@@ -121,6 +126,12 @@ def migrate(evidence):
         if waiting_reads is None:
             raise RuntimeError("Did not observe the exclusive migration lock")
         evidence["migration_reads"] = [read.result() for read in waiting_reads]
+        evidence["blocked_reads"] = sorted(blocked)
+        outcomes = {read["table"]: read["result"] for read in evidence["migration_reads"]}
+        if (not {"deliveries", "recipients"} <= blocked
+                or outcomes["deliveries"] != "ok" or outcomes["campaigns"] != "ok"
+                or 'relation "recipients" does not exist' not in outcomes["recipients"]):
+            raise RuntimeError("Unexpected outcomes in the migration lock probes")
 
 
 def restore(database):
@@ -135,6 +146,7 @@ def verify(database, expected, migration, migrated=False, normalized=False):
         raise RuntimeError(f"Unexpected EF migration history in {database}")
     observed = pg(database, "-v", f"migrated={str(migrated).lower()}", "-v",
                   f"normalized={str(normalized).lower()}", "-f", "/tmp/check.sql")
+    (OUTPUT / f"{database}-fingerprints.txt").write_text(observed + "\n", encoding="utf-8")
     if observed != expected:
         raise RuntimeError(f"Rehearsal fingerprints differ in {database}")
     return observed

@@ -46,6 +46,11 @@ FROM deliveries;
 -- Hash row JSON in primary-key order, retaining nulls without exporting addresses or messages.
 SELECT 'people', count(*), md5(string_agg(md5(row_to_json(p)::text), '' ORDER BY p.id, p.channel_id))
 FROM people p;
+\if :migrated
+SELECT 'contact_counts', (SELECT count(*) FROM contacts), (SELECT count(*) FROM contact_channels);
+\else
+SELECT 'contact_counts', count(*), count(*) FROM recipients;
+\endif
 SELECT 'history', count(*),
        md5(string_agg(md5(row_to_json(h)::text), '' ORDER BY h.id))
 FROM (SELECT id, campaign_id, person_id, delivery_status, created_at, updated_at,
