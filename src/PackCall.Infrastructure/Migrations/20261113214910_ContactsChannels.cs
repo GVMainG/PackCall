@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -11,19 +12,46 @@ namespace PackCall.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            const string whitespace = """U&'\0009\000A\000B\000C\000D\0020\0085\00A0\1680\2000\2001\2002\2003\2004\2005\2006\2007\2008\2009\200A\2028\2029\202F\205F\3000'""";
+            var uppercase = new StringBuilder();
+            var lowercase = new StringBuilder();
+            // Match Trim().ToLowerInvariant() without using the database locale's case or whitespace rules.
+            for (var codePoint = 0; codePoint <= 0x10FFFF; codePoint++)
+            {
+                if (!Rune.TryCreate(codePoint, out var character))
+                    continue;
+
+                var lower = Rune.ToLowerInvariant(character);
+                if (character == lower)
+                    continue;
+
+                uppercase.Append(character);
+                lowercase.Append(lower);
+            }
+
+            // ASCII addresses use the smaller translation table, including in the bulk snapshot update.
+            string Normalize(string column) => $"""
+                CASE WHEN octet_length({column}) = char_length({column})
+                    THEN translate(btrim({column}, {whitespace}), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')
+                    ELSE translate(btrim({column}, {whitespace}), $case${uppercase}$case$, $case${lowercase}$case$)
+                END
+                """;
+            var email = Normalize("email");
+            var snapshot = $"NULLIF({Normalize("address_snapshot")}, '')";
+
             migrationBuilder.DropForeignKey(
                 name: "fk_deliveries_recipients",
                 table: "deliveries");
 
-            migrationBuilder.Sql("""
+            migrationBuilder.Sql($"""
                 LOCK TABLE recipients IN ACCESS EXCLUSIVE MODE;
                 DO $$ BEGIN
-                  IF EXISTS (SELECT 1 FROM recipients WHERE email IS NULL OR email ~ '^[[:space:]]*$') THEN
+                  IF EXISTS (SELECT 1 FROM recipients WHERE email IS NULL OR btrim(email, {whitespace}) = '') THEN
                     RAISE EXCEPTION 'Contact migration rejected: empty address';
                   END IF;
                   IF EXISTS (
                     SELECT 1 FROM recipients
-                    GROUP BY lower(regexp_replace(email, '^[[:space:]]+|[[:space:]]+$', '', 'g') COLLATE pg_catalog.pg_c_utf8)
+                    GROUP BY {email}
                     HAVING count(*) > 1
                   ) THEN
                     RAISE EXCEPTION 'Contact migration rejected: normalized address collision';
@@ -36,12 +64,11 @@ namespace PackCall.Infrastructure.Migrations
                 table: "deliveries");
 
             migrationBuilder.RenameColumn(name: "recipient_email", table: "deliveries", newName: "address_snapshot");
-            migrationBuilder.Sql("""
+            migrationBuilder.Sql($"""
                 ALTER TABLE deliveries ALTER COLUMN address_snapshot DROP NOT NULL;
                 UPDATE deliveries
-                SET address_snapshot = NULLIF(lower(regexp_replace(address_snapshot, '^[[:space:]]+|[[:space:]]+$', '', 'g') COLLATE pg_catalog.pg_c_utf8), '')
-                WHERE address_snapshot IS DISTINCT FROM
-                    NULLIF(lower(regexp_replace(address_snapshot, '^[[:space:]]+|[[:space:]]+$', '', 'g') COLLATE pg_catalog.pg_c_utf8), '');
+                SET address_snapshot = {snapshot}
+                WHERE address_snapshot IS DISTINCT FROM {snapshot};
                 """);
 
             migrationBuilder.RenameColumn(
@@ -138,11 +165,11 @@ namespace PackCall.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.Sql("""
+            migrationBuilder.Sql($"""
                 INSERT INTO contacts (id, display_name, created_at, updated_at)
                     SELECT id, NULL, created_at, updated_at FROM recipients;
                 INSERT INTO contact_channels (id, contact_id, channel, address)
-                    SELECT id, id, 'email', lower(regexp_replace(email, '^[[:space:]]+|[[:space:]]+$', '', 'g') COLLATE pg_catalog.pg_c_utf8)
+                    SELECT id, id, 'email', {email}
                     FROM recipients;
                 INSERT INTO campaign_contacts (campaign_id, contact_id)
                     SELECT DISTINCT campaign_id, contact_id FROM deliveries;

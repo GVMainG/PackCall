@@ -89,6 +89,8 @@ public sealed class ContactsChannelsMigrationTests : IAsyncLifetime
     [Theory]
     [InlineData(" DUPLICATE@example.test ", "duplicate@example.test", "normalized address collision")]
     [InlineData(" ", "valid@example.test", "empty address")]
+    [InlineData("\u00A0\u2007", "valid@example.test", "empty address")]
+    [InlineData("\u202F\u00C4@example.test\u00A0", "\u00E4@example.test", "normalized address collision")]
     public async Task InvalidAddressesLeaveLegacySchemaAndRecordsIntact(string first, string second, string reason)
     {
         await using var connection = new NpgsqlConnection(ConnectionString);
@@ -105,6 +107,37 @@ public sealed class ContactsChannelsMigrationTests : IAsyncLifetime
         Assert.Equal(new[] { Initial }, await db.Database.GetAppliedMigrationsAsync());
         Assert.Equal(2L, await SqlAsync("SELECT count(*) FROM recipients"));
         Assert.Null(await SqlAsync("SELECT to_regclass('contacts')::text"));
+    }
+
+    [Fact]
+    public async Task MigratesUnicodeUsingDotNetInvariantNormalization()
+    {
+        const string current = "\u00A0\u0130\U00010400@Example.test\u202F";
+        const string distinct = "i\U00010428@example.test";
+        const string historical = "\u2007\u00C4@Old.example.test\u0085";
+        await SqlAsync($"""
+            INSERT INTO recipients (id, email) VALUES
+                ('00000000-0000-0000-0000-000000000001', '{current}'),
+                ('00000000-0000-0000-0000-000000000002', '{distinct}');
+            INSERT INTO campaigns (id, name, message_text, status) VALUES
+                ('00000000-0000-0000-0000-000000000003', 'history', 'message', 1);
+            INSERT INTO deliveries (id, campaign_id, recipient_id, recipient_email, delivery_status, created_at, updated_at)
+            VALUES
+                ('00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000003',
+                  '00000000-0000-0000-0000-000000000001', '{historical}', 0, now(), now()),
+                ('00000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000003',
+                  '00000000-0000-0000-0000-000000000002', U&'\00A0\2007', 2, now(), now());
+            """);
+
+        await using var db = Context();
+        await db.Database.MigrateAsync();
+
+        Assert.Equal(new[] { current.Trim().ToLowerInvariant(), distinct },
+            await db.ContactChannels.OrderBy(channel => channel.ContactId).Select(channel => channel.Address).ToArrayAsync());
+        var deliveries = await db.Deliveries.OrderBy(delivery => delivery.Id).ToArrayAsync();
+        Assert.Equal(historical.Trim().ToLowerInvariant(), deliveries[0].AddressSnapshot);
+        Assert.Null(deliveries[1].AddressSnapshot);
+        Assert.Equal(2, (int)deliveries[1].DeliveryStatus);
     }
 
     private AppDbContext Context() => new(new DbContextOptionsBuilder<AppDbContext>()

@@ -49,6 +49,10 @@ curl -s "http://localhost:8080/api/recipients?pageNumber=1&pageSize=1"
 [`tests/README.md`](tests/README.md); зависимости Python (`jsonschema`, `pytest`) —
 [`scripts/performance/requirements.txt`](scripts/performance/requirements.txt).
 
+При обновлении существующей БД с beta.2 на beta.3 используйте
+[порядок проверки, миграции и отката](docs/adr/0002-legacy-migration-api-evolution.md)
+перед запуском новых Api и Worker.
+
 ## Структура и ссылки
 
 - [`docs/architecture/`](docs/architecture/) — компоненты, модель данных, потоки, решения as-is.
