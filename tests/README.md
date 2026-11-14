@@ -35,15 +35,4 @@
 
 ## История реорганизации
 
-[Архив свидетельств](reorganization-evidence/README.md) относится к реорганизации в коммите `72228dd69a81f9eb90eb95978a8a3aceba89fe26`. Команды внутри архива относятся к структуре той ревизии. Проверка перезаписывает отчёты, поэтому запускайте её из отдельного checkout с LF. Нужен .NET SDK с Roslyn.
-
-```powershell
-git worktree add --detach --no-checkout ../packcall-evidence-replay 72228dd69a81f9eb90eb95978a8a3aceba89fe26
-Set-Location ../packcall-evidence-replay
-git -c core.autocrlf=false -c core.eol=lf restore --source=HEAD --staged --worktree -- .
-python tests/reorganization-evidence/verify_preservation.py
-```
-
-Исторический `verify_paths.py` сравнивает байты файлов с исходным снимком. В снимке есть Compose-файлы с другими окончаниями строк и локальные артефакты сборки probe. На чистом checkout скрипт останавливается на несовпадении хеша Compose-файла. Нагрузочная приёмка 1 000 000 доставок в архиве отсутствует.
-
-Известные исходные ограничения: operator `run.py` очищает обязательные для текущего Compose TEST_* переменные; worker lifecycle direct `docker run` не передаёт обязательные production PACKCALL_ENVIRONMENT/TEST_SENDER_MODE. Подготовка и точные ограничения описаны в README модулей; их полная приёмка не выполнялась.
+Свидетельства реорганизации тестов (TRX-отчёты и снимки сравнения) в репозитории не хранятся: они удалены при чистке истории. Актуальная структура наборов описана выше.

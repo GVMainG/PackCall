@@ -377,8 +377,6 @@ FodyWeavers.xsd
 /.agents
 /_bmad
 
-!/tests/reorganization-evidence/**/*.log
-
 # --- Documentation and evidence are versioned proof (Story 1.1) ---
 # docs/** must stay committable: generic rules above (artifacts/, *.log) must not swallow
 # evidence. Planning artifacts stay local; artifacts/ and _bmad-output/ above stay ignored.
