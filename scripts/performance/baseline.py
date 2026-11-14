@@ -20,7 +20,7 @@ from session import REPO, atomic, cleanup_owned, compose_profile, digest
 
 
 TAG = "v0.5.0-beta.2"
-PRODUCT_SHA = "113d228b6803f9a2b2c98a007925764dc3f5b7b2"
+PRODUCT_SHA = "50a3ac33a6ba3cafa805bdda5b1646a5d45ffbd2"
 THROUGHPUT_ORDER = (("off", "on"), ("on", "off"), ("off", "on"))
 LATENCY_ORDER = (("off", "on"), ("on", "off"))
 WORKERS = {"worker0", "worker1"}
@@ -297,7 +297,7 @@ def prepare_images(root, output):
                     "missing_baseline_image")
         return result["image_ids"]
     template = compose_profile(str(uuid.uuid4()), output, product_root=root)["services"]
-    build = {role: {"image": "packcall-baseline-113d228:" + name, "build": template[source]["build"]}
+    build = {role: {"image": "packcall-baseline-50a3ac3:" + name, "build": template[source]["build"]}
              for role, name, source in (("api", "api", "api"), ("worker", "worker", "worker0"),
                                         ("migrator", "migrator", "migrator"),
                                         ("http", "testemailoperator", "http"))}

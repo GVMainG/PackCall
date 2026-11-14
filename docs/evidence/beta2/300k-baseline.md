@@ -1,6 +1,6 @@
 # Baseline на 300 000 доставок для v0.5.0-beta.2
 
-Коммит продукта `113d228b6803f9a2b2c98a007925764dc3f5b7b2`. Профиль `windows-http-300k` использует два независимых Worker на одной БД, тестовый HTTP email-оператор и `simulate_errors=false`. Подготовка кампании, остановка и выгрузка итоговых сверок проходят вне окна обработки.
+Коммит продукта `50a3ac33a6ba3cafa805bdda5b1646a5d45ffbd2`. Профиль `windows-http-300k` использует два независимых Worker на одной БД, тестовый HTTP email-оператор и `simulate_errors=false`. Подготовка кампании, остановка и выгрузка итоговых сверок проходят вне окна обработки.
 
 ## Результат
 
@@ -60,7 +60,7 @@ SHA-256 итоговой `series.json` `0bb5336d1370bcd696415e96b200bb62f84f524c
 Из корня `gv` в PowerShell:
 
 ```powershell
-$product = Join-Path $env:TEMP 'packcall-21-beta2-product-113d228'
+$product = Join-Path $env:TEMP 'packcall-21-beta2-product-50a3ac3'
 git worktree add --detach $product 'v0.5.0-beta.2^{commit}'
 $output = 'artifacts/baseline-2-1/replay-d95e46e'
 uv run --with-requirements scripts/performance/requirements.txt python scripts/performance/baseline.py --product-root $product --output $output --smoke
@@ -97,7 +97,7 @@ Smoke `small-http` на 6 000 доставок прошёл в четырёх 
 `MeasurementWriterTests.BoundedRetainedTelemetryStateFitsSixteenMiB` на теге прошёл в Docker Linux. Passed: 1, Failed: 0, Skipped: 0. Проверка ограничивает удерживаемый managed state при максимуме гистограмм, заполненных очередях writer и текущем буфере сериализации. RSS контейнера включает остальной код Worker и память среды исполнения.
 
 ```powershell
-$tagCheckout = Join-Path $env:TEMP 'packcall-21-beta2-memory-113d228'
+$tagCheckout = Join-Path $env:TEMP 'packcall-21-beta2-memory-50a3ac3'
 git worktree add --detach $tagCheckout 'v0.5.0-beta.2^{commit}'
 $evidence = Join-Path (Get-Location) 'artifacts/baseline-2-1/verification'
 New-Item -ItemType Directory -Force -Path $evidence | Out-Null
