@@ -12,7 +12,7 @@
 | Источник `v0.5.0-beta.1` | `2f4e1dde9e68094c74ddc7b82e9adb8e177d9288` |
 | Откат `v0.5.0-beta.2` | `50a3ac33a6ba3cafa805bdda5b1646a5d45ffbd2` |
 
-SHA приведены по текущей истории после чистки; деревья этих ревизий совпадают с прогоном.
+В таблице указаны соответствующие коммиты после переписывания истории. При замере использовались `b3ae6be64c22f8ed366ad6b1085be9a6718f390f` (кандидат), `96272c849a53012f8213934d8f2364b2282c7eeb` (источник) и `113d228b6803f9a2b2c98a007925764dc3f5b7b2` (откат). Исходники в `src/` совпадают попарно.
 
 Кандидат сверен с удалённой `gv` командой `git ls-remote --heads origin gv` перед замером. Образы собраны локально из снимков Git, GitHub CI не запускался. Docker Desktop Engine 29.8.2, Linux x86_64, 16 CPU, 22 435 520 512 байт памяти. PostgreSQL 18.6 Alpine 3.24, образ `postgres@sha256:9ba53c7d41ea093baf5c1ba635ba5434c4f979880527d49bb7d9237d3193085b`. `shared_buffers` 128 МБ, `work_mem` 4 МБ, `maintenance_work_mem` 64 МБ, локаль `en_US.utf8`, провайдер libc.
 
@@ -30,6 +30,8 @@ SHA приведены по текущей истории после чистк�
 | Sent | 250 000 | 5 000 |
 
 Размер исходной БД в начале замера 543 086 271 байт, размер архива 86 565 162 байта. SHA-256 архива `6a8fe7d31e781db0af62ca1b2319aaa7f52a61bc8d8f4667cfe31907c224bdd9`.
+
+Эталон сверки рассчитан на этот SQL-скрипт с ASCII-адресами, пробелами и табуляцией. Проверка других форм Unicode-пробелов и регистра требует отдельной выборки и эталонных значений.
 
 ## Длительность
 
@@ -67,6 +69,8 @@ SHA приведены по текущей истории после чистк�
 
 Время чтения включает запуск команды Docker и подключение psql. Отнесение ожидания к Migrator подтверждено отдельно снимками блокировок. Рабочая нагрузка, длительные клиентские транзакции и конкурирующие записи отсутствовали.
 
+После ревью сценарий повторён с теми же образами и источником. Теперь контрольные чтения обязаны завершиться успешно, а ожидающий `AccessShareLock` сопоставляется с PID Migrator, удерживающим `AccessExclusiveLock` на той же таблице. Повтор подтвердил ожидание чтений `deliveries` и `recipients` по 30,937 с. Применение заняло 63,422 с, откат — 18,625 с, сумма — 82,047 с. Сверки и обе тестовые отправки прошли. SHA-256 архива повторного прогона `0a9b44ca7d71be38490bc2b612fbbbd147a6914482802f1723e2195ba9e72251`.
+
 ## Сверка
 
 Источник имел ровно одну EF-миграцию `20261028193126_InitialCreate`. У кандидата появилась `20261113214910_ContactsChannels`, история EF после восстановления снова совпала с исходной.
@@ -79,23 +83,24 @@ SHA приведены по текущей истории после чистк�
 
 ## Воспроизведение
 
-Из корня репозитория, PowerShell и Python 3.11+. Нужны свободные имена сети и контейнеров ниже. Сборка и генерация выполняются до измерительных окон.
+Из корня репозитория, PowerShell 7.4+ и Python 3.11+. Нужны свободные имена сети и контейнеров ниже. Сборка и генерация выполняются до измерительных окон. Перед повтором сохраните предыдущие результаты отдельно, чтобы не смешать их с новым замером.
 
 ```powershell
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 $dir = 'artifacts/story-2-3'
 New-Item -Force -ItemType Directory $dir | Out-Null
-$candidate = git rev-parse gv
-if ((git ls-remote --heads origin gv) -notlike "$candidate*") { throw 'gv отличается от origin/gv' }
-foreach ($entry in @(@('gv','candidate'), @('v0.5.0-beta.1','source'), @('v0.5.0-beta.2','rollback'))) {
+$build = Join-Path $dir ('build-' + [guid]::NewGuid())
+New-Item -ItemType Directory $build | Out-Null
+$candidate = '9162a553dd2fa4539fabab41d3f2e6f5b1a120d8'
+foreach ($entry in @(@($candidate,'candidate'), @('v0.5.0-beta.1','source'), @('v0.5.0-beta.2','rollback'))) {
     $ref, $role = $entry
     $sha = git rev-parse "$ref^{}"
-    "$role $sha" | Add-Content "$dir/revisions.txt"
-    $context = "$dir/build/$role"
-    New-Item -Force -ItemType Directory $context | Out-Null
-    git archive -o "$dir/$role.tar" $sha
-    tar -xf "$dir/$role.tar" -C $context
+    "$role $sha" | Add-Content "$build/revisions.txt"
+    $context = "$build/$role"
+    New-Item -ItemType Directory $context | Out-Null
+    git archive -o "$build/$role.tar" $sha
+    tar -xf "$build/$role.tar" -C $context
     $services = switch ($role) {
         candidate { 'Migrator'; 'Api'; 'Worker' }
         source { 'Migrator' }
@@ -105,9 +110,9 @@ foreach ($entry in @(@('gv','candidate'), @('v0.5.0-beta.1','source'), @('v0.5.0
         docker build --label "org.opencontainers.image.revision=$sha" -f "$context/src/PackCall.$service/Dockerfile" -t "packcall-rehearsal-${role}:$($service.ToLowerInvariant())" $context
     }
 }
-docker build -t packcall-rehearsal:testoperator "$dir/build/candidate/src/PackCall.TestEmailOperator"
+docker build -t packcall-rehearsal:testoperator "$build/candidate/src/PackCall.TestEmailOperator"
 docker network create --internal packcall-rehearsal-23
-docker run -d --name packcall-rehearsal-23-db --network packcall-rehearsal-23 -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=source postgres:18.6-alpine3.24
+docker run -d --name packcall-rehearsal-23-db --network packcall-rehearsal-23 -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=source postgres@sha256:9ba53c7d41ea093baf5c1ba635ba5434c4f979880527d49bb7d9237d3193085b
 docker exec packcall-rehearsal-23-db sh -ec 'until pg_isready -h localhost -U postgres -d source; do sleep 1; done'
 docker run --rm --network packcall-rehearsal-23 --env-file docker-compose.test-http.env -e 'ConnectionStrings__Postgres=Host=packcall-rehearsal-23-db;Database=source;Username=postgres' packcall-rehearsal-source:migrator
 docker cp scripts/load-test/seed_beta1_migration_rehearsal.sql packcall-rehearsal-23-db:/tmp/seed.sql
@@ -117,7 +122,7 @@ python scripts/load-test/run_migration_rehearsal.py
 
 Команды `pg_dump -Fc`, `pg_restore --exit-on-error`, запуск контейнеров, проверки и фиксирование блокировок находятся в [сценарии репетиции](../../../scripts/load-test/run_migration_rehearsal.py). В `artifacts/story-2-3/` остаются агрегаты, журнал замера и архив. В Git хранится этот отчёт. Дамп, значения адресов и сообщения в отчёт не выводятся.
 
-После замера можно удалить контейнеры и сеть. Команды затрагивают только среду репетиции. Скопированный дамп сохраняется в `artifacts/story-2-3/`.
+После успешного замера сценарий копирует дамп в `artifacts/story-2-3/`. Если он остановился после создания архива, перед очисткой сохраните архив отдельно через `docker cp packcall-rehearsal-23-db:/tmp/pre-migration.dump artifacts/story-2-3/failed-attempt.dump`. Команды очистки затрагивают только среду репетиции.
 
 ```powershell
 docker rm -f packcall-rehearsal-23-candidate-api packcall-rehearsal-23-candidate-worker packcall-rehearsal-23-rollback-api packcall-rehearsal-23-rollback-worker packcall-rehearsal-23-operator

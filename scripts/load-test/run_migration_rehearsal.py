@@ -114,12 +114,20 @@ def migrate(evidence):
                 if current:
                     samples.write(current + "\n")
                     samples.flush()
-                    for row in current.splitlines():
-                        _, _, application, relation, _, granted, blockers = row.split("|")
-                        if application == "story23-probe" and granted == "f" and blockers != "{}":
+                    rows = [row.split("|") for row in current.splitlines()]
+                    exclusive = {
+                        (pid, relation) for _, pid, application, relation, mode, granted, _ in rows
+                        if application == "story23-candidate" and mode == "AccessExclusiveLock"
+                        and granted == "t"
+                    }
+                    for _, _, application, relation, mode, granted, blockers in rows:
+                        if (application == "story23-probe" and mode == "AccessShareLock"
+                                and granted == "f" and any(
+                                    (pid, relation) in exclusive for pid in blockers[1:-1].split(","))):
                             blocked.add(relation)
-                if waiting_reads is None and "|AccessExclusiveLock|t|" in current:
-                    waiting_reads = [pool.submit(probe_read, table) for table in tables]
+                    if waiting_reads is None and {"deliveries", "recipients"} <= {
+                            relation for _, relation in exclusive}:
+                        waiting_reads = [pool.submit(probe_read, table) for table in tables]
                 time.sleep(0.1)
         result = migration.result()
         (OUTPUT / "migrator.log").write_text(result.stdout + result.stderr, encoding="utf-8")
@@ -223,6 +231,8 @@ def run(evidence):
             restore("candidate")
         with measure(timings, "control_reads"):
             evidence["control_reads"] = [probe_read(table) for table in ("campaigns", "deliveries", "recipients")]
+            if any(read["result"] != "ok" for read in evidence["control_reads"]):
+                raise RuntimeError("Control read failed before migration")
         with measure(timings, "migrator_with_sampling"):
             migrate(evidence)
         with measure(timings, "verify_candidate"):
@@ -263,6 +273,7 @@ if __name__ == "__main__":
     except Exception as error:
         evidence["result"] = "FAIL-RECORDED"
         evidence["reason"] = str(error)
+        evidence["decision"] = "Investigate the failed stage before accepting the migration"
         if isinstance(error, subprocess.CalledProcessError):
             (OUTPUT / "error.log").write_text(error.stdout + error.stderr, encoding="utf-8")
         raise
