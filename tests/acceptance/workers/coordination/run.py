@@ -1,5 +1,8 @@
 """Run from repository root. Only creates/mutates a fresh packcall-w22-* Compose project."""
-import datetime as dt, json, os, pathlib, subprocess as sp, time, urllib.request, uuid
+import datetime as dt, json, os, pathlib, subprocess as sp, sys, time, urllib.request, uuid
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
+from email_fixture import RESET, email_deliveries
 
 ROOT = pathlib.Path.cwd()
 OUT = ROOT / os.environ.get('W22_OUTPUT', '_bmad-output/implementation-artifacts/story-2-2-workers')
@@ -41,10 +44,9 @@ def wait(fn, seconds=35):
 def data():
     return json.loads(sql("select json_build_object('dbNow',clock_timestamp(),'deliveries',(select coalesce(json_agg(d order by id),'[]') from deliveries d),'journal',(select coalesce(json_agg(j order by id),'[]') from delivery_status_journal j),'campaigns',(select coalesce(json_agg(c order by id),'[]') from campaigns c))"))
 def seed(count):
-    sql('TRUNCATE deliveries,campaigns,recipients,delivery_status_journal CASCADE')
+    sql(RESET)
     cid = str(uuid.uuid4())
-    sql(f"insert into campaigns(id,name,message_text,status,created_at,updated_at,started_at) values('{cid}','W22','acceptance',1,clock_timestamp(),clock_timestamp(),clock_timestamp()); " +
-        f"with r as (insert into recipients(id,email,created_at,updated_at) select gen_random_uuid(),'w22-'||n||'@example.test',clock_timestamp(),clock_timestamp() from generate_series(1,{count}) n returning id,email) insert into deliveries select gen_random_uuid(),'{cid}',id,email,0,clock_timestamp(),clock_timestamp(),null,null,null from r")
+    sql(email_deliveries(cid, 'w22', count))
     return cid
 def launch(identity, offset=0):
     name = PROJECT + '-' + identity
@@ -147,7 +149,7 @@ try:
     save('W22-01-final',state);results['scenarios']['W22-01']='passed'
 
     # Kill a holder; survivor is live throughout. Real expiry is never edited.
-    seed(1);old=launch('old');wait(lambda:snapshots('old'));old_snapshot=snapshots('old')[0]
+    cid=seed(1);old=launch('old');wait(lambda:snapshots('old'));old_snapshot=snapshots('old')[0]
     (CONTROL/'stale.json').write_text(json.dumps(old_snapshot['row']))
     survivor=launch('survivor')
     assert inspect(survivor)['State']['Running']
@@ -183,7 +185,7 @@ try:
         for key in ['deliveries','journal','campaigns']: assert before[key]==after[key],key
     stale_result('W22-03-new-lease')
     # Keep campaign InProgress with a second waiting delivery to permit the second stale service call.
-    sql("with r as (insert into recipients(id,email) values(gen_random_uuid(),'tail@example.test') returning id,email) insert into deliveries select gen_random_uuid(),(select id from campaigns limit 1),id,email,0,clock_timestamp(),clock_timestamp(),null,null,null from r")
+    sql(email_deliveries(cid, 'tail', create_campaign=False))
     release('survivor');wait(lambda:terminal(2));stop_all()
     # ProcessAsync checks campaign state before reaching SQL. Reopen campaign fixture only, snapshot after it.
     sql('update campaigns set status=1, completed_at=null')

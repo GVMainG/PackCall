@@ -361,7 +361,7 @@ def experiment(args):
         publish("in_progress")
         try:
             session = run(params, product_root=root, enabled=mode == "on", images=images,
-                          latency_probe=probe if latency else None, protocol=protocol)
+                          latency_probe=probe if latency else None, protocol=protocol, baseline_beta2=True)
             result, stand = assess(session, count, protocol, images, stand)
             entry.update(status="valid", **result)
             return result

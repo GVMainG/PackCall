@@ -8,12 +8,13 @@
 | Integration C# | `tests/PackCall.Test/Integration/<Module>` | `dotnet test tests/PackCall.Test --filter "Category=Integration"` | Локальный HTTP, файловая система, host; PostgreSQL-проверки требуют `PACKCALL_TEST_POSTGRES` |
 | C# по модулю | Api, Campaigns, Deliveries, Workers, Operators, Measurements | `dotnet test tests/PackCall.Test --filter "Module=Workers"` | Можно сочетать: `"Category=Unit&Module=Workers"` |
 | C# с изолированной БД | `tests/PackCall.Test` | `python scripts/performance/postgres_tests.py` | Docker Engine и временный PostgreSQL. Полноту прогона проверьте по числу пропусков в TRX; в CI интеграционные тесты прогоняются с запретом скипов (`--forbid-skipped`) |
-| Offline Python | `tests/tools/performance` | `python -m pytest tests/tools/performance -q` | 18 проверок инструментов анализа/чтения/сбора (`jsonschema`, `pytest` из `scripts/performance/requirements.txt`); в CI прогоняется в job `python_offline` с запретом скипов |
+| Offline Python | `tests/tools/performance` | `python -m pytest tests/tools/performance -q` | Проверки инструментов анализа, чтения и сбора (`jsonschema`, `pytest` из `scripts/performance/requirements.txt`); в CI прогоняется в job `python_offline` с запретом скипов |
 | Offline Python | `tests/tools/operators` | `python -m unittest discover -s tests/tools/operators -p "test_*.py" -v` | 4 теста orchestration с mock-процессами |
 | Offline Python | `tests/tools/ci` | `python -m unittest discover -s tests/tools/ci -p "test_*.py" -v` | 47 проверок: strict UTF-8 (6), release gate (18), TRX-счётчик (9), JUnit-счётчик (6), контракт workflow (8) |
 | Contract Python | `tests/acceptance/operators/operator_contract.py` | `python tests/acceptance/operators/operator_contract.py` | 5 тестов ASGI, без Docker |
 | Acceptance | `tests/acceptance/workers/lifecycle` | См. [README](acceptance/workers/lifecycle/README.md) | Docker Engine, Compose, SDK; последовательность подготовки БД обязательна |
 | Acceptance | `tests/acceptance/workers/coordination` | См. [README](acceptance/workers/coordination/README.md) | Docker Engine, Compose, SDK; независимые worker-процессы, recovery и lease fence |
+| Acceptance | `tests/acceptance/workers/sm6` | См. [README](acceptance/workers/sm6/README.md) | Чистый checkout; recovery, отказ оператора, остановка Worker и устаревшая запись |
 | Acceptance | `tests/acceptance/operators` | Полный порядок: [operators/README.md](acceptance/operators/README.md) | Python 3.11+, фиксированный venv для privacy, Docker Engine, Compose, SDK; отдельные run/config_matrix/precedence/privacy/prod_compose/retention/late_http/shutdown и W22 dependencies |
 | Acceptance измерений | `tests/acceptance/measurements` | `python tests/acceptance/measurements/postgres_repeat.py` | Реальный изолированный PostgreSQL в Docker; fixture удаляет только свой контейнер |
 | Smoke измерений | `tests/acceptance/measurements` | `python tests/acceptance/measurements/crash_smoke.py` | SDK и Docker; SIGKILL и сохранённый префикс телеметрии |
@@ -27,6 +28,8 @@
 Фикстуры: HTTP servers и email JSON — `tests/acceptance/operators/fixtures/` и `tests/acceptance/operators/email-fixtures.json`; clock shim — `tests/acceptance/workers/coordination/fixtures/`. Общее C# окружение PostgreSQL и HTTP server — `tests/PackCall.Test/Integration/Support`; общие fake-объекты — `tests/PackCall.Test/Support`.
 
 Инструменты запуска, сбора и анализа, SQL, schema, examples и probe остаются в [scripts/performance](../scripts/performance/README.md). Исторические пути выходных артефактов `story-*` сохранены. Скрипты приёмки сохраняют прежние границы владения ресурсами; перед удалением стенда используйте инструкции соответствующего runner.
+
+Приёмка работает с контактами, email-каналами и снимками новой схемы. HTTP-совместимость проверяется по прежним `/api/recipients`, `recipient_id` и `recipient_email`. Для 300k подготовки без отправок и малого профиля см. [команды performance](../scripts/performance/README.md). Воспроизведение baseline beta.2 использует отдельный чистый checkout тега и отдельную тестовую БД.
 
 Проекты для запуска отдельных процессов:
 

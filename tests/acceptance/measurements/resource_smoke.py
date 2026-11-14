@@ -28,12 +28,19 @@ def run():
         else: raise RuntimeError("fixture_not_ready")
         sql = f"""
 CREATE TABLE campaigns(id uuid, status integer);
-CREATE TABLE deliveries(campaign_id uuid, delivery_status integer, lock_expires_at timestamptz, created_at timestamptz);
+CREATE TABLE deliveries(campaign_id uuid, delivery_status integer, lock_expires_at timestamptz,
+                        created_at timestamptz, channel text, address_snapshot text);
 CREATE TABLE delivery_status_journal(id integer);
-INSERT INTO campaigns VALUES ('{campaign}',1), ('{paused}',4);
-INSERT INTO deliveries VALUES ('{campaign}',0,NULL,now()-interval '1 hour'),
-('{campaign}',1,now()-interval '1 second',now()-interval '1 hour'),
-('{campaign}',2,NULL,now()), ('{campaign}',-1,NULL,now()), ('{paused}',0,NULL,now());
+INSERT INTO campaigns (id, status) VALUES ('{campaign}',1), ('{paused}',4);
+INSERT INTO deliveries (campaign_id, delivery_status, lock_expires_at, created_at, channel, address_snapshot)
+VALUES ('{campaign}',0,NULL,now()-interval '1 hour','email','valid@example.test'),
+('{campaign}',1,now()-interval '1 second',now()-interval '3 hours','email','recovered@example.test'),
+('{campaign}',2,NULL,now(),'email','sent@example.test'),
+('{campaign}',-1,NULL,now(),'email','failed@example.test'),
+('{paused}',0,NULL,now(),'email','paused@example.test'),
+('{campaign}',0,NULL,now()-interval '2 hours','telegram','123'),
+('{campaign}',0,NULL,now()-interval '2 hours','email',NULL),
+('{campaign}',0,NULL,now()-interval '2 hours','email',E' \t');
 CREATE ROLE perf_read LOGIN;
 GRANT CONNECT ON DATABASE postgres TO perf_read;
 GRANT USAGE ON SCHEMA public TO perf_read;
@@ -44,13 +51,14 @@ CREATE ROLE perf_denied LOGIN;
         docker("exec", "-i", name, "psql", "-U", "postgres", "-qAt", "-v", "ON_ERROR_STOP=1", input=sql)
         metrics, _ = queue_snapshot(name, "postgres", campaign, "perf_read")
         assert metrics["queue.waiting_eligible"]["value"] == 1
+        assert metrics["queue.waiting_total"]["value"] == 4
         assert metrics["queue.expired"]["value"] == 1
-        assert metrics["queue.oldest_waiting_age_s"]["value"] >= 3600
+        assert 3600 <= metrics["queue.oldest_eligible_age_s"]["value"] < metrics["queue.oldest_waiting_age_s"]["value"]
         docker("exec", "-i", name, "psql", "-U", "postgres", "-qAt", "-v", "ON_ERROR_STOP=1",
                input=f"UPDATE deliveries SET delivery_status=0, lock_expires_at=NULL WHERE campaign_id='{campaign}' AND delivery_status=1;")
         recovered, _ = queue_snapshot(name, "postgres", campaign, "perf_read")
         assert recovered["queue.waiting_eligible"]["value"] == 2
-        assert recovered["queue.oldest_waiting_age_s"]["value"] >= metrics["queue.oldest_waiting_age_s"]["value"]
+        assert 10800 <= recovered["queue.oldest_eligible_age_s"]["value"] < 10920
         paused_metrics, _ = queue_snapshot(name, "postgres", paused, "perf_read")
         assert paused_metrics["queue.waiting_total"]["value"] == 1
         assert paused_metrics["queue.waiting_eligible"]["value"] == 0

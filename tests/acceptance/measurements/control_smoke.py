@@ -34,6 +34,10 @@ if __name__=="__main__":
     assert manifest["workload_status"]=="aborted"
     assert not (directory/"processing-epoch.json").exists()
     assert (directory/"initial.json").exists()
+    assert json.loads((directory/"audience.json").read_text()) == {
+        "contacts": 20, "channels": 20, "distinct_addresses": 20,
+        "campaign_contacts": 20, "campaign_channels": 1, "matching_deliveries": 20,
+    }
     cleanup_owned(directory)
     assert (directory/"manifest.json").exists()
     print("PASS: stop by SessionId before start, DB retained until explicit cleanup, artifacts preserved; "+str(directory))

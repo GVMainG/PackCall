@@ -102,9 +102,21 @@ try:
             snapshot=sql("select json_build_object('deliveries',(select json_agg(d) from deliveries d),'journal',(select json_agg(j) from delivery_status_journal j),'campaigns',(select json_agg(c) from campaigns c))")
             (RUN/(mode+'-terminal.json')).write_text(snapshot)
             if mode=='inprocess':
-                port=cmd(['docker','port',project+'-packcall.db-1','5432/tcp']).stdout.strip().split(':')[-1]
-                tests=dict(ENV,PACKCALL_TEST_POSTGRES='Host=127.0.0.1;Port='+port+';Database=packcall;Username=packcall;Password=packcall')
-                cmd(['dotnet','test','tests/PackCall.Test','--logger','trx;LogFileName=full.trx','--results-directory',str(RUN/'results')],tests,timeout=300)
+                reports=RUN/'results';reports.mkdir()
+                sdk_container=project+'-sdk-tests'
+                try:
+                    cmd(['docker','run','--rm','--name',sdk_container,'--network',project+'_default','-w','/work',
+                         '-e','PACKCALL_TEST_POSTGRES=Host=packcall.db;Database=packcall;Username=packcall;Password=packcall;Pooling=false',
+                         '-e','PACKCALL_ENVIRONMENT=test','-e','TEST_SENDER_MODE=inprocess',
+                         '--mount',f'type=bind,source={ROOT},target=/source,readonly',
+                         '--mount',f'type=bind,source={reports},target=/results',
+                         'mcr.microsoft.com/dotnet/sdk:10.0','sh','-ec',
+                         "tar -C /source --exclude=bin --exclude=obj -cf /tmp/source.tar config src tests; "
+                         "tar -xf /tmp/source.tar; "
+                         "dotnet test tests/PackCall.Test --logger 'trx;LogFileName=full.trx' --results-directory /results"],
+                        timeout=600)
+                finally:
+                    cmd(['docker','rm','-f',sdk_container],check=False)
                 counters=ET.parse(RUN/'results/full.trx').find('.//{*}Counters').attrib
                 assert int(counters['total'])>0 and counters['passed']==counters['total'] and int(counters.get('failed',0))==0 and int(counters.get('notExecuted',0))==0,counters
                 (RUN/'test-counters.json').write_text(json.dumps(counters,indent=2))

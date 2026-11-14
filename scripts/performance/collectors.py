@@ -38,7 +38,7 @@ def utc():
 
 
 def sql_snapshot(container, database, script, campaign=None, user="postgres", timeout_ms=500):
-    if script not in {"queue", "postgres", "postgres_extra", "tables"}:
+    if script not in {"queue", "queue_beta2", "postgres", "postgres_extra", "tables"}:
         raise CollectionError("unsupported")
     sql = "\\set VERBOSITY sqlstate\nBEGIN READ ONLY;\nSET LOCAL statement_timeout = '%dms';\n" % timeout_ms
     sql += (ROOT / "sql" / f"{script}.sql").read_text() + "\nCOMMIT;\n"
@@ -52,8 +52,8 @@ def sql_snapshot(container, database, script, campaign=None, user="postgres", ti
         raise CollectionError("collection_error") from None
 
 
-def queue_snapshot(container, database, campaign, user="postgres"):
-    values = sql_snapshot(container, database, "queue", campaign, user, 1000)
+def queue_snapshot(container, database, campaign, user="postgres", *, baseline_beta2=False):
+    values = sql_snapshot(container, database, "queue_beta2" if baseline_beta2 else "queue", campaign, user, 1000)
     metrics = {"queue." + key: scalar(value, "s" if key.endswith("_s") else "deliveries")
                for key, value in values.items() if key != "db_now"}
     return metrics, {"db_now": values["db_now"], "campaign_id": campaign}

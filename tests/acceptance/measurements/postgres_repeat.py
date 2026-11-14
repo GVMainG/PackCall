@@ -34,7 +34,7 @@ def run():
         first, second, third = (str(uuid.uuid4()) for _ in range(3))
         sql = f"""
 CREATE TABLE delivery_status_journal(campaign_id uuid, delivery_id uuid, previous_status integer, new_status integer);
-INSERT INTO delivery_status_journal VALUES
+INSERT INTO delivery_status_journal (campaign_id, delivery_id, previous_status, new_status) VALUES
 ('{campaign}', '{first}', 0, 1), ('{campaign}', '{first}', 1, 0), ('{campaign}', '{first}', 0, 1),
 ('{campaign}', '{second}', 0, 1), ('{campaign}', '{second}', 1, 0),
 ('{campaign}', '{third}', 1, 0);

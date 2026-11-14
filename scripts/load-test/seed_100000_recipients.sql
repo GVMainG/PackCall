@@ -1,5 +1,5 @@
--- Test recipients for PackCall. Requires the schema created at API startup.
--- PostgreSQL generates all 100000 rows; safe to run again.
+-- Legacy: 10,000 synthetic recipients for beta.2, on a dedicated test database.
+-- Despite the filename, this is not a 100k or 1M generator.
 BEGIN;
 
 INSERT INTO recipients (id, email, created_at, updated_at)

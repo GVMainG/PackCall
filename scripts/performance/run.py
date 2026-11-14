@@ -53,7 +53,7 @@ def verify_privacy(output, secret=None):
 
 
 def run(args, fault=None, *, product_root=REPO, enabled=True, images=None, latency_probe=None,
-        protocol=None):
+        protocol=None, baseline_beta2=False):
     if os.name != "nt": raise CollectionError("windows_profile_required")
     sid = str(uuid.uuid4())
     project = "packcall-perf-" + sid.replace("-", "")
@@ -176,21 +176,30 @@ def run(args, fault=None, *, product_root=REPO, enabled=True, images=None, laten
             dc("up","-d","api")
             remember()
             port=dc("port","api","8080").strip().rsplit(":",1)[1]
-            def api(path, payload=None):
+            def api(path, payload=None, *, timeout=180):
                 request=urllib.request.Request("http://127.0.0.1:"+port+"/api/"+path,
                     data=None if payload is None else json.dumps(payload).encode(),headers={"Content-Type":"application/json"})
-                with urllib.request.urlopen(request,timeout=180) as response: return json.load(response)
+                with urllib.request.urlopen(request,timeout=timeout) as response: return json.load(response)
             deadline=time.monotonic()+60
             while True:
                 try: api("campaigns"); break
                 except OSError:
                     if time.monotonic()>deadline: raise CollectionError("api_not_ready")
                     time.sleep(.25)
-            sql((ROOT/"sql/seed.sql").read_text(),count=args.count)
-            campaign=api("campaigns",{"name":"performance-synthetic","messageText":"x"*64})
+            seed = "seed_beta2.sql" if baseline_beta2 else "seed.sql"
+            sql((ROOT/"sql"/seed).read_text(),count=args.count)
+            formation_timeout = 900 if not baseline_beta2 and args.profile == "windows-http-300k" else 180
+            campaign=api("campaigns",{"name":"performance-synthetic","messageText":"x"*64},timeout=formation_timeout)
             manifest["campaign_id"]=campaign["id"]
             initial=snapshot()
             if initial != dict(campaign_status=0,campaigns=1,total=args.count,waiting=args.count,in_progress=0,sent=0,failed=0): raise CollectionError("preparation_mismatch")
+            if not baseline_beta2:
+                audience = json.loads(sql((ROOT/"sql/audience.sql").read_text(), cid=manifest["campaign_id"]))
+                expected = dict(contacts=args.count, channels=args.count, distinct_addresses=args.count,
+                                campaign_contacts=args.count, campaign_channels=1, matching_deliveries=args.count)
+                if audience != expected: raise CollectionError("preparation_mismatch")
+                atomic(output/"audience.json", audience)
+            if (output/"stop-request.json").exists(): raise KeyboardInterrupt
             sidecar("initial.json", initial)
             if args.prepare_only:
                 manifest.update(workload_status="aborted",stop_reason="aborted",stop_utc=utc())
@@ -205,7 +214,7 @@ def run(args, fault=None, *, product_root=REPO, enabled=True, images=None, laten
             manifest["image_digests"]={role:item["image"] for role,item in inventory["containers"].items()}
             db=state["containers"]["db"]
             if enabled:
-                collectors=[ScheduledCollector(sid,"queue",30,lambda:queue_snapshot(db,"performance",manifest["campaign_id"]),epoch),
+                collectors=[ScheduledCollector(sid,"queue",30,lambda:queue_snapshot(db,"performance",manifest["campaign_id"],baseline_beta2=baseline_beta2),epoch),
                             ScheduledCollector(sid,"postgres",15,lambda:postgres_snapshot(db,"performance"),epoch),
                             ScheduledCollector(sid,"postgres",60,lambda:postgres_snapshot(db,"performance",tables=True),epoch),
                             ScheduledCollector(sid,"containers",5,lambda:container_snapshot({k:v for k,v in state["containers"].items() if k!="migrator"}),epoch),

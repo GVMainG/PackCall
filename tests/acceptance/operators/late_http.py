@@ -1,9 +1,12 @@
-import pathlib,subprocess as sp,json,time,uuid
+import pathlib,subprocess as sp,json,re,sys,time,uuid
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
+from email_fixture import RESET, email_deliveries
 
 ROOT=pathlib.Path.cwd();OUT=ROOT/'_bmad-output/implementation-artifacts/story-11-1-test-email-operator'
 
 RUN=pathlib.Path((OUT/'w22-http/latest-run.txt').read_text());PROJECT=json.loads((RUN/'results.json').read_text())['project']
-if json.loads((RUN/'results.json').read_text()).get('status')!='passed':raise SystemExit('Refusing failed W22 run')
+if not re.fullmatch(r'packcall-w22-[0-9a-f]{8}', PROJECT) or json.loads((RUN/'results.json').read_text()).get('status')!='passed':raise SystemExit('Expected an isolated successful W22 run')
 
 CONTROL=RUN/'late-control';CONTROL.mkdir()
 
@@ -19,7 +22,7 @@ def cmd(args,check=True):
 
  return r.stdout.strip()
 
-def sql(q):return cmd(['exec',PROJECT+'-db-1','psql','-U','acceptance','-d','acceptance','-Atc',q])
+def sql(q):return cmd(['exec',PROJECT+'-db-1','psql','-U','acceptance','-d','acceptance','-At','-v','ON_ERROR_STOP=1','-c',q])
 
 def wait(fn,seconds=35):
 
@@ -49,11 +52,11 @@ try:
 
  cmd(['start',PROJECT+'-db-1',PROJECT+'-operator-1']);wait(lambda:cmd(['exec',PROJECT+'-db-1','pg_isready','-U','acceptance'],False).endswith('accepting connections'))
 
- sql('TRUNCATE deliveries,campaigns,recipients,delivery_status_journal CASCADE')
+ sql(RESET)
 
  cid=str(uuid.uuid4())
 
- sql(f"insert into campaigns(id,name,message_text,status,created_at,updated_at,started_at) values('{cid}','Late HTTP','synthetic',1,clock_timestamp(),clock_timestamp(),clock_timestamp()); with r as(insert into recipients(id,email) values(gen_random_uuid(),'late@example.test') returning id,email) insert into deliveries select gen_random_uuid(),'{cid}',id,email,0,clock_timestamp(),clock_timestamp(),null,null,null from r")
+ sql(email_deliveries(cid, 'late'))
 
  script=str(ROOT/'tests/acceptance/operators/fixtures/delayed.py')
 
