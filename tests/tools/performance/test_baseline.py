@@ -29,6 +29,15 @@ def test_throughput_requires_previous_incomplete_poll():
         throughput(300_000, 10, dict(previous=None, confirmed={}))
 
 
+@pytest.mark.parametrize(("sent", "status"), [(-1, 1), (300_001, 1), (299_999, 99), (True, 1)],
+                         ids=["negative-count", "excess-count", "unexpected-status", "non-integer-count"])
+def test_throughput_rejects_impossible_previous_poll(sent, status):
+    previous = dict(request_s=19, response_s=19.3, sent=sent, campaign_status=status)
+    confirmed = dict(request_s=20, response_s=20.3, sent=300_000, campaign_status=2)
+    with pytest.raises(CollectionError, match="invalid_incomplete_poll"):
+        throughput(300_000, 10, dict(previous=previous, confirmed=confirmed))
+
+
 @pytest.mark.parametrize(("off", "on", "status"), [
     ([100, 100, 100], [96, 97, 98], "pass"),
     ([100, 100, 100], [94, 94, 94], "over_budget"),
@@ -48,6 +57,134 @@ def test_throughput_gate_pairs_and_brackets(off, on, status):
 def test_throughput_gate_rejects_two_pairs():
     with pytest.raises(CollectionError, match="incomplete_throughput_series"):
         throughput_gate([{}, {}])
+
+
+@pytest.mark.parametrize(("bounds", "status", "median_bounds"), [
+    ([(90, 91)] * 3, "pass", [90, 91]),
+    ([(89, 90)] * 3, "inconclusive", [89, 90]),
+    ([(88, 89)] * 3, "regression", [88, 89]),
+    ([(90, 95), (90, 90), (90, 90)], "inconclusive", [90, 90]),
+    ([(89, 92), (91, 91), (90, 90)], "pass", [90, 91]),
+    ([(95, 95), (100, 100), (100, 100)], "pass", [100, 100]),
+], ids=["exact-threshold", "touches-threshold", "stable-regression", "uncertainty-makes-spread-unstable",
+        "median-endpoints-from-different-sessions", "exact-spread-limit"])
+def test_schema_gate_uses_full_median_and_spread_bounds(bounds, status, median_bounds):
+    result = baseline.schema_gate([dict(deliveries_per_s=low, upper_deliveries_per_s=high)
+                                   for low, high in bounds], 100)
+    assert result["status"] == status
+    assert result["threshold_deliveries_per_s"] == 90
+    assert result["median_bounds_deliveries_per_s"] == median_bounds
+
+
+@pytest.mark.parametrize("bounds", [[(100, 101)] * 2, [(100, 99)] * 3, [(100, float("inf"))] * 3])
+def test_schema_gate_rejects_incomplete_or_impossible_series(bounds):
+    with pytest.raises(CollectionError, match="invalid_schema_throughput_series"):
+        baseline.schema_gate([dict(deliveries_per_s=low, upper_deliveries_per_s=high)
+                              for low, high in bounds], 100)
+
+
+def test_schema_reference_rejects_modified_summary(tmp_path):
+    report = tmp_path / "series.json"
+    atomic(report, {"product_sha": baseline.SCHEMA_SHA, "sessions": []})
+    with pytest.raises(CollectionError, match="reference_series_checksum_mismatch"):
+        baseline.schema_reference(report)
+
+
+@pytest.mark.parametrize("role", ["db", "http"])
+def test_schema_image_receipt_rejects_different_shared_image(tmp_path, role):
+    expected = {"db": "db", "http": "http"}
+    atomic(tmp_path / "images.json", {"schema_version": 1, "product_sha": baseline.SCHEMA_SHA,
+           "image_ids": dict(api="api", worker="worker", migrator="migrator") | expected | {role: "different"}})
+    with pytest.raises(CollectionError, match="image_provenance_mismatch"):
+        baseline.prepare_images(tmp_path / "product", tmp_path, baseline.SCHEMA_SHA, expected)
+
+
+def test_schema_stand_allows_one_page_difference_but_rejects_resource_drift():
+    reference = {"vm": ["wsl2", 16, 10**10, None], "limits": {"memory": "unlimited"},
+                 "settings": {"batch_size": 10}, "load": {"deliveries": 300_000}}
+    actual = reference | {"vm": ["wsl2", 16, 10**10 - 4096, None], "load": {"deliveries": 6000}}
+    baseline.check_schema_stand(actual, reference, 6000)
+    with pytest.raises(CollectionError, match="reference_stand_mismatch"):
+        baseline.check_schema_stand(actual | {"limits": {"memory": 2**30}}, reference, 6000)
+    with pytest.raises(CollectionError, match="reference_stand_mismatch"):
+        baseline.check_schema_stand(actual | {"vm": ["wsl2", 16, 10**10 - 8192, None]}, reference, 6000)
+
+
+@pytest.mark.parametrize("last_session", ["valid", "invalid", "different-stand"])
+def test_schema_series_publishes_verdict_only_after_three_matching_sessions(tmp_path, monkeypatch, last_session):
+    stand = {"vm": ["wsl2", 16, 10**10, None], "limits": {"memory": "unlimited"},
+             "settings": {"batch_size": 10}, "load": {"deliveries": 300_000}}
+    images = {"db": "historical-db", "http": "historical-http"}
+    reference = {"stand": stand, "median_deliveries_per_s": 100, "image_ids": images}
+    monkeypatch.setattr(baseline, "schema_reference", lambda _: reference)
+    monkeypatch.setattr(baseline, "preflight", lambda *args: {})
+    monkeypatch.setattr(baseline, "tool_revision", lambda: {})
+    monkeypatch.setattr(baseline, "command", lambda *args: "compose-version")
+    monkeypatch.setattr(baseline, "prepare_images", lambda root, output, sha, shared: shared)
+    cleaned = []
+
+    def run_arm(args, **options):
+        index = len(cleaned) + 1
+        assert args.profile == "windows-http-300k" and args.count == 300_000 and args.workers == 2
+        assert options["enabled"] is False and options["baseline_beta2"] is False
+        assert options["latency_probe"] is None and options["images"] == images
+        assert options["protocol"]["pair"] == index
+        directory = args.output / str(index)
+        directory.mkdir()
+        return directory
+
+    def assess_arm(directory, *args, **kwargs):
+        if directory.name == "3" and last_session == "invalid":
+            raise CollectionError("invalid_db_result")
+        current = stand
+        if directory.name == "3" and last_session == "different-stand":
+            current = stand | {"limits": {"memory": 2**30}}
+        return {"deliveries_per_s": 95, "upper_deliveries_per_s": 96}, current
+
+    monkeypatch.setattr(baseline, "run", run_arm)
+    monkeypatch.setattr(baseline, "assess", assess_arm)
+    monkeypatch.setattr(baseline, "cleanup_owned", lambda directory, **_: cleaned.append(directory.name))
+    args = Namespace(product_root=tmp_path / "product", output=tmp_path / "output", smoke=False, schema_gate=True)
+    if last_session == "valid":
+        assert baseline.experiment(args) == "pass"
+    else:
+        code = "invalid_db_result" if last_session == "invalid" else "reference_stand_mismatch"
+        with pytest.raises(CollectionError, match=code):
+            baseline.experiment(args)
+    report = json.loads(next(args.output.glob("*/series.json")).read_text())
+    assert cleaned == ["1", "2", "3"]
+    assert [entry["status"] for entry in report["sessions"]] == ["valid", "valid", last_session if last_session == "valid" else "invalid"]
+    if last_session == "valid":
+        assert report["gate"]["status"] == report["status"] == "pass"
+    else:
+        assert report["status"] == "invalid" and "gate" not in report
+
+
+def test_preflight_keeps_beta2_bound_to_tag(tmp_path, monkeypatch):
+    root, output = tmp_path / "product", tmp_path / "output"
+    monkeypatch.setattr(baseline, "os", Namespace(name="nt"))
+    monkeypatch.setattr(baseline, "host_snapshot", lambda: ({}, None))
+    monkeypatch.setattr(baseline, "docker_inventory", lambda _: {"container_os": "linux"})
+    monkeypatch.setattr(baseline.shutil, "disk_usage", lambda _: Namespace(free=10**10))
+    head = baseline.PRODUCT_SHA
+    tag = baseline.SCHEMA_SHA
+
+    def git(root, *args):
+        if args[0] == "branch":
+            return "gv"
+        if args == ("rev-parse", "HEAD"):
+            return head
+        if args == ("rev-parse", baseline.TAG + "^{commit}"):
+            return tag
+        return ""
+
+    monkeypatch.setattr(baseline, "git", git)
+    with pytest.raises(CollectionError, match="product_checkout_mismatch"):
+        baseline.preflight(root, output)
+    tag = baseline.PRODUCT_SHA
+    assert baseline.preflight(root, output)["docker"]["container_os"] == "linux"
+    head = baseline.SCHEMA_SHA
+    assert baseline.preflight(root, output, baseline.SCHEMA_SHA)["docker"]["container_os"] == "linux"
 
 
 def test_off_spread_upper_cannot_use_both_endpoints_of_one_arm():
@@ -225,8 +362,10 @@ def test_cleanup_skips_absent_resources_and_validates_before_removing(tmp_path, 
         assert json.loads((directory / "cleanup.json").read_text())["resources_removed"] is True
 
 
-@pytest.mark.parametrize("failure", ["interrupted", "run_failed"])
+@pytest.mark.parametrize("failure", ["interrupted", "run_failed", "invalid_candidate"])
 def test_series_records_interrupt_or_original_failure(tmp_path, monkeypatch, failure):
+    candidate = failure == "invalid_candidate"
+    monkeypatch.setattr(baseline, "schema_reference", lambda _: {"image_ids": {"db": "db", "http": "http"}})
     for name in ("preflight", "prepare_images", "tool_revision"):
         monkeypatch.setattr(baseline, name, lambda *args: {})
     def command(argv, **kwargs):
@@ -235,27 +374,40 @@ def test_series_records_interrupt_or_original_failure(tmp_path, monkeypatch, fai
         return "test"
     monkeypatch.setattr(baseline, "command", command)
     def run_arm(args, **kwargs):
+        assert kwargs["baseline_beta2"] is not candidate
+        if candidate:
+            assert kwargs["enabled"] is False and kwargs["latency_probe"] is None
+            assert kwargs["protocol"]["product_sha"] == baseline.SCHEMA_SHA
         directory = args.output / str(len(list(args.output.iterdir())))
         directory.mkdir()
         if failure == "run_failed":
             raise CollectionError("run_failed")
         return directory
     monkeypatch.setattr(baseline, "run", run_arm)
-    monkeypatch.setattr(baseline, "assess", lambda *args: ({}, {}))
+    def assess(*args, **kwargs):
+        if candidate:
+            assert kwargs["expected_sha"] == baseline.SCHEMA_SHA
+            raise CollectionError("invalid_db_result")
+        return {}, {}
+    monkeypatch.setattr(baseline, "assess", assess)
     def cleanup(*args, **kwargs):
         if failure == "run_failed":
             raise CollectionError("cleanup_failed")
     monkeypatch.setattr(baseline, "cleanup_owned", cleanup)
     output = tmp_path / "output"
-    args = Namespace(product_root=tmp_path / "product", output=output, smoke=True)
+    args = Namespace(product_root=tmp_path / "product", output=output, smoke=not candidate, schema_gate=candidate)
     if failure == "interrupted":
         assert baseline.experiment(args) == "interrupted"
     else:
-        with pytest.raises(CollectionError, match="run_failed"):
+        with pytest.raises(CollectionError, match="invalid_db_result" if candidate else "run_failed"):
             baseline.experiment(args)
     report = json.loads(next(output.glob("*/series.json")).read_text())
     if failure == "interrupted":
         assert report["status"] == "interrupted"
-    else:
+    elif failure == "run_failed":
         assert report["status"] == "invalid" and report["failure_code"] == "run_failed"
         assert report["sessions"][0]["cleanup"] == "failed"
+    else:
+        assert report["status"] == "invalid" and report["failure_code"] == "invalid_db_result"
+        assert report["sessions"][0]["status"] == "invalid"
+        assert len(report["sessions"]) == 1 and "gate" not in report

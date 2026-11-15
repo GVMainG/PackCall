@@ -1,4 +1,4 @@
-"""Run the pinned beta.2 two-Worker baseline and validate its local evidence."""
+"""Run the pinned beta.2 baseline or the Story 2.6 schema throughput gate."""
 import argparse
 import hashlib
 from itertools import product
@@ -21,6 +21,9 @@ from session import REPO, atomic, cleanup_owned, compose_profile, digest
 
 TAG = "v0.5.0-beta.2"
 PRODUCT_SHA = "50a3ac33a6ba3cafa805bdda5b1646a5d45ffbd2"
+SCHEMA_SHA = "b935a11d42e1971ffbe08be17dc77d95b5d3f17a"
+REFERENCE_SERIES = REPO / "artifacts/baseline-2-1/replay-d95e46e/f66a660e-2e90-4e26-a650-c079bbbddd36/series.json"
+REFERENCE_SHA256 = "0bb5336d1370bcd696415e96b200bb62f84f524ced27965f22ab0dd43dd6b4ee"
 THROUGHPUT_ORDER = (("off", "on"), ("on", "off"), ("off", "on"))
 LATENCY_ORDER = (("off", "on"), ("on", "off"))
 WORKERS = {"worker0", "worker1"}
@@ -54,12 +57,21 @@ def throughput(count, start, completion):
     previous, confirmed = completion["previous"], completion["confirmed"]
     require(previous is not None and (previous["sent"], previous["campaign_status"]) != (count, 2),
             "missing_incomplete_poll")
-    require((confirmed["sent"], confirmed["campaign_status"]) == (count, 2) and
+    require(type(previous["sent"]) is int and 0 <= previous["sent"] <= count and
+            type(previous["campaign_status"]) is int and previous["campaign_status"] in {1, 2},
+            "invalid_incomplete_poll")
+    require(all(type(value) in {int, float} and math.isfinite(value) for value in
+                (start, previous["request_s"], previous["response_s"], confirmed["request_s"], confirmed["response_s"])) and
+            (confirmed["sent"], confirmed["campaign_status"]) == (count, 2) and
             start < previous["request_s"] <= previous["response_s"] <= confirmed["request_s"] <= confirmed["response_s"],
             "invalid_completion_bounds")
     duration = confirmed["response_s"] - start
     return {"duration_s": duration, "uncertainty_s": confirmed["response_s"] - previous["request_s"],
             "deliveries_per_s": count / duration, "upper_deliveries_per_s": count / (previous["request_s"] - start)}
+
+
+def spread_pct(rates):
+    return 100 * (max(rates) - min(rates)) / median(rates)
 
 
 def throughput_gate(pairs):
@@ -73,8 +85,6 @@ def throughput_gate(pairs):
         losses.append(100 * (1 - on["deliveries_per_s"] / off["deliveries_per_s"]))
         loss_low.append(100 * (1 - on["upper_deliveries_per_s"] / off["deliveries_per_s"]))
         loss_high.append(100 * (1 - on["deliveries_per_s"] / off["upper_deliveries_per_s"]))
-    def spread_pct(rates):
-        return 100 * (max(rates) - min(rates)) / median(rates)
     spread = spread_pct(off_low)
     # With fixed rank order the spread is monotonic in each rate. At a rank
     # crossover two rates tie, and moving toward the larger spread reaches endpoints.
@@ -87,6 +97,22 @@ def throughput_gate(pairs):
         status = "over_budget"
     return {"status": status, "paired_loss_pct": losses, "median_loss_pct": median(losses),
             "median_loss_bounds_pct": [low, high], "off_spread_pct": spread, "off_spread_upper_pct": spread_upper}
+
+
+def schema_gate(sessions, reference_rate):
+    bounds = [(row["deliveries_per_s"], row["upper_deliveries_per_s"]) for row in sessions]
+    require(len(bounds) == 3 and all(0 < low <= high < math.inf for low, high in bounds) and
+            0 < reference_rate < math.inf, "invalid_schema_throughput_series")
+    lower, upper = (median(rates) for rates in zip(*bounds))
+    spread = max(map(spread_pct, product(*bounds)))
+    threshold = reference_rate * 0.9
+    if spread > 5 or lower < threshold <= upper:
+        status = "inconclusive"
+    else:
+        status = "pass" if lower >= threshold else "regression"
+    return {"status": status, "threshold_deliveries_per_s": threshold,
+            "median_bounds_deliveries_per_s": [lower, upper], "spread_upper_pct": spread,
+            "change_bounds_pct": [100 * (rate / reference_rate - 1) for rate in (lower, upper)]}
 
 
 def pooled_p95(root, workers, count):
@@ -190,14 +216,14 @@ def sha256(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def assess(root, count, protocol, images, comparison=None):
+def assess(root, count, protocol, images, comparison=None, *, expected_sha=PRODUCT_SHA):
     manifest = read("manifest", root / "manifest.json")
-    require(manifest["commit"] == PRODUCT_SHA and not manifest["dirty"] and
+    require(manifest["commit"] == expected_sha and not manifest["dirty"] and
             manifest["workload_status"] == "completed" and manifest["telemetry_status"] == "complete" and
             manifest["load"]["deliveries"] == count, "incomplete_session")
     verify_privacy(root)
     verify_checksums(root)
-    require(load(root, "protocol.json") == protocol, "protocol_mismatch")
+    require(load(root, "protocol.json") == protocol and protocol["product_sha"] == expected_sha, "protocol_mismatch")
     lifecycle = read_prefix([root / "lifecycle.jsonl"], "lifecycle", contiguous=False)
     require(not lifecycle["quality"] and [row["event"] for row in lifecycle["records"]] ==
             ["preparing", "ready", "processing", "draining", "process_stopped", "completed"] and
@@ -210,6 +236,9 @@ def assess(root, count, protocol, images, comparison=None):
     repeat = versioned(root, "repeat-captures.json", "observed_repeat_captures", "journal_non_atomic", "quality")
     require(journal["capture_entries"] == journal["terminal_entries"] == count and
             journal["release_entries"] == repeat["observed_repeat_captures"] == 0, "invalid_journal_counts")
+    if expected_sha == SCHEMA_SHA:
+        require(load(root, "audience.json") == dict(contacts=count, channels=count, distinct_addresses=count,
+                campaign_contacts=count, campaign_channels=1, matching_deliveries=count), "invalid_candidate_audience")
     readiness = versioned(root, "readiness.json", "workers")["workers"]
     require(readiness.keys() == WORKERS and len(set(readiness.values())) == 2, "workers_not_ready")
     participation = versioned(root, "worker-journal.json", "workers", "unique_sent")
@@ -230,7 +259,7 @@ def assess(root, count, protocol, images, comparison=None):
     limits = {role: {key: item[key] for key in ("memory", "nano_cpus", "cpu_period", "cpu_quota", "cpuset")}
               for role, item in containers.items()}
     stand = {"limits": limits, "settings": manifest["effective_settings"], "load": manifest["load"],
-             "vm": [inventory["backend"], inventory["vm_cpu_cores"], inventory["vm_memory_bytes"]]}
+             "vm": [inventory[key] for key in ("backend", "vm_cpu_cores", "vm_memory_bytes", "vm_swap_bytes")]}
     require(comparison is None or stand == comparison, "stand_configuration_changed")
     for stage in ("initial", "final"):
         clocks = versioned(root, f"clock-{stage}.json", "api", "http", "postgres", *WORKERS)
@@ -241,6 +270,8 @@ def assess(root, count, protocol, images, comparison=None):
                            "elapsed_end_s", "business_started_at")
     completion = versioned(root, "completion.json", "previous", "confirmed")
     result = throughput(count, processing["elapsed_start_s"], completion)
+    require(processing["elapsed_start_s"] <= processing["elapsed_end_s"] <= completion["previous"]["request_s"],
+            "invalid_start_response_bounds")
     resource = {"files_bytes": sum(path.stat().st_size for path in root.rglob("*") if path.is_file())}
     if protocol["measurement"] == "on":
         validate_on(root, manifest, readiness, workers, processing["elapsed_start_s"],
@@ -273,10 +304,11 @@ def git(root, *args):
     return command(["git", "-C", str(root), *args]).strip()
 
 
-def preflight(root, output):
+def preflight(root, output, product_sha=PRODUCT_SHA):
     require(os.name == "nt" and not output.is_relative_to(root) and root != REPO, "invalid_baseline_paths")
     require(git(REPO, "branch", "--show-current") == "gv" and
-            git(root, "rev-parse", "HEAD") == git(root, "rev-parse", TAG + "^{commit}") == PRODUCT_SHA and
+            git(root, "rev-parse", "HEAD") == product_sha and
+            (product_sha != PRODUCT_SHA or git(root, "rev-parse", TAG + "^{commit}") == PRODUCT_SHA) and
             not git(root, "status", "--porcelain", "--untracked-files=all") and
             not git(root, "ls-files", "--others", "--ignored", "--exclude-standard"),
             "product_checkout_mismatch")
@@ -287,32 +319,39 @@ def preflight(root, output):
     return {"docker": inventory, "host": host, "free_disk_bytes": free}
 
 
-def prepare_images(root, output):
+def prepare_images(root, output, product_sha=PRODUCT_SHA, shared_images=None):
     receipt = output / "images.json"
     if receipt.exists():
         result = versioned(output, "images.json", "product_sha", "image_ids")
-        require(result["product_sha"] == PRODUCT_SHA, "image_provenance_mismatch")
+        require(result["product_sha"] == product_sha and
+                result["image_ids"].keys() == {"api", "worker", "migrator", "db", "http"} and
+                all(result["image_ids"][role] == image for role, image in (shared_images or {}).items()),
+                "image_provenance_mismatch")
         for image in result["image_ids"].values():
             require(command(["docker", "image", "inspect", "--format", "{{.Id}}", image]).strip() == image,
                     "missing_baseline_image")
         return result["image_ids"]
     template = compose_profile(str(uuid.uuid4()), output, product_root=root)["services"]
-    build = {role: {"image": "packcall-baseline-50a3ac3:" + name, "build": template[source]["build"]}
+    for image in (shared_images or {}).values():
+        require(command(["docker", "image", "inspect", "--format", "{{.Id}}", image]).strip() == image,
+                "missing_reference_image")
+    build = {role: {"image": f"packcall-baseline-{product_sha[:7]}:" + name, "build": template[source]["build"]}
              for role, name, source in (("api", "api", "api"), ("worker", "worker", "worker0"),
                                         ("migrator", "migrator", "migrator"),
-                                        ("http", "testemailoperator", "http"))}
+                                        ("http", "testemailoperator", "http"))
+             if role not in (shared_images or {})}
     with tempfile.TemporaryDirectory(prefix="packcall-baseline-images-") as temporary:
         compose = Path(temporary) / "compose.json"
         atomic(compose, {"services": build})
         compose_output(["-p", "packcall-baseline-images", "-f", str(compose), "build"], timeout=1200)
-    tags = {role: item["image"] for role, item in build.items()} | {"db": template["db"]["image"]}
+    tags = {role: item["image"] for role, item in build.items()} | {"db": template["db"]["image"]} | (shared_images or {})
     try:
         command(["docker", "image", "inspect", tags["db"]])
     except CollectionError:
         command(["docker", "pull", tags["db"]], timeout=300)
     images = {role: command(["docker", "image", "inspect", "--format", "{{.Id}}", tag]).strip()
               for role, tag in tags.items()}
-    atomic(receipt, {"schema_version": 1, "product_sha": PRODUCT_SHA, "image_ids": images})
+    atomic(receipt, {"schema_version": 1, "product_sha": product_sha, "image_ids": images})
     return images
 
 
@@ -324,12 +363,51 @@ def tool_revision():
             digest({path.relative_to(REPO).as_posix(): sha256(path) for path in sources})}
 
 
+def schema_reference(path):
+    try:
+        contents = path.read_bytes()
+        require(hashlib.sha256(contents).hexdigest() == REFERENCE_SHA256, "reference_series_checksum_mismatch")
+        report = json.loads(contents)
+        entries = [row for row in report["sessions"] if row["protocol"]["attempt"] == 2 and
+                   row["protocol"]["measurement"] == "off" and row["protocol"]["latency_probe"] is False]
+        require(len(entries) == 3 and {row["protocol"]["pair"] for row in entries} == {1, 2, 3}
+                and all(row["status"] == "valid" for row in entries), "invalid_reference_series")
+        rates, stand = [], None
+        for entry in entries:
+            directory = path.parent / entry["session_id"]
+            result, stand = assess(directory, 300_000, entry["protocol"], report["image_ids"], stand,
+                                   expected_sha=report["product_sha"])
+            require(all(result[key] == entry[key] for key in ("checksums_sha256", "deliveries_per_s",
+                    "upper_deliveries_per_s")), "reference_measurement_mismatch")
+            rates.append(result["deliveries_per_s"])
+        return {"series_sha256": REFERENCE_SHA256, "product_sha": report["product_sha"],
+                "tool_revision": report["tool_revision"], "session_ids": [entry["session_id"] for entry in entries],
+                "median_deliveries_per_s": median(rates), "image_ids": report["image_ids"],
+                "preflight": report["preflight"], "tools": report["tools"], "stand": stand}
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        if isinstance(error, CollectionError):
+            raise
+        raise CollectionError("invalid_reference_evidence") from None
+
+
+def check_schema_stand(actual, reference, count):
+    vm, expected_vm = actual["vm"], reference["vm"]
+    # Docker may report a one-page difference in usable VM RAM after a restart.
+    require(vm[:2] == expected_vm[:2] and abs(vm[2] - expected_vm[2]) <= 4096 and vm[3:] == expected_vm[3:] and
+            (actual | {"vm": expected_vm}) == (reference | {"load": reference["load"] | {"deliveries": count}}),
+            "reference_stand_mismatch")
+
+
 def experiment(args):
+    candidate = getattr(args, "schema_gate", False)
+    product_sha = SCHEMA_SHA if candidate else PRODUCT_SHA
+    reference = schema_reference(REFERENCE_SERIES) if candidate else None
     root, output = args.product_root.resolve(), args.output.resolve()
     require(not output.is_relative_to(root) and root != REPO, "invalid_baseline_paths")
     output.mkdir(parents=True, exist_ok=True)
-    resources = preflight(root, output)
-    images = prepare_images(root, output)
+    resources = preflight(root, output, product_sha)
+    shared_images = {role: reference["image_ids"][role] for role in ("db", "http")} if candidate else None
+    images = prepare_images(root, output, product_sha, shared_images)
     revision = tool_revision()
     run_root = output / str(uuid.uuid4())
     run_root.mkdir()
@@ -337,9 +415,11 @@ def experiment(args):
     count = 6000 if args.smoke else 300_000
     profile = "small-http" if args.smoke else "windows-http-300k"
     report = {"schema_version": 1, "profile": profile, "count": count, "status": "in_progress",
-              "product_sha": PRODUCT_SHA, "tool_revision": revision, "image_ids": images, "preflight": resources,
+              "product_sha": product_sha, "tool_revision": revision, "image_ids": images, "preflight": resources,
               "start_utc": utc(), "sessions": [],
               "tools": {"docker_compose": command(["docker", "compose", "version", "--short"]).strip()}}
+    if candidate:
+        report["reference"] = reference
     atomic(run_root / "series.json", report)
     print(run_root, flush=True)
     stand = None
@@ -351,7 +431,7 @@ def experiment(args):
     def arm(mode, latency, pair, attempt):
         nonlocal stand
         protocol = {"schema_version": 1, "measurement": mode, "latency_probe": latency, "pair": pair,
-                    "attempt": attempt, "tool_revision": revision, "product_sha": PRODUCT_SHA,
+                    "attempt": attempt, "tool_revision": revision, "product_sha": product_sha,
                     "latency_probe_sha256": sha256(probe) if latency else None}
         params = argparse.Namespace(output=run_root, profile=profile, workers=2, count=count, prepare_only=False)
         before = set(run_root.iterdir())
@@ -361,8 +441,13 @@ def experiment(args):
         publish("in_progress")
         try:
             session = run(params, product_root=root, enabled=mode == "on", images=images,
-                          latency_probe=probe if latency else None, protocol=protocol, baseline_beta2=True)
-            result, stand = assess(session, count, protocol, images, stand)
+                          latency_probe=probe if latency else None, protocol=protocol, baseline_beta2=not candidate)
+            if candidate:
+                result, stand = assess(session, count, protocol, images, stand, expected_sha=product_sha)
+                check_schema_stand(stand, reference["stand"], count)
+                report["stand"] = stand
+            else:
+                result, stand = assess(session, count, protocol, images, stand)
             entry.update(status="valid", **result)
             return result
         except Exception as error:
@@ -384,6 +469,14 @@ def experiment(args):
                         raise CollectionError("session_cleanup_failed") from None
             publish("in_progress")
     try:
+        if candidate:
+            results = [arm("off", False, index, 1) for index in range(1, 2 if args.smoke else 4)]
+            if args.smoke:
+                publish("smoke_pass")
+            else:
+                report["gate"] = schema_gate(results, reference["median_deliveries_per_s"])
+                publish(report["gate"]["status"])
+            return report["status"]
         if args.smoke:
             for mode in ("off", "on"):
                 arm(mode, False, 1, 1)
@@ -430,13 +523,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--product-root", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--schema-gate", action="store_true", help="Run the candidate against the pinned Story 2.1 reference")
     parser.add_argument("--smoke", action="store_true")
-    parser.add_argument("--attempts", type=int, default=2, help="Repeat an inconclusive throughput series up to this limit")
+    parser.add_argument("--attempts", type=int, help="Beta.2 only: repeat an inconclusive throughput series (default: 2)")
     arguments = parser.parse_args()
-    if arguments.attempts < 2:
+    if arguments.attempts is not None and (arguments.schema_gate or arguments.attempts < 2):
         parser.error("invalid attempt limit")
+    arguments.attempts = arguments.attempts or 2
     try:
         status = experiment(arguments)
     except CollectionError as error:
         parser.exit(1, f"Baseline failed: {error}\n")
-    parser.exit(0 if status in {"smoke_pass", "pass_pending_privacy_review"} else 2, f"{status}\n")
+    parser.exit(0 if status in {"pass", "smoke_pass", "pass_pending_privacy_review"} else 2, f"{status}\n")

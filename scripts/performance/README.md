@@ -151,6 +151,64 @@ python scripts/performance/run.py --profile small-http
 с отдельным чистым checkout тега beta.2 по [протоколу Story 2.1](../../docs/evidence/beta2/300k-baseline.md#воспроизведение).
 Он явно выбирает старые SQL для подготовки и метрики очереди, сохраняя формат
 артефактов. `--smoke` запускает малую baseline-серию.
+
+### Гейт новой схемы на 300 000 доставок
+
+Запускайте из ветки `gv`. Подготовьте отдельный чистый checkout коммита
+`b935a11d42e1971ffbe08be17dc77d95b5d3f17a` вне рабочего каталога инструмента.
+`$product` — путь к этому checkout. Скрипт требует локальную сводку Story 2.1
+`artifacts/baseline-2-1/replay-d95e46e/f66a660e-2e90-4e26-a650-c079bbbddd36/series.json`
+и исходные каталоги её сеансов; сводка проверяется по закреплённому SHA-256.
+
+```powershell
+$product = Join-Path $env:TEMP ("packcall-26-b935a11-" + [guid]::NewGuid().ToString('N'))
+git worktree add --detach $product b935a11d42e1971ffbe08be17dc77d95b5d3f17a
+if ($LASTEXITCODE -ne 0) { throw 'Не удалось подготовить checkout кандидата' }
+$output = 'artifacts/story-2-6'
+uv run --python 3.13.3 --with-requirements scripts/performance/requirements.txt python -B scripts/performance/baseline.py --schema-gate --product-root $product --output $output --smoke
+if ($LASTEXITCODE -ne 0) { throw 'Малый прогон не прошёл' }
+uv run --python 3.13.3 --with-requirements scripts/performance/requirements.txt python -B scripts/performance/baseline.py --schema-gate --product-root $product --output $output
+```
+
+Smoke выполняет один сеанс на 6 000 доставок и не выдаёт вердикт. Полная серия
+выполняет три последовательных сеанса `windows-http-300k` на отдельных пустых
+БД. Используются SQL новой схемы, два Worker, по 4 линии, batch 10 и HTTP
+email-оператор с выключенными ошибками. Измерения в режиме `off`, зонд выключен.
+В каждом сеансе проверяются итог БД, 300 000 уникальных `Sent` по журналу,
+вклад обоих Worker, отсутствие возвратов и наблюдаемых повторных захватов.
+Журнал захватов неатомарен: счётчик повторов даёт нижнюю оценку.
+
+API, Worker и Migrator собираются из проверенного checkout. PostgreSQL и HTTP
+используют образы Story 2.1 по точным ID; если их нет локально, восстановите те же
+образы и проверьте `docker image inspect --format '{{.Id}}' <image>` по исходной
+сводке. Новый каталог вывода даёт новую сборку; существующий `images.json`
+повторно используется после проверки SHA продукта и наличия указанных ID.
+В `images.json` и `series.json` записаны SHA продукта и ID образов.
+`manifest.json` и `inventory.json` подтверждают фактические ID API, Worker,
+PostgreSQL и HTTP-оператора. Одноразовый Migrator запускается по ID из `images.json`.
+Используйте квитанцию только от своей сборки из проверенного checkout. Для проверки
+на другом стенде сверяйте модель CPU, схему питания и версии инструментов с отчётом
+Story 2.1. Размер swap Docker VM не измеряется. Сырые артефакты держите локально.
+
+Пусть `t0` — отправление запроса запуска по монотонным часам, `t1` — ответ
+первого опроса, где 300 000 `Sent` и кампания `Completed`, `tp` — начало
+предыдущего неполного опроса. Интервал скорости: от `300000 / (t1 - t0)`
+до `300000 / (tp - t0)`. Формирование и итоговые сверки проходят вне окна.
+Порог равен 90% точной медианы нижних оценок трёх чистых сеансов `off`
+из второй попытки Story 2.1 (около 580,46 доставки/с).
+
+При стабильной серии `pass` означает, что медиана нижних оценок не ниже
+порога; `regression` — что медиана верхних оценок строго ниже порога.
+Пересечение порога или максимальный возможный разброс
+`100 × (max − min) / median` свыше 5% дают `inconclusive`.
+После `inconclusive`, ошибки или прерванного сеанса повторите полную серию
+после устранения причины; частичные серии не объединяются. При подтверждённой
+регрессии гейт закрыт до исправления и нового замера.
+Коды выхода для `--schema-gate`: `0` — `pass` или `smoke_pass`, `1` — ошибка
+подготовки или проверки, `2` — серия не дала `pass`.
+
+### Подготовка очереди и очистка
+
 `queue.waiting_eligible` и `queue.oldest_eligible_age_s` на новой схеме
 учитывают только `Waiting` email-доставки активной кампании с непустым снимком адреса.
 `scripts/load-test/seed_100000_recipients.sql` — legacy seed на 10 000 строк
