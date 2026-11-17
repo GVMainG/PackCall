@@ -52,6 +52,9 @@ curl -s "http://localhost:8080/api/recipients?pageNumber=1&pageSize=1"
 При обновлении существующей БД с beta.2 на beta.3 используйте
 [порядок проверки, миграции и отката](docs/adr/0002-legacy-migration-api-evolution.md)
 перед запуском новых Api и Worker.
+Миграция `DeliveryCaptureIndex` добавляет индекс `(delivery_status, id)` для захвата
+доставок. Планируйте её в том же окне обслуживания: создание индекса блокирует
+запись в `deliveries` до завершения миграции. Откат этой миграции удаляет только индекс.
 
 ## Структура и ссылки
 

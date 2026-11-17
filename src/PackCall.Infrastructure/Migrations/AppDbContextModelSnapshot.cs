@@ -230,6 +230,9 @@ namespace PackCall.Infrastructure.Migrations
 
                     b.HasIndex("CampaignId", "Channel");
 
+                    b.HasIndex("DeliveryStatus", "Id")
+                        .HasDatabaseName("ix_deliveries_status_id");
+
                     b.HasIndex("DeliveryStatus", "LockExpiresAt")
                         .HasDatabaseName("ix_deliveries_status_lock_expires_at");
 

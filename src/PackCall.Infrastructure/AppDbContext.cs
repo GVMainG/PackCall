@@ -93,6 +93,7 @@ namespace PackCall.Infrastructure
                 entity.HasOne(e => e.Contact).WithMany(r => r.Deliveries).HasForeignKey(e => e.ContactId).HasConstraintName("fk_deliveries_contacts").OnDelete(DeleteBehavior.Cascade);
                 entity.HasIndex(e => new { e.CampaignId, e.ContactId, e.Channel }).HasDatabaseName("ix_deliveries_campaign_contact_channel").IsUnique();
                 entity.HasIndex(e => e.DeliveryStatus).HasDatabaseName("ix_deliveries_status");
+                entity.HasIndex(e => new { e.DeliveryStatus, e.Id }).HasDatabaseName("ix_deliveries_status_id");
                 entity.HasIndex(e => new { e.DeliveryStatus, e.LockExpiresAt }).HasDatabaseName("ix_deliveries_status_lock_expires_at");
                 entity.HasIndex(e => e.CreatedAt).HasDatabaseName("ix_deliveries_created_at");
             });
