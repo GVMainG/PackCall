@@ -155,16 +155,17 @@ python scripts/performance/run.py --profile small-http
 ### Гейт новой схемы на 300 000 доставок
 
 Запускайте из ветки `gv`. Подготовьте отдельный чистый checkout коммита
-`b935a11d42e1971ffbe08be17dc77d95b5d3f17a` вне рабочего каталога инструмента.
+`c1854caeda1905b43127e6846e84e3c988e55724` с миграцией `DeliveryCaptureIndex`
+вне рабочего каталога инструмента.
 `$product` — путь к этому checkout. Скрипт требует локальную сводку Story 2.1
 `artifacts/baseline-2-1/replay-d95e46e/f66a660e-2e90-4e26-a650-c079bbbddd36/series.json`
 и исходные каталоги её сеансов; сводка проверяется по закреплённому SHA-256.
 
 ```powershell
-$product = Join-Path $env:TEMP ("packcall-26-b935a11-" + [guid]::NewGuid().ToString('N'))
-git worktree add --detach $product b935a11d42e1971ffbe08be17dc77d95b5d3f17a
+$product = Join-Path $env:TEMP ("packcall-26-c1854ca-" + [guid]::NewGuid().ToString('N'))
+git worktree add --detach $product c1854caeda1905b43127e6846e84e3c988e55724
 if ($LASTEXITCODE -ne 0) { throw 'Не удалось подготовить checkout кандидата' }
-$output = 'artifacts/story-2-6'
+$output = 'artifacts/story-2-6/capture-index-migration'
 uv run --python 3.13.3 --with-requirements scripts/performance/requirements.txt python -B scripts/performance/baseline.py --schema-gate --product-root $product --output $output --smoke
 if ($LASTEXITCODE -ne 0) { throw 'Малый прогон не прошёл' }
 uv run --python 3.13.3 --with-requirements scripts/performance/requirements.txt python -B scripts/performance/baseline.py --schema-gate --product-root $product --output $output
