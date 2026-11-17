@@ -8,5 +8,6 @@ commit SHA, версию окружения и команду воспроизв
 
 Для `beta.3` опубликованы [проверка кандидата миграции](beta3/migration-candidate.md),
 [репетиция применения и отката на миллионе доставок](beta3/migration-rehearsal.md),
-[замер новой схемы на 300 000 доставок](beta3/300k-schema-gate.md) и
-[эксперимент с индексом захвата](beta3/capture-index-experiment.md).
+[замер новой схемы на 300 000 доставок](beta3/300k-schema-gate.md),
+[эксперимент с индексом захвата](beta3/capture-index-experiment.md) и
+[проверка миграции индекса](beta3/capture-index-migration.md).
