@@ -22,6 +22,7 @@ from session import REPO, atomic, cleanup_owned, compose_profile, digest
 TAG = "v0.5.0-beta.2"
 PRODUCT_SHA = "50a3ac33a6ba3cafa805bdda5b1646a5d45ffbd2"
 SCHEMA_SHA = "c1854caeda1905b43127e6846e84e3c988e55724"
+PRE_INDEX_SCHEMA_SHA = "b935a11d42e1971ffbe08be17dc77d95b5d3f17a"
 REFERENCE_SERIES = REPO / "artifacts/baseline-2-1/replay-d95e46e/f66a660e-2e90-4e26-a650-c079bbbddd36/series.json"
 REFERENCE_SHA256 = "0bb5336d1370bcd696415e96b200bb62f84f524ced27965f22ab0dd43dd6b4ee"
 THROUGHPUT_ORDER = (("off", "on"), ("on", "off"), ("off", "on"))
@@ -236,7 +237,7 @@ def assess(root, count, protocol, images, comparison=None, *, expected_sha=PRODU
     repeat = versioned(root, "repeat-captures.json", "observed_repeat_captures", "journal_non_atomic", "quality")
     require(journal["capture_entries"] == journal["terminal_entries"] == count and
             journal["release_entries"] == repeat["observed_repeat_captures"] == 0, "invalid_journal_counts")
-    if expected_sha != PRODUCT_SHA:
+    if expected_sha in {SCHEMA_SHA, PRE_INDEX_SCHEMA_SHA}:
         require(load(root, "audience.json") == dict(contacts=count, channels=count, distinct_addresses=count,
                 campaign_contacts=count, campaign_channels=1, matching_deliveries=count), "invalid_candidate_audience")
     readiness = versioned(root, "readiness.json", "workers")["workers"]
