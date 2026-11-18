@@ -25,7 +25,7 @@ public interface ICampaignService
     Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct);
 
     /// <summary>Создаёт черновик и доставки по снимку выборки. Null в contactIds означает все контакты.</summary>
-    Task<Guid> CreateCampaignAsync(string name, string messageText,
+    Task<Campaign> CreateCampaignAsync(string name, string messageText,
         IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct);
 
     /// <summary>Сохраняет кампанию в Forming вместе со снимком аудитории. Null в contactIds означает все контакты.</summary>

@@ -12,8 +12,18 @@ import session
 from baseline import (EXTERNAL_CORE_METRICS, assess, latency_in_budget, pooled_p95, terminal_counts,
                       throughput, throughput_gate, validate_external, verify_checksums)
 from collectors import CollectionError
-from run import compose_output, verify_privacy
+from run import campaign_request, compose_output, verify_privacy
 from session import atomic, compose_profile, finalize_artifacts
+
+
+@pytest.mark.parametrize(("baseline_beta2", "selection"), [
+    (True, {}),
+    (False, {"selection": "all", "channels": ["email"]}),
+])
+def test_campaign_request_matches_target_api(baseline_beta2, selection):
+    assert campaign_request(baseline_beta2) == {
+        "name": "performance-synthetic", "messageText": "x" * 64, **selection,
+    }
 
 
 def test_throughput_uses_response_and_conservative_previous_request():

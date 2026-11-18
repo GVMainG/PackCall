@@ -36,7 +36,7 @@ public sealed class CampaignService : ICampaignService
         return campaign.Id;
     }
 
-    public async Task<Guid> CreateCampaignAsync(string name, string messageText,
+    public async Task<Campaign> CreateCampaignAsync(string name, string messageText,
         IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct)
     {
         var (contacts, channelSnapshot) = ValidateSelection(contactIds, channels, ct);
@@ -49,8 +49,8 @@ public sealed class CampaignService : ICampaignService
             return true;
         }, ct);
         if (!formed)
-            throw MissingContacts();
-        return campaign.Id;
+            throw new CampaignContactsNotFoundException();
+        return campaign;
     }
 
     private static (Guid[]? Contacts, List<string> Channels) ValidateSelection(

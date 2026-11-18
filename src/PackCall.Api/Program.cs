@@ -1,5 +1,11 @@
 using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.OpenApi;
+using PackCall.Api.Controllers;
 using PackCall.Api.Middleware;
+using PackCall.Api.Models;
+using PackCall.Core.Entities;
 using PackCall.Core.Services;
 using PackCall.Infrastructure;
 using PackCall.Infrastructure.Hosting;
@@ -14,7 +20,35 @@ try
 
     builder.Services.AddControllers().AddJsonOptions(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-    builder.Services.AddOpenApi();
+    builder.Services.AddOpenApi(options =>
+    {
+        options.AddSchemaTransformer((schema, context, _) =>
+        {
+            if (context.JsonTypeInfo.Type == typeof(CreateCampaignRequest) &&
+                schema.Properties?["channels"] is OpenApiSchema { Items: OpenApiSchema channel })
+            {
+                channel.Enum = ContactChannel.SupportedChannels.Select(value => (JsonNode)JsonValue.Create(value)!).ToList();
+            }
+            return Task.CompletedTask;
+        });
+        options.AddOperationTransformer((operation, context, _) =>
+        {
+            if (context.Description.ActionDescriptor is ControllerActionDescriptor action &&
+                action.ControllerTypeInfo.AsType() == typeof(CampaignsController) &&
+                action.MethodInfo.Name == nameof(CampaignsController.CreateCampaign) &&
+                operation.Responses?["201"] is OpenApiResponse created)
+            {
+                created.Headers ??= new Dictionary<string, IOpenApiHeader>();
+                created.Headers["Location"] = new OpenApiHeader
+                {
+                    Required = true,
+                    Description = "URL деталей созданной кампании.",
+                    Schema = new OpenApiSchema { Type = JsonSchemaType.String, Format = "uri" }
+                };
+            }
+            return Task.CompletedTask;
+        });
+    });
     builder.Services.AddProblemDetails();
     builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 

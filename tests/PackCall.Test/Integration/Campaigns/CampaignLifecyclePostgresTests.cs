@@ -17,7 +17,7 @@ namespace PackCall.Core.Test;
 public sealed class CampaignLifecyclePostgresTests : PostgresTestBase
 {
     [PostgresFact]
-    public async Task FormingIsVisibleBeforePublication_AndFinalCountsUseTheSavedRows()
+    public async Task PublicCreationExposesForming_AndPublishesUniqueSelectedPairs()
     {
         using var deadline = new CancellationTokenSource(Timeout);
         var ct = deadline.Token;
@@ -31,13 +31,20 @@ public sealed class CampaignLifecyclePostgresTests : PostgresTestBase
         var both = await contacts.CreateAsync(Contact.Create(
             [(ContactChannel.Email, "both@example.com"), (ContactChannel.Telegram, "42")], DateTime.UtcNow), ct);
         var email = await campaigns.CreateRecipientAsync("email@example.com", ct);
+        await campaigns.CreateRecipientAsync("excluded@example.com", ct);
 
         await using var blocker = new NpgsqlConnection(_connectionString);
         await blocker.OpenAsync(ct);
         await using var transaction = await blocker.BeginTransactionAsync(ct);
         await LockDeliveries(blocker, transaction, ct);
-        var creation = campaigns.CreateCampaignAsync("Selected", "Text", [both.Id, email.Id],
-            [ContactChannel.Telegram, ContactChannel.Email], ct);
+        var creation = client.PostAsJsonAsync("/api/campaigns", new
+        {
+            name = "Selected",
+            messageText = "Text",
+            selection = "contactIds",
+            contactIds = new[] { both.Id, email.Id, both.Id },
+            channels = new[] { "telegram", "email", "telegram" }
+        }, ct);
         Guid id;
         try
         {
@@ -54,10 +61,25 @@ public sealed class CampaignLifecyclePostgresTests : PostgresTestBase
             await transaction.RollbackAsync();
         }
 
-        Assert.Equal(id, await creation);
+        using var created = await creation;
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        Assert.Equal($"/api/campaigns/{id}", created.Headers.Location?.AbsolutePath);
+        var body = await created.Content.ReadFromJsonAsync<JsonElement>(ct);
+        Assert.Equal(id, body.GetProperty("id").GetGuid());
+        Assert.Equal("Draft", body.GetProperty("status").GetString());
         var draft = await ReadDetails(client, id, ct);
         Assert.Equal("Draft", draft.GetProperty("campaign").GetProperty("status").GetString());
         AssertFormation(draft, 2, ["email", "telegram"], 3, 1);
+        var snapshot = await db.CampaignContacts.Where(row => row.CampaignId == id)
+            .Select(row => row.ContactId).ToListAsync(ct);
+        Assert.Equal(new[] { both.Id, email.Id }.Order(), snapshot.Order());
+        var selectedDeliveries = await db.Deliveries.Where(row => row.CampaignId == id).ToListAsync(ct);
+        Assert.Equal(new (Guid ContactId, string Channel, string? Address)[]
+        {
+            (both.Id, "email", "both@example.com"),
+            (both.Id, "telegram", "42"),
+            (email.Id, "email", "email@example.com")
+        }.Order(), selectedDeliveries.Select(row => (row.ContactId, row.Channel, row.AddressSnapshot)).Order());
 
         await contacts.ReplaceAddressesAsync(both.Id, [(ContactChannel.Email, "changed@example.com")], ct);
         var deliveryId = await db.Deliveries.Where(d => d.CampaignId == id && d.Channel == "telegram")
@@ -68,11 +90,11 @@ public sealed class CampaignLifecyclePostgresTests : PostgresTestBase
         Assert.Equal(1, updated.GetProperty("deliveries").GetProperty("sent").GetInt32());
         AssertFormation(updated, 2, ["email", "telegram"], 3, 1);
 
-        var emailId = await campaigns.CreateCampaignAsync("Email", "Text", [email.Id], ["email"], ct);
+        var emailId = (await campaigns.CreateCampaignAsync("Email", "Text", [email.Id], ["email"], ct)).Id;
         using var started = await client.PostAsync($"/api/campaigns/{emailId}/start", null, ct);
         Assert.Equal(HttpStatusCode.OK, started.StatusCode);
 
-        var zeroId = await campaigns.CreateCampaignAsync("Zero", "Text", [email.Id], ["telegram"], ct);
+        var zeroId = (await campaigns.CreateCampaignAsync("Zero", "Text", [email.Id], ["telegram"], ct)).Id;
         var zero = await ReadDetails(client, zeroId, ct);
         Assert.Equal("Draft", zero.GetProperty("campaign").GetProperty("status").GetString());
         AssertFormation(zero, 1, ["telegram"], 0, 1);
@@ -87,7 +109,7 @@ public sealed class CampaignLifecyclePostgresTests : PostgresTestBase
         await repository.DeleteIfFormingAsync(publicEmailId, ct);
         await writer.ServiceProvider.GetRequiredService<AppDbContext>().SaveChangesAsync(ct);
         Assert.Equal(CampaignStatus.InProgress, (await campaigns.GetCampaignAsync(publicEmailId, ct))!.Status);
-        AssertFormation(await ReadDetails(client, publicEmailId, ct), 2, ["email"], 2, 0);
+        AssertFormation(await ReadDetails(client, publicEmailId, ct), 3, ["email"], 3, 0);
     }
 
     [PostgresFact]
@@ -158,7 +180,8 @@ public sealed class CampaignLifecyclePostgresTests : PostgresTestBase
 
         await using var app = await StartApiAsync();
         using var client = CreateClient(app);
-        using var response = await client.PostAsJsonAsync("/api/campaigns", new { name = "Email", messageText = "Text" });
+        using var response = await client.PostAsJsonAsync("/api/campaigns",
+            new { name = "Email", messageText = "Text", selection = "all", channels = new[] { "email" } });
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         var problem = await response.Content.ReadFromJsonAsync<JsonElement>();

@@ -24,14 +24,27 @@ GET {{baseUrl}}/api/channels
 ### Кампания со статистикой
 GET {{baseUrl}}/api/campaigns/{{campaignId}}
 
-### Создать кампанию
+### Создать email-кампанию для всех контактов
 POST {{baseUrl}}/api/campaigns
 Content-Type: application/json
 
 {
   "name": "Первая рассылка",
   "messageText": "Добрый день!",
+  "selection": "all",
   "channels": ["email"]
+}
+
+### Создать кампанию для выбранного контакта в двух каналах
+POST {{baseUrl}}/api/campaigns
+Content-Type: application/json
+
+{
+  "name": "Выборочная рассылка",
+  "messageText": "Добрый день!",
+  "selection": "contactIds",
+  "contactIds": ["{{createRecipient.response.body.$.id}}"],
+  "channels": ["email", "telegram"]
 }
 
 ### Неизвестный канал (400)
@@ -41,6 +54,7 @@ Content-Type: application/json
 {
   "name": "Первая рассылка",
   "messageText": "Добрый день!",
+  "selection": "all",
   "channels": ["sms"]
 }
 

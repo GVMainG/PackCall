@@ -187,7 +187,9 @@ def check_active_lease(snapshot, worker):
 def run_case(stand, scenario, mode, outcome):
     folder = stand.output / "control" / scenario
     folder.mkdir()
-    campaign_id = UUID(stand.api("campaigns", {"name": f"SM-6 A {scenario}", "messageText": scenario})["id"])
+    campaign_id = UUID(stand.api("campaigns", {
+        "name": f"SM-6 A {scenario}", "messageText": scenario, "selection": "all", "channels": ["email"],
+    })["id"])
     stand.api(f"campaigns/{campaign_id}/start", {})
     worker = stand.start_probe(scenario, "-d", "-e", f"TEST_SENDER_MODE={mode}")
 

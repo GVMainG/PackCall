@@ -45,6 +45,7 @@ def run_cases(stand, report):
     report["current_case"] = "B"
     campaign_id = UUID(stand.api("campaigns", {
         "name": "SM-6 B and C", "messageText": "Worker loss and stale lease",
+        "selection": "all", "channels": ["email"],
     })["id"])
     stand.api(f"campaigns/{campaign_id}/start", {})
     report["campaign_id"] = str(campaign_id)

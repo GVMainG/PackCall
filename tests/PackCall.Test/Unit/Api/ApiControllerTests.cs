@@ -12,11 +12,13 @@ public class ApiControllerTests
 {
     private readonly FakeDeliveryRepository _deliveries = new();
     private readonly FakeContactRepository _recipients = new();
+    private readonly FakeCampaignRepository _campaigns;
     private readonly ICampaignService _service;
 
     public ApiControllerTests()
     {
-        _service = new CampaignService(new FakeCampaignRepository(_deliveries), _deliveries, _recipients,
+        _campaigns = new FakeCampaignRepository(_deliveries);
+        _service = new CampaignService(_campaigns, _deliveries, _recipients,
             new EmailOperatorAvailability());
     }
 
@@ -43,13 +45,32 @@ public class ApiControllerTests
     [Fact]
     public async Task CampaignEndpoints_CreateReadAndPatchPreserveOtherField()
     {
-        _recipients.Items.Add(Contact.Create([(ContactChannel.Email, "user@example.com")], DateTime.UtcNow));
         var controller = new CampaignsController(_service);
+        var contact = Contact.Create([(ContactChannel.Email, "user@example.com")], DateTime.UtcNow);
+        _campaigns.OnCreateSnapshot = (campaign, contactIds, channels) =>
+        {
+            Assert.NotNull(contactIds);
+            Assert.Equal(contact.Id, Assert.Single(contactIds));
+            Assert.Equal(ContactChannel.Email, Assert.Single(channels));
+            Assert.Equal(CampaignStatus.Forming, campaign.Status);
+        };
+        _deliveries.OnFormSnapshotDeliveries = id =>
+        {
+            _deliveries.Add(Delivery.Create(id, contact.Id, "user@example.com", DateTime.UtcNow));
+            return 1;
+        };
 
+        _campaigns.OnGet = () => throw new InvalidOperationException("POST не должен повторно читать кампанию.");
         var created = await controller.CreateCampaign(
-            new CreateCampaignRequest { Name = "Название", MessageText = "Текст" }, CancellationToken.None);
+            new CreateCampaignRequest
+            {
+                Name = "Название", MessageText = "Текст", Selection = "contactIds",
+                ContactIds = [contact.Id], Channels = [ContactChannel.Email]
+            }, CancellationToken.None);
+        _campaigns.OnGet = null;
         var result = Assert.IsType<CreatedAtActionResult>(created.Result);
         var campaign = Assert.IsType<CampaignResponse>(result.Value);
+        Assert.Equal(CampaignStatus.Draft, campaign.Status);
         Assert.Equal(nameof(CampaignsController.GetCampaign), result.ActionName);
         Assert.Equal(campaign.Id, result.RouteValues!["id"]);
 

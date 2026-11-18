@@ -94,7 +94,8 @@ try:
             wait(lambda:api('campaigns') is not None)
             # Real API creates the entire delivery snapshot; no direct fixture SQL for happy path.
             for i in range(3):api('recipients',{'email':f'b11-{i}@example.test'})
-            campaign=api('campaigns',{'name':'B11 smoke','messageText':'synthetic-marker'})
+            campaign=api('campaigns',{'name':'B11 smoke','messageText':'synthetic-marker',
+                                      'selection':'all','channels':['email']})
             api('campaigns/'+campaign['id']+'/start',{})
             wait(lambda:sql('select count(*) from deliveries where delivery_status=2')=='3')
             wait(lambda:sql('select count(*) from delivery_status_journal where new_status=2')=='3')
@@ -141,7 +142,8 @@ try:
                 changed=project+'-changed-worker'
                 try:
                     cmd(compose+['run','-d','--no-deps','--name',changed,'-e','TEST_OPERATOR_URL=http://alternate:8000','packcall.worker'],env)
-                    campaign=api('campaigns',{'name':'Changed URL','messageText':'synthetic-marker'})
+                    campaign=api('campaigns',{'name':'Changed URL','messageText':'synthetic-marker',
+                                              'selection':'all','channels':['email']})
                     api('campaigns/'+campaign['id']+'/start',{})
                     wait(lambda:sql('select count(*) from deliveries where delivery_status=2')=='6')
                     wait(lambda:sql('select count(*) from delivery_status_journal where new_status=2')=='6')

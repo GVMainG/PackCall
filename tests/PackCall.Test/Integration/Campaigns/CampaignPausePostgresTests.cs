@@ -253,7 +253,8 @@ public class CampaignPausePostgresTests : PostgresTestBase
         {
             using var missing = await client.PostAsync($"/api/campaigns/{Guid.NewGuid()}/{action}", null);
             Assert.Equal(HttpStatusCode.NotFound, missing.StatusCode);
-            using var draft = await client.PostAsJsonAsync("/api/campaigns", new { name = "Черновик", messageText = "Текст" });
+            using var draft = await client.PostAsJsonAsync("/api/campaigns",
+                new { name = "Черновик", messageText = "Текст", selection = "all", channels = new[] { "email" } });
             draft.EnsureSuccessStatusCode();
             var draftId = (await draft.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>()).GetProperty("id").GetGuid();
             using var invalid = await client.PostAsync($"/api/campaigns/{draftId}/{action}", null);

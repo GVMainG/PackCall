@@ -22,7 +22,8 @@ def ready():
  except Exception: return None
 wait(ready)
 sql('TRUNCATE deliveries,campaigns,delivery_status_journal CASCADE')
-c=http('campaigns',{'name':'W21 independent lifecycle','messageText':'test'}); cid=c['id']
+c=http('campaigns',{'name':'W21 independent lifecycle','messageText':'test',
+                    'selection':'all','channels':['email']}); cid=c['id']
 http(f'campaigns/{cid}/start',{}); http(f'campaigns/{cid}/pause',{}); http(f'campaigns/{cid}/resume',{})
 time.sleep(.5)
 r={'apiOnly':http(f'campaigns/{cid}'),'initialSql':sql('select delivery_status,count(*) from deliveries group by delivery_status')}

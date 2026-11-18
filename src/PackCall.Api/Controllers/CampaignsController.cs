@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PackCall.Api.Models;
-using PackCall.Core.Entities;
+using PackCall.Core.Exceptions;
 using PackCall.Core.Services;
 
 namespace PackCall.Api.Controllers;
@@ -36,31 +36,33 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
                 details.Deliveries.Total, details.SkippedDeliveryCount)));
     }
 
-    /// <summary>Создаёт черновик кампании и доставки для статичной аудитории.</summary>
+    /// <summary>Создаёт кампанию и доставки для выбранных контактов и каналов.</summary>
     [HttpPost]
-    [ProducesResponseType(typeof(CampaignResponse), StatusCodes.Status201Created)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest,
-        "text/plain", "application/json", "text/json", "application/problem+json")]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError, "application/problem+json")]
+    [EndpointDescription(
+        "Поля name, messageText, selection и channels обязательны. Имя и текст должны содержать непробельные символы. " +
+        "В режиме all поле contactIds отсутствует или равно null. В режиме contactIds требуется непустой массив существующих UUID. " +
+        "Допустимые каналы: email и telegram. С каналом telegram текст ограничен 4096 кодовыми точками Unicode включительно. " +
+        "Повторяющиеся UUID и каналы учитываются один раз. Снимок включает контакты без адреса выбранного канала.")]
+    [ProducesResponseType<CampaignResponse>(StatusCodes.Status201Created,
+        Description = "Кампания в Draft после завершения формирования, включая случай без доставок.")]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json",
+        Description = "Ошибка формата, валидации или отсутствующий контакт. Причина указана в errors.")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError, "application/problem+json",
+        Description = "Ошибка при формировании кампании.")]
     public async Task<ActionResult<CampaignResponse>> CreateCampaign(
         CreateCampaignRequest request, CancellationToken ct)
     {
-        if (request.Channels is { } channels)
+        try
         {
-            if (channels.Count == 0)
-                return Problem("Укажите хотя бы один канал.", statusCode: StatusCodes.Status400BadRequest);
-            if (channels.Any(channel => channel is null || !ContactChannel.SupportedChannels.Contains(channel)))
-                return Problem("Укажите известные каналы в нижнем регистре: email, telegram.",
-                    statusCode: StatusCodes.Status400BadRequest);
-            if (channels.Contains(ContactChannel.Telegram))
-                return Problem("Создание кампаний для telegram появится после перехода на снимки.",
-                    statusCode: StatusCodes.Status400BadRequest);
+            var campaign = await campaigns.CreateCampaignAsync(request.Name, request.MessageText,
+                request.ContactIds, request.Channels, ct);
+            return CreatedAtAction(nameof(GetCampaign), new { id = campaign.Id }, campaign.ToResponse());
         }
-
-        var id = await campaigns.CreateCampaignAsync(request.Name ?? "", request.MessageText ?? "", ct);
-        var campaign = await campaigns.GetCampaignAsync(id, ct)
-            ?? throw new InvalidOperationException("Созданная кампания не найдена.");
-        return CreatedAtAction(nameof(GetCampaign), new { id }, campaign.ToResponse());
+        catch (CampaignContactsNotFoundException)
+        {
+            ModelState.AddModelError("contactIds", CampaignContactsNotFoundException.Reason);
+            return ValidationProblem(ModelState);
+        }
     }
 
     /// <summary>Изменяет поля черновика кампании.</summary>

@@ -38,6 +38,13 @@ WORKER_STARTED = re.compile(
 CANARY_EMAIL = re.compile(rb"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
 
 
+def campaign_request(baseline_beta2):
+    payload = {"name": "performance-synthetic", "messageText": "x" * 64}
+    if not baseline_beta2:
+        payload.update(selection="all", channels=["email"])
+    return payload
+
+
 def verify_privacy(output, secret=None):
     for path in output.rglob("*"):
         if not path.is_file() or path.name == ".byte-budget":
@@ -189,7 +196,7 @@ def run(args, fault=None, *, product_root=REPO, enabled=True, images=None, laten
             seed = "seed_beta2.sql" if baseline_beta2 else "seed.sql"
             sql((ROOT/"sql"/seed).read_text(),count=args.count)
             formation_timeout = 900 if not baseline_beta2 and args.profile == "windows-http-300k" else 180
-            campaign=api("campaigns",{"name":"performance-synthetic","messageText":"x"*64},timeout=formation_timeout)
+            campaign = api("campaigns", campaign_request(baseline_beta2), timeout=formation_timeout)
             manifest["campaign_id"]=campaign["id"]
             initial=snapshot()
             if initial != dict(campaign_status=0,campaigns=1,total=args.count,waiting=args.count,in_progress=0,sent=0,failed=0): raise CollectionError("preparation_mismatch")

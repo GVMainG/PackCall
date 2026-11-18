@@ -22,6 +22,7 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
     public Action? OnGet { get; set; }
     public Action? AfterCreate { get; set; }
     public Action? OnTryUpdateStatus { get; set; }
+    public Action<Campaign, Guid[]?, IReadOnlyList<string>>? OnCreateSnapshot { get; set; }
 
     public Task<Campaign?> Get(Guid id, CancellationToken ct)
     {
@@ -66,8 +67,13 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         return Task.FromResult(campaign);
     }
 
-    public Task<bool> CreateWithSnapshotAsync(Campaign campaign, Guid[]? contactIds,
-        IReadOnlyList<string> channels, CancellationToken ct) => throw new NotSupportedException();
+    public async Task<bool> CreateWithSnapshotAsync(Campaign campaign, Guid[]? contactIds,
+        IReadOnlyList<string> channels, CancellationToken ct)
+    {
+        (OnCreateSnapshot ?? throw new NotSupportedException())(campaign, contactIds, channels);
+        await Create(campaign, ct);
+        return true;
+    }
 
     public Task<bool> TryPublishDraftAsync(Campaign campaign, CancellationToken ct) =>
         TryUpdateStatusAsync(campaign, CampaignStatus.Forming, ct);
@@ -181,9 +187,10 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
     public IReadOnlyList<Delivery> Items => _store;
 
     public Func<IReadOnlyList<Delivery>, Task>? BeforeAddBatchAsync { get; set; }
+    public Func<Guid, int>? OnFormSnapshotDeliveries { get; set; }
 
     public Task<int> FormDeliveriesFromSnapshotAsync(Guid campaignId, CancellationToken ct) =>
-        throw new NotSupportedException();
+        Task.FromResult((OnFormSnapshotDeliveries ?? throw new NotSupportedException())(campaignId));
 
     public async Task AddLegacyEmailBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct)
     {
