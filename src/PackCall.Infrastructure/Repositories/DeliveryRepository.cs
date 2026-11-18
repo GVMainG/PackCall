@@ -23,9 +23,9 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         foreach (var campaign in deliveries.GroupBy(d => d.CampaignId))
         {
             if (!await context.CampaignChannels.AnyAsync(c => c.CampaignId == campaign.Key && c.Channel == "email", ct))
-                context.CampaignChannels.Add(new CampaignChannel { CampaignId = campaign.Key, Channel = "email" });
+                context.CampaignChannels.Add(new CampaignChannel(campaign.Key, "email"));
             context.CampaignContacts.AddRange(campaign.Select(d => d.ContactId).Distinct()
-                .Select(id => new CampaignContact { CampaignId = campaign.Key, ContactId = id }));
+                .Select(id => new CampaignContact(campaign.Key, id)));
         }
         await context.Deliveries.AddRangeAsync(rows, ct);
         await context.SaveChangesAsync(ct);

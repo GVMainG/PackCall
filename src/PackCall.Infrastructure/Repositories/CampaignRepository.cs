@@ -5,7 +5,7 @@ using PackCall.Core.Repositorys;
 
 namespace PackCall.Infrastructure.Repositories;
 
-public sealed class CampaignRepository(AppDbContext dbContext) : ICampaingRepository
+public sealed class CampaignRepository(AppDbContext dbContext, IDbContextFactory<AppDbContext> factory) : ICampaingRepository
 {
     public Task<Campaign?> Get(Guid id, CancellationToken ct) =>
         dbContext.Campaigns
@@ -36,6 +36,35 @@ public sealed class CampaignRepository(AppDbContext dbContext) : ICampaingReposi
         await dbContext.Campaigns.AddAsync(campaign, ct);
         await dbContext.SaveChangesAsync(ct);
         return campaign;
+    }
+
+    public async Task CreateWithSnapshotAsync(Campaign campaign, Guid[]? contactIds,
+        IReadOnlyList<CampaignChannel> channels, CancellationToken ct)
+    {
+        await using var db = await factory.CreateDbContextAsync(ct);
+        await using var transaction = await db.Database.BeginTransactionAsync(ct);
+        db.Campaigns.Add(campaign);
+        db.CampaignChannels.AddRange(channels);
+        await db.SaveChangesAsync(ct);
+
+        if (contactIds is null)
+        {
+            await db.Database.ExecuteSqlInterpolatedAsync($"""
+                INSERT INTO campaign_contacts (campaign_id, contact_id)
+                SELECT {campaign.Id}, id FROM contacts
+                """, ct);
+        }
+        else
+        {
+            var inserted = await db.Database.ExecuteSqlInterpolatedAsync($"""
+                INSERT INTO campaign_contacts (campaign_id, contact_id)
+                SELECT {campaign.Id}, id FROM contacts WHERE id = ANY({contactIds})
+                """, ct);
+            if (inserted != contactIds.Length)
+                throw new ArgumentException("Один или несколько выбранных контактов не найдены.", nameof(contactIds));
+        }
+
+        await transaction.CommitAsync(ct);
     }
 
     public async Task<Campaign> Update(Campaign campaign, CancellationToken ct)

@@ -51,6 +51,9 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         return Task.FromResult(campaign);
     }
 
+    public Task CreateWithSnapshotAsync(Campaign campaign, Guid[]? contactIds,
+        IReadOnlyList<CampaignChannel> channels, CancellationToken ct) => throw new NotSupportedException();
+
     public Task<Campaign> Update(Campaign campaign, CancellationToken ct)
     {
         if (!_store.ContainsKey(campaign.Id))

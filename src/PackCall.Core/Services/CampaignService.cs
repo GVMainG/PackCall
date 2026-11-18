@@ -26,6 +26,33 @@ public sealed class CampaignService : ICampaignService
         _operators = operators;
     }
 
+    public async Task<Guid> CreateCampaignSnapshotAsync(string name, string messageText,
+        IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        ArgumentNullException.ThrowIfNull(channels);
+        var selectedContacts = contactIds?.Distinct().ToArray();
+        if (selectedContacts is { Length: 0 })
+            throw new ArgumentException("Укажите хотя бы один контакт.", nameof(contactIds));
+
+        var selectedChannels = channels.Distinct(StringComparer.Ordinal).ToArray();
+        if (selectedChannels.Length == 0)
+            throw new ArgumentException("Укажите хотя бы один канал.", nameof(channels));
+
+        var campaign = Campaign.Create(name, messageText);
+        var channelSnapshot = new List<CampaignChannel>(selectedChannels.Length);
+        foreach (var channel in selectedChannels)
+        {
+            if (channel is null || !ContactChannel.SupportedChannels.Contains(channel, StringComparer.Ordinal))
+                throw new ArgumentException($"Неизвестный канал: '{channel}'.", nameof(channels));
+            channelSnapshot.Add(new CampaignChannel(campaign.Id, channel));
+        }
+
+        campaign.StatusFromDraftToForming();
+        await _campaignRepository.CreateWithSnapshotAsync(campaign, selectedContacts, channelSnapshot, ct);
+        return campaign.Id;
+    }
+
     public async Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();

@@ -24,6 +24,11 @@ public interface ICampaignService
     /// <exception cref="ArgumentException">У получателя отсутствует идентификатор или заполненный email.</exception>
     Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct);
 
+    /// <summary>Сохраняет кампанию в Forming вместе со снимком аудитории. Null в contactIds означает все контакты.</summary>
+    /// <exception cref="ArgumentException">Выборка или каналы некорректны либо контакт не найден.</exception>
+    Task<Guid> CreateCampaignSnapshotAsync(string name, string messageText,
+        IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct);
+
     /// <summary>Изменяет название и сообщение черновика и возвращает сохранённую кампанию.</summary>
     /// <exception cref="KeyNotFoundException">Кампания не найдена.</exception>
     /// <exception cref="InvalidOperationException">Кампания формируется, запущена, приостановлена или завершена.</exception>

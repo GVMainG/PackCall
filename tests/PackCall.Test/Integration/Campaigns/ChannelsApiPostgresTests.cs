@@ -97,7 +97,7 @@ public sealed class ChannelsApiPostgresTests : PostgresTestBase
 
         await campaigns.CreateRecipientAsync("test@example.com", default);
         var campaignId = await campaigns.CreateCampaignAsync("Multiple channels", "text", default);
-        db.CampaignChannels.Add(new CampaignChannel { CampaignId = campaignId, Channel = "telegram" });
+        db.CampaignChannels.Add(new CampaignChannel(campaignId, "telegram"));
         await db.SaveChangesAsync();
 
         using var rejected = await client.PostAsync($"/api/campaigns/{campaignId}/start", null);
