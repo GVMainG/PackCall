@@ -62,14 +62,17 @@ public sealed class CampaignFormationPostgresTests : PostgresTestBase
     }
 
     [PostgresFact]
-    public async Task StoresAddressFromFormationAndExcludesUnselectedChannel()
+    public async Task FormsFromFrozenAllSelectionAndReadsCurrentAddresses()
     {
         await using var scope = _provider!.CreateAsyncScope();
         var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
         var contacts = scope.ServiceProvider.GetRequiredService<IContactRepository>();
         var contact = await contacts.CreateAsync(Contact.Create(
             [(ContactChannel.Email, "before@example.com"), (ContactChannel.Telegram, "42")], DateTime.UtcNow), default);
-        var id = await campaigns.CreateCampaignSnapshotAsync("Email", "Text", [contact.Id], [ContactChannel.Email], default);
+        var id = await campaigns.CreateCampaignSnapshotAsync("Email", "Text", null, [ContactChannel.Email], default);
+        var added = await contacts.CreateAsync(Contact.Create(
+            [(ContactChannel.Email, "added@example.com"), (ContactChannel.Telegram, "43")], DateTime.UtcNow), default);
+        var otherCampaign = await campaigns.CreateCampaignSnapshotAsync("Other", "Text", [added.Id], [ContactChannel.Telegram], default);
         await contacts.ReplaceAddressesAsync(contact.Id,
             [(ContactChannel.Email, " AtFormation@Example.com "), (ContactChannel.Telegram, "42")], default);
 
@@ -81,6 +84,7 @@ public sealed class CampaignFormationPostgresTests : PostgresTestBase
         Assert.Equal(contact.Id, delivery.ContactId);
         Assert.Equal(ContactChannel.Email, delivery.Channel);
         Assert.Equal("atformation@example.com", delivery.AddressSnapshot);
+        Assert.Empty(await ReadDeliveries(db, otherCampaign));
 
         await contacts.ReplaceAddressesAsync(contact.Id, [(ContactChannel.Telegram, "42")], default);
         var stored = Assert.Single(await ReadDeliveries(db, id));
@@ -90,12 +94,15 @@ public sealed class CampaignFormationPostgresTests : PostgresTestBase
     }
 
     [PostgresFact]
-    public async Task FormationReturnsZeroWhenNoSelectedContactHasAnAddressInSelectedChannel()
+    public async Task FormationReturnsZeroWhenSelectedAddressWasRemovedBeforeFormation()
     {
         await using var scope = _provider!.CreateAsyncScope();
         var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
-        var contact = await campaigns.CreateRecipientAsync("email@example.com", default);
+        var contacts = scope.ServiceProvider.GetRequiredService<IContactRepository>();
+        var contact = await contacts.CreateAsync(Contact.Create(
+            [(ContactChannel.Email, "email@example.com"), (ContactChannel.Telegram, "42")], DateTime.UtcNow), default);
         var id = await campaigns.CreateCampaignSnapshotAsync("Telegram", "Text", [contact.Id], [ContactChannel.Telegram], default);
+        await contacts.ReplaceAddressesAsync(contact.Id, [(ContactChannel.Email, "email@example.com")], default);
 
         Assert.Equal(0, await campaigns.FormDeliveriesFromSnapshotAsync(id, default));
 
@@ -125,7 +132,52 @@ public sealed class CampaignFormationPostgresTests : PostgresTestBase
     }
 
     [PostgresFact]
-    public async Task DuplicatePairRollsBackNewlyEligiblePairs()
+    public async Task DraftTransitionWaitsUntilFormationCommits()
+    {
+        using var deadline = new CancellationTokenSource(Timeout);
+        var ct = deadline.Token;
+        await using var scope = _provider!.CreateAsyncScope();
+        var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
+        var contact = await campaigns.CreateRecipientAsync("email@example.com", ct);
+        var id = await campaigns.CreateCampaignSnapshotAsync("Locked", "Text", [contact.Id], [ContactChannel.Email], ct);
+
+        await using var blocker = new NpgsqlConnection(_connectionString);
+        await blocker.OpenAsync(ct);
+        await using var transaction = await blocker.BeginTransactionAsync(ct);
+        await using var lockDeliveries = new NpgsqlCommand("LOCK TABLE deliveries IN SHARE MODE", blocker, transaction);
+        await lockDeliveries.ExecuteNonQueryAsync(ct);
+
+        var formation = campaigns.FormDeliveriesFromSnapshotAsync(id, ct);
+        // Блокировка таблицы задерживает INSERT после того, как формирование прочитало статус кампании.
+        await using var waitingInsert = new NpgsqlCommand("""
+            SELECT EXISTS (SELECT FROM pg_locks
+                WHERE relation = 'deliveries'::regclass AND mode = 'RowExclusiveLock' AND NOT granted)
+            """, blocker, transaction);
+        while (!(bool)(await waitingInsert.ExecuteScalarAsync(ct))!)
+        {
+            Assert.False(formation.IsCompleted);
+            await Task.Delay(10, ct);
+        }
+
+        await using var writer = _provider!.CreateAsyncScope();
+        var db = writer.ServiceProvider.GetRequiredService<AppDbContext>();
+        await db.Database.OpenConnectionAsync(ct);
+        var repository = writer.ServiceProvider.GetRequiredService<ICampaingRepository>();
+        var campaign = (await repository.Get(id, ct))!;
+        Assert.Equal(CampaignStatus.Forming, campaign.Status);
+        campaign.StatusFromFormingToDraft();
+        var transition = repository.TryUpdateStatusAsync(campaign, CampaignStatus.Forming, ct);
+        await WaitBlocked(((NpgsqlConnection)db.Database.GetDbConnection()).ProcessID);
+
+        await transaction.RollbackAsync(ct);
+        Assert.Equal(1, await formation);
+        Assert.True(await transition);
+        Assert.Equal(CampaignStatus.Draft, (await repository.Get(id, ct))!.Status);
+        Assert.Equal(DeliveryStatus.Waiting, (await db.Deliveries.AsNoTracking().SingleAsync(ct)).DeliveryStatus);
+    }
+
+    [PostgresFact]
+    public async Task DuplicatePairLeavesThePreviouslyStoredDeliverySetIntact()
     {
         await using var scope = _provider!.CreateAsyncScope();
         var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();

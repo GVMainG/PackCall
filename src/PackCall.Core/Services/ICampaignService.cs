@@ -30,6 +30,7 @@ public interface ICampaignService
         IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct);
 
     /// <summary>Создаёт ожидающие доставки по снимку кампании в Forming и возвращает число доставок.</summary>
+    /// <remarks>Вызывается один раз для снимка. При повторной вставке пары хранилище отклоняет всю операцию.</remarks>
     /// <exception cref="KeyNotFoundException">Кампания не найдена.</exception>
     /// <exception cref="InvalidOperationException">Кампания не находится в Forming.</exception>
     Task<int> FormDeliveriesFromSnapshotAsync(Guid campaignId, CancellationToken ct);
