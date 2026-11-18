@@ -55,7 +55,7 @@ public sealed class CampaignAudiencePostgresTests(ITestOutputHelper output) : Po
         Assert.Equal(HttpStatusCode.OK, started.StatusCode);
         Assert.Empty(_sender.Requests);
         using var logger = new LoggerConfiguration().CreateLogger();
-        using var worker = new DeliveryWorker(_provider.GetRequiredService<IServiceScopeFactory>(),
+        using var worker = new DeliveryWorker(_provider!.GetRequiredService<IServiceScopeFactory>(),
             Options.Create(new DeliveryWorkerOptions { Parallelism = 1 }), logger, new WorkerIdentity("worker-A"));
         using var deadline = new CancellationTokenSource(Timeout);
         await worker.StartAsync(deadline.Token);
@@ -70,7 +70,8 @@ public sealed class CampaignAudiencePostgresTests(ITestOutputHelper output) : Po
         }
         finally
         {
-            await worker.StopAsync(CancellationToken.None);
+            using var shutdown = new CancellationTokenSource(Timeout);
+            await worker.StopAsync(shutdown.Token);
         }
 
         var calls = _sender.Requests;
@@ -104,6 +105,7 @@ public sealed class CampaignAudiencePostgresTests(ITestOutputHelper output) : Po
 
         async Task<Delivery[]> ReadDraft()
         {
+            Assert.Equal(CampaignStatus.Draft, await db.Campaigns.Where(c => c.Id == id).Select(c => c.Status).SingleAsync());
             Assert.Equal(selected.Order(), (await db.CampaignContacts.Where(c => c.CampaignId == id)
                 .Select(c => c.ContactId).ToListAsync()).Order());
             Assert.Equal("email", await db.CampaignChannels.Where(c => c.CampaignId == id).Select(c => c.Channel).SingleAsync());
