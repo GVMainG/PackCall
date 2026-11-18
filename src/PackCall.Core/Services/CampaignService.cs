@@ -53,6 +53,9 @@ public sealed class CampaignService : ICampaignService
         return campaign.Id;
     }
 
+    public Task<int> FormDeliveriesFromSnapshotAsync(Guid campaignId, CancellationToken ct) =>
+        _deliveryRepository.FormDeliveriesFromSnapshotAsync(campaignId, ct);
+
     public async Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();

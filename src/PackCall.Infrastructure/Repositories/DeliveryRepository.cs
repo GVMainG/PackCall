@@ -31,6 +31,36 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         await context.SaveChangesAsync(ct);
     }
 
+    public async Task<int> FormDeliveriesFromSnapshotAsync(Guid campaignId, CancellationToken ct)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync(ct);
+        await using var transaction = await context.Database.BeginTransactionAsync(ct);
+        // Кампания должна оставаться в Forming до фиксации доставок.
+        var status = await context.Database.SqlQuery<int?>($"""
+            SELECT status FROM campaigns WHERE id = {campaignId} FOR NO KEY UPDATE
+            """).AsAsyncEnumerable().SingleOrDefaultAsync(ct);
+        if (status is null)
+            throw new KeyNotFoundException($"Кампания {campaignId} не найдена.");
+        if (status != (int)CampaignStatus.Forming)
+            throw new InvalidOperationException("Формирование доставок доступно только для кампании в статусе Forming.");
+
+        var inserted = await context.Database.ExecuteSqlInterpolatedAsync($"""
+            INSERT INTO deliveries (id, campaign_id, contact_id, channel, address_snapshot, delivery_status, created_at, updated_at)
+            SELECT gen_random_uuid(), selected_contact.campaign_id, selected_contact.contact_id,
+                   selected_channel.channel, address.address, {(int)DeliveryStatus.Waiting},
+                   statement_timestamp(), statement_timestamp()
+            FROM campaign_contacts AS selected_contact
+            INNER JOIN contact_channels AS address ON address.contact_id = selected_contact.contact_id
+            INNER JOIN campaign_channels AS selected_channel
+                ON selected_channel.campaign_id = selected_contact.campaign_id
+                AND selected_channel.channel = address.channel
+            WHERE selected_contact.campaign_id = {campaignId}
+            """, ct);
+
+        await transaction.CommitAsync(ct);
+        return inserted;
+    }
+
     public Task<Delivery?> Get(Guid id, CancellationToken ct) =>
         dbContext.Deliveries.SingleOrDefaultAsync(delivery => delivery.Id == id, ct);
 

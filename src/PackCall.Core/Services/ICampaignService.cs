@@ -29,6 +29,11 @@ public interface ICampaignService
     Task<Guid> CreateCampaignSnapshotAsync(string name, string messageText,
         IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct);
 
+    /// <summary>Создаёт ожидающие доставки по снимку кампании в Forming и возвращает число доставок.</summary>
+    /// <exception cref="KeyNotFoundException">Кампания не найдена.</exception>
+    /// <exception cref="InvalidOperationException">Кампания не находится в Forming.</exception>
+    Task<int> FormDeliveriesFromSnapshotAsync(Guid campaignId, CancellationToken ct);
+
     /// <summary>Изменяет название и сообщение черновика и возвращает сохранённую кампанию.</summary>
     /// <exception cref="KeyNotFoundException">Кампания не найдена.</exception>
     /// <exception cref="InvalidOperationException">Кампания формируется, запущена, приостановлена или завершена.</exception>

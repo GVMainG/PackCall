@@ -158,6 +158,9 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
 
     public Func<IReadOnlyList<Delivery>, Task>? BeforeAddBatchAsync { get; set; }
 
+    public Task<int> FormDeliveriesFromSnapshotAsync(Guid campaignId, CancellationToken ct) =>
+        throw new NotSupportedException();
+
     public async Task AddLegacyEmailBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct)
     {
         if (BeforeAddBatchAsync is not null)
