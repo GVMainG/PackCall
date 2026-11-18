@@ -36,7 +36,7 @@ public class CampaignServiceTests
     [Fact]
     public async Task CreateRecipient_RejectsDuplicateIgnoringCase()
     {
-        _recipientRepository.Items.Add(new Contact { Id = Guid.NewGuid(), Email = "User@Example.com" });
+        _recipientRepository.Items.Add(Contact.Create([(ContactChannel.Email, "User@Example.com")], DateTime.UtcNow));
 
         await Assert.ThrowsAsync<RecipientAlreadyExistsException>(() =>
             _service.CreateRecipientAsync(" user@example.com ", CancellationToken.None));
@@ -46,9 +46,9 @@ public class CampaignServiceTests
     [Fact]
     public async Task CreateCampaign_PersistsDraftAndOneWaitingDeliveryPerRecipient()
     {
-        var recipient = new Contact { Id = Guid.NewGuid(), Email = "first@example.com" };
+        var recipient = Contact.Create([(ContactChannel.Email, "first@example.com")], DateTime.UtcNow);
         _recipientRepository.Items.Add(recipient);
-        _recipientRepository.Items.Add(new Contact { Id = Guid.NewGuid(), Email = "second@example.com" });
+        _recipientRepository.Items.Add(Contact.Create([(ContactChannel.Email, "second@example.com")], DateTime.UtcNow));
 
         var id = await CreateCampaignAsync();
         var campaign = await _service.GetCampaignAsync(id, CancellationToken.None);
@@ -63,15 +63,18 @@ public class CampaignServiceTests
         });
         Assert.Equal(2, _deliveryRepository.Items.Select(delivery => delivery.ContactId).Distinct().Count());
 
-        recipient.Email = "changed@example.com";
+        recipient.ReplaceAddresses([(ContactChannel.Email, "changed@example.com")], DateTime.UtcNow);
         Assert.Equal("first@example.com", _deliveryRepository.Items.Single(d => d.ContactId == recipient.Id).AddressSnapshot);
     }
 
     [Fact]
     public async Task CreateCampaign_WithInvalidRecipient_PersistsNothing()
     {
-        _recipientRepository.Items.Add(new Contact { Id = Guid.NewGuid(), Email = "valid@example.com" });
-        _recipientRepository.Items.Add(new Contact { Id = Guid.NewGuid(), Email = " " });
+        _recipientRepository.Items.Add(Contact.Create([(ContactChannel.Email, "valid@example.com")], DateTime.UtcNow));
+        var invalid = Contact.Create([(ContactChannel.Email, "legacy@example.com")], DateTime.UtcNow);
+        // Эмулируем исторический адрес, сохранённый до доменной валидации.
+        typeof(ContactChannel).GetProperty(nameof(ContactChannel.Address))!.SetValue(invalid.Channels.Single(), " ");
+        _recipientRepository.Items.Add(invalid);
 
         await Assert.ThrowsAsync<ArgumentException>(() => CreateCampaignAsync());
 
@@ -83,7 +86,7 @@ public class CampaignServiceTests
     public async Task CreateCampaign_FormsDeliveriesInBatchesAndBlocksChangesUntilReady()
     {
         _recipientRepository.Items.AddRange(Enumerable.Range(0, 1001)
-            .Select(index => new Contact { Id = Guid.NewGuid(), Email = $"user{index}@example.com" }));
+            .Select(index => Contact.Create([(ContactChannel.Email, $"user{index}@example.com")], DateTime.UtcNow)));
         var batchSizes = new List<int>();
         _deliveryRepository.BeforeAddBatchAsync = async deliveries =>
         {
@@ -111,7 +114,7 @@ public class CampaignServiceTests
     public async Task CreateCampaign_WhenLaterBatchFails_RemovesPartialCampaign()
     {
         _recipientRepository.Items.AddRange(Enumerable.Range(0, 501)
-            .Select(index => new Contact { Id = Guid.NewGuid(), Email = $"user{index}@example.com" }));
+            .Select(index => Contact.Create([(ContactChannel.Email, $"user{index}@example.com")], DateTime.UtcNow)));
         var batchNumber = 0;
         _deliveryRepository.BeforeAddBatchAsync = _ =>
         {
@@ -130,7 +133,7 @@ public class CampaignServiceTests
     public async Task CreateCampaign_WhenCancelledAfterFirstBatch_RemovesPartialCampaign()
     {
         _recipientRepository.Items.AddRange(Enumerable.Range(0, 501)
-            .Select(index => new Contact { Id = Guid.NewGuid(), Email = $"user{index}@example.com" }));
+            .Select(index => Contact.Create([(ContactChannel.Email, $"user{index}@example.com")], DateTime.UtcNow)));
         using var cancellation = new CancellationTokenSource();
         _deliveryRepository.BeforeAddBatchAsync = _ =>
         {
@@ -148,7 +151,7 @@ public class CampaignServiceTests
     [Fact]
     public async Task StartCampaign_WhenAlreadyStarted_DoesNotChangeDatesOrDeliveries()
     {
-        _recipientRepository.Items.Add(new Contact { Id = Guid.NewGuid(), Email = "user@example.com" });
+        _recipientRepository.Items.Add(Contact.Create([(ContactChannel.Email, "user@example.com")], DateTime.UtcNow));
         var id = await CreateCampaignAsync();
         await _service.StartCampaignAsync(id, CancellationToken.None);
         var campaign = (await _service.GetCampaignAsync(id, CancellationToken.None))!;

@@ -1,7 +1,6 @@
 using PackCall.Core.Entities;
 using PackCall.Core.Repositorys;
 using PackCall.Core.Exceptions;
-using System.Net.Mail;
 
 namespace PackCall.Core.Services;
 
@@ -170,27 +169,24 @@ public sealed class CampaignService : ICampaignService
     public async Task<Contact> CreateRecipientAsync(string email, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        if (string.IsNullOrWhiteSpace(email))
-            throw new ArgumentException("Укажите email получателя.", nameof(email));
-
-        var normalizedEmail = email.Trim().ToLowerInvariant();
-        if (normalizedEmail.Length > 255 ||
-            !MailAddress.TryCreate(normalizedEmail, out var address) ||
-            !string.Equals(address.Address, normalizedEmail, StringComparison.Ordinal))
-            throw new ArgumentException("Укажите корректный email длиной не более 255 символов.", nameof(email));
-
-        if (await _recipientRepository.GetByEmailAsync(normalizedEmail, ct) is not null)
-            throw new RecipientAlreadyExistsException();
-
-        ct.ThrowIfCancellationRequested();
-        var now = DateTime.UtcNow;
-        return await _recipientRepository.CreateAsync(new Contact
+        Contact recipient;
+        try
         {
-            Id = Guid.NewGuid(),
-            Email = normalizedEmail,
-            CreatedAt = now,
-            UpdatedAt = now
-        }, ct);
+            recipient = Contact.Create([(ContactChannel.Email, email)], DateTime.UtcNow);
+        }
+        catch (ContactValidationException exception)
+        {
+            throw new ArgumentException(exception.Message, nameof(email), exception);
+        }
+
+        try
+        {
+            return await _recipientRepository.CreateAsync(recipient, ct);
+        }
+        catch (ContactAddressConflictException exception)
+        {
+            throw new RecipientAlreadyExistsException(exception);
+        }
     }
 
     public Task<PageResult<Contact>> GetRecipientsAsync(int pageNumber, int pageSize, CancellationToken ct)

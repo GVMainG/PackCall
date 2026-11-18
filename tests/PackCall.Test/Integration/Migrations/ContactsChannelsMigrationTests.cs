@@ -48,8 +48,9 @@ public sealed class ContactsChannelsMigrationTests : IAsyncLifetime
             """);
 
         await using var db = Context();
-        await db.Database.MigrateAsync();
-        await db.Database.MigrateAsync();
+        var migrator = db.GetService<IMigrator>();
+        await migrator.MigrateAsync(Candidate);
+        await migrator.MigrateAsync(Candidate);
 
         Assert.Equal(new[] { Initial, Candidate }, await db.Database.GetAppliedMigrationsAsync());
         var deliveries = await db.Deliveries.OrderBy(d => d.Id).ToArrayAsync();

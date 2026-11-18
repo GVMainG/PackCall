@@ -15,7 +15,7 @@ public class CampaignWorkflowTests
         var deliveries = new FakeDeliveryRepository();
         var campaigns = new FakeCampaignRepository(deliveries);
         var recipients = new FakeContactRepository();
-        recipients.Items.Add(new Contact { Id = Guid.NewGuid(), Email = "user@example.com" });
+        recipients.Items.Add(Contact.Create([(ContactChannel.Email, "user@example.com")], DateTime.UtcNow));
         var service = new CampaignService(campaigns, deliveries, recipients);
         var sender = new FakeMessageSender();
         var processing = new DeliveryProcessingService(deliveries, campaigns, sender, new FakeJournal(), new SendPolicy(false));
@@ -53,8 +53,8 @@ public class CampaignWorkflowTests
         var deliveries = new FakeDeliveryRepository();
         var campaigns = new FakeCampaignRepository(deliveries);
         var recipients = new FakeContactRepository();
-        recipients.Items.Add(new Contact { Id = Guid.NewGuid(), Email = "first@example.com" });
-        recipients.Items.Add(new Contact { Id = Guid.NewGuid(), Email = "second@example.com" });
+        recipients.Items.Add(Contact.Create([(ContactChannel.Email, "first@example.com")], DateTime.UtcNow));
+        recipients.Items.Add(Contact.Create([(ContactChannel.Email, "second@example.com")], DateTime.UtcNow));
         ICampaignService campaignService = new CampaignService(campaigns, deliveries, recipients);
         var sender = new FakeMessageSender();
         var journal = new FakeJournal();
@@ -64,7 +64,8 @@ public class CampaignWorkflowTests
         var campaign = (await campaignService.GetCampaignAsync(id, CancellationToken.None))!;
         Assert.Equal(CampaignStatus.Draft, campaign.Status);
         Assert.Equal(2, deliveries.Items.Count);
-        recipients.Items.Single(contact => contact.Email == "first@example.com").Email = "changed@example.com";
+        recipients.Items.Single(contact => contact.Email == "first@example.com")
+            .ReplaceAddresses([(ContactChannel.Email, "changed@example.com")], DateTime.UtcNow);
         Assert.Empty(await processing.CaptureBatchAsync(2, "worker-1", TimeSpan.FromMinutes(2), CancellationToken.None));
 
         await campaignService.StartCampaignAsync(id, CancellationToken.None);

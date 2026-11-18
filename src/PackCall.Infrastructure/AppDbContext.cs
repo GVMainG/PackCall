@@ -59,6 +59,7 @@ namespace PackCall.Infrastructure
                 e.HasIndex(x => new { x.Channel, x.Address }).IsUnique().HasDatabaseName("ix_contact_channels_channel_address");
                 e.HasIndex(x => new { x.ContactId, x.Channel }).IsUnique();
             });
+            modelBuilder.Entity<Contact>().Navigation(x => x.Channels).UsePropertyAccessMode(PropertyAccessMode.Field);
             modelBuilder.Entity<CampaignContact>(e => {
                 e.ToTable("campaign_contacts"); e.HasKey(x => new { x.CampaignId, x.ContactId });
                 e.Property(x => x.CampaignId).HasColumnName("campaign_id"); e.Property(x => x.ContactId).HasColumnName("contact_id");

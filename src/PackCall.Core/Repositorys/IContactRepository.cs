@@ -7,8 +7,11 @@ namespace PackCall.Core.Repositorys;
 /// </summary>
 public interface IContactRepository
 {
-    /// <summary>Сохраняет нового получателя. Повторный email отклоняется.</summary>
-    Task<Contact> CreateAsync(Contact recipient, CancellationToken ct);
+    /// <summary>Сохраняет контакт. Адрес, занятый в том же канале, отклоняется.</summary>
+    Task<Contact> CreateAsync(Contact contact, CancellationToken ct);
+    /// <summary>Атомарно заменяет адреса. Возвращает null, если контакт не найден.</summary>
+    Task<Contact?> ReplaceAddressesAsync(Guid id, IEnumerable<(string Channel, string? Address)> addresses,
+        CancellationToken ct);
     /// <summary>Возвращает получателя по email без учёта регистра.</summary>
     Task<Contact?> GetByEmailAsync(string email, CancellationToken ct);
     /// <summary>Возвращает порцию уникальных получателей в порядке Id без подсчёта всей аудитории.</summary>

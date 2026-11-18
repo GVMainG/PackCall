@@ -84,10 +84,31 @@ internal sealed class FakeContactRepository : IContactRepository
     public Task<Contact> CreateAsync(Contact recipient, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        if (Items.Any(item => string.Equals(item.Email, recipient.Email, StringComparison.OrdinalIgnoreCase)))
-            throw new RecipientAlreadyExistsException();
+        EnsureUnique(recipient.Id, recipient.Channels);
         Items.Add(recipient);
         return Task.FromResult(recipient);
+    }
+
+    public Task<Contact?> ReplaceAddressesAsync(Guid id,
+        IEnumerable<(string Channel, string? Address)> addresses, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        var contact = Items.SingleOrDefault(item => item.Id == id);
+        if (contact is not null)
+        {
+            var now = DateTime.UtcNow;
+            var proposed = Contact.Create(addresses, now);
+            EnsureUnique(id, proposed.Channels);
+            contact.ReplaceAddresses(proposed.Channels.Select(c => (c.Channel, (string?)c.Address)), now);
+        }
+        return Task.FromResult(contact);
+    }
+
+    private void EnsureUnique(Guid ownId, IEnumerable<ContactChannel> addresses)
+    {
+        var existing = Items.Where(item => item.Id != ownId).SelectMany(item => item.Channels);
+        if (existing.Select(c => (c.Channel, c.Address)).Intersect(addresses.Select(c => (c.Channel, c.Address))).Any())
+            throw new ContactAddressConflictException();
     }
 
     public Task<Contact?> GetByEmailAsync(string email, CancellationToken ct) =>

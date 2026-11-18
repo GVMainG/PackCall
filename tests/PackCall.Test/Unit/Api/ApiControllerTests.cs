@@ -42,7 +42,7 @@ public class ApiControllerTests
     [Fact]
     public async Task CampaignEndpoints_CreateReadAndPatchPreserveOtherField()
     {
-        _recipients.Items.Add(new Contact { Id = Guid.NewGuid(), Email = "user@example.com" });
+        _recipients.Items.Add(Contact.Create([(ContactChannel.Email, "user@example.com")], DateTime.UtcNow));
         var controller = new CampaignsController(_service);
 
         var created = await controller.CreateCampaign(
@@ -76,7 +76,7 @@ public class ApiControllerTests
         Assert.IsType<NotFoundResult>((await recipients.GetRecipient(Guid.NewGuid(), CancellationToken.None)).Result);
 
         _recipients.Items.AddRange(Enumerable.Range(0, 3)
-            .Select(index => new Contact { Id = Guid.NewGuid(), Email = $"user{index}@example.com" }));
+            .Select(index => Contact.Create([(ContactChannel.Email, $"user{index}@example.com")], DateTime.UtcNow)));
         var page = await recipients.GetRecipients(2, 2, CancellationToken.None);
         var response = Assert.IsType<PageResponse<RecipientResponse>>(
             Assert.IsType<OkObjectResult>(page.Result).Value);

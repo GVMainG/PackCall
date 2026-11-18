@@ -7,22 +7,46 @@ using Npgsql;
 
 namespace PackCall.Infrastructure.Repositories;
 
-public sealed class ContactRepository(AppDbContext dbContext) : IContactRepository
+public sealed class ContactRepository(AppDbContext dbContext, IDbContextFactory<AppDbContext> factory) : IContactRepository
 {
-    public async Task<Contact> CreateAsync(Contact recipient, CancellationToken ct)
+    public async Task<Contact> CreateAsync(Contact contact, CancellationToken ct)
     {
-        ArgumentNullException.ThrowIfNull(recipient);
-        await dbContext.Contacts.AddAsync(recipient, ct);
+        ArgumentNullException.ThrowIfNull(contact);
+        await using var db = await factory.CreateDbContextAsync(ct);
+        db.Contacts.Add(contact);
+        await SaveAsync(db, ct);
+        return contact;
+    }
+
+    public async Task<Contact?> ReplaceAddressesAsync(Guid id,
+        IEnumerable<(string Channel, string? Address)> addresses, CancellationToken ct)
+    {
+        await using var db = await factory.CreateDbContextAsync(ct);
+        await using var transaction = await db.Database.BeginTransactionAsync(ct);
+        // Сериализуем замены одного контакта до чтения его текущих адресов.
+        var contact = await db.Contacts.FromSqlInterpolated($"SELECT * FROM contacts WHERE id = {id} FOR NO KEY UPDATE")
+            .AsAsyncEnumerable().FirstOrDefaultAsync(ct);
+        if (contact is null)
+            return null;
+
+        await db.Entry(contact).Collection(item => item.Channels).LoadAsync(ct);
+        contact.ReplaceAddresses(addresses, DateTime.UtcNow);
+        await SaveAsync(db, ct);
+        await transaction.CommitAsync(ct);
+        return contact;
+    }
+
+    private static async Task SaveAsync(AppDbContext db, CancellationToken ct)
+    {
         try
         {
-            await dbContext.SaveChangesAsync(ct);
+            await db.SaveChangesAsync(ct);
         }
         catch (DbUpdateException exception) when (exception.InnerException is PostgresException
             { SqlState: PostgresErrorCodes.UniqueViolation, ConstraintName: "ix_contact_channels_channel_address" })
         {
-            throw new RecipientAlreadyExistsException(exception);
+            throw new ContactAddressConflictException(exception);
         }
-        return recipient;
     }
 
     public Task<Contact?> GetByEmailAsync(string email, CancellationToken ct)

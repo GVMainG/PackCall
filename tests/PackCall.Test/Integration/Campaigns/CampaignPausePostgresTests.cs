@@ -33,11 +33,9 @@ public class CampaignPausePostgresTests : PostgresTestBase
     {
         await using var scope = _provider!.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var contacts = Enumerable.Range(0, 501).Select(index => new Contact
-        {
-            Id = Guid.NewGuid(),
-            Email = $"batch{index}@example.test"
-        }).ToArray();
+        var contacts = Enumerable.Range(0, 501)
+            .Select(index => Contact.Create([(ContactChannel.Email, $"batch{index}@example.test")], DateTime.UtcNow))
+            .ToArray();
         db.Contacts.AddRange(contacts);
         await db.SaveChangesAsync();
 
