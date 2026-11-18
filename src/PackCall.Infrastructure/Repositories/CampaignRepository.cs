@@ -39,12 +39,12 @@ public sealed class CampaignRepository(AppDbContext dbContext, IDbContextFactory
     }
 
     public async Task CreateWithSnapshotAsync(Campaign campaign, Guid[]? contactIds,
-        IReadOnlyList<CampaignChannel> channels, CancellationToken ct)
+        IReadOnlyList<string> channels, CancellationToken ct)
     {
         await using var db = await factory.CreateDbContextAsync(ct);
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
         db.Campaigns.Add(campaign);
-        db.CampaignChannels.AddRange(channels);
+        db.CampaignChannels.AddRange(channels.Select(channel => new CampaignChannel(campaign.Id, channel)));
         await db.SaveChangesAsync(ct);
 
         if (contactIds is null)

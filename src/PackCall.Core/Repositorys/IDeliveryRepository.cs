@@ -5,7 +5,8 @@ namespace PackCall.Core.Repositorys
     public interface IDeliveryRepository
     {
         /// <summary>Сохраняет порцию новых доставок без накопления отслеживаемых сущностей.</summary>
-        Task AddBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct);
+        /// <summary>Записывает пакет прежнего email-формирования, включая строки аудитории для доставок.</summary>
+        Task AddLegacyEmailBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct);
         Task<Delivery?> Get(Guid id, CancellationToken ct);
         /// <summary>Возвращает страницу в порядке Id и общее число доставок кампании; нумерация с 1.</summary>
         Task<PageResult<Delivery>> GetPage(Guid campaignId, int pageNumber, int pageSize, CancellationToken ct);

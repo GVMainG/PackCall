@@ -52,8 +52,30 @@ public sealed class CampaignSnapshotPostgresTests : PostgresTestBase
         await using var observer = _provider!.CreateAsyncScope();
         var db = observer.ServiceProvider.GetRequiredService<AppDbContext>();
         await AssertSnapshot(db, id, [chosen.Id], [ContactChannel.Email, ContactChannel.Telegram]);
+
+        var reader = observer.ServiceProvider.GetRequiredService<ICampaignService>();
+        var persisted = (await reader.GetCampaignAsync(id, default))!;
+        Assert.Equal("Explicit", persisted.Name);
+        Assert.Equal("Text", persisted.MessageText);
+        persisted.StatusFromFormingToDraft();
+        var repository = observer.ServiceProvider.GetRequiredService<ICampaingRepository>();
+        Assert.True(await repository.TryUpdateStatusAsync(persisted, CampaignStatus.Forming, default));
+        await campaigns.UpdateCampaignAsync(id, "Edited", "Updated text", default);
+        await AssertSnapshot(db, id, [chosen.Id], [ContactChannel.Email, ContactChannel.Telegram], CampaignStatus.Draft);
         Assert.True(await campaigns.DeleteCampaignAsync(id, default));
         await AssertNoCampaignData(db);
+    }
+
+    [PostgresFact]
+    public async Task ExplicitSnapshotKeepsContactWithoutAddressInSelectedChannel()
+    {
+        await using var scope = _provider!.CreateAsyncScope();
+        var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
+        var contact = await campaigns.CreateRecipientAsync("email-only@example.com", default);
+        var id = await campaigns.CreateCampaignSnapshotAsync("Telegram", "Text", [contact.Id], [ContactChannel.Telegram], default);
+
+        await using var observer = _provider!.CreateAsyncScope();
+        await AssertSnapshot(observer.ServiceProvider.GetRequiredService<AppDbContext>(), id, [contact.Id], [ContactChannel.Telegram]);
     }
 
     [PostgresFact]
@@ -107,9 +129,10 @@ public sealed class CampaignSnapshotPostgresTests : PostgresTestBase
         Assert.Equal(1, await db.Campaigns.CountAsync());
     }
 
-    private static async Task AssertSnapshot(AppDbContext db, Guid id, Guid[] contacts, string[] channels)
+    private static async Task AssertSnapshot(AppDbContext db, Guid id, Guid[] contacts, string[] channels,
+        CampaignStatus status = CampaignStatus.Forming)
     {
-        Assert.Equal(CampaignStatus.Forming, await db.Campaigns.Where(c => c.Id == id).Select(c => c.Status).SingleAsync());
+        Assert.Equal(status, await db.Campaigns.Where(c => c.Id == id).Select(c => c.Status).SingleAsync());
         var actualContacts = await db.CampaignContacts.Where(c => c.CampaignId == id).Select(c => c.ContactId).ToArrayAsync();
         Assert.Equal(contacts.Order(), actualContacts.Order());
         var actualChannels = await db.CampaignChannels.Where(c => c.CampaignId == id).Select(c => c.Channel).ToArrayAsync();

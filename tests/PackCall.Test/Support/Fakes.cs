@@ -52,7 +52,7 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
     }
 
     public Task CreateWithSnapshotAsync(Campaign campaign, Guid[]? contactIds,
-        IReadOnlyList<CampaignChannel> channels, CancellationToken ct) => throw new NotSupportedException();
+        IReadOnlyList<string> channels, CancellationToken ct) => throw new NotSupportedException();
 
     public Task<Campaign> Update(Campaign campaign, CancellationToken ct)
     {
@@ -158,7 +158,7 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
 
     public Func<IReadOnlyList<Delivery>, Task>? BeforeAddBatchAsync { get; set; }
 
-    public async Task AddBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct)
+    public async Task AddLegacyEmailBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct)
     {
         if (BeforeAddBatchAsync is not null)
             await BeforeAddBatchAsync(deliveries);

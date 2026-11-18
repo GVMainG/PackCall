@@ -39,15 +39,15 @@ public sealed class CampaignService : ICampaignService
         if (selectedChannels.Length == 0)
             throw new ArgumentException("Укажите хотя бы один канал.", nameof(channels));
 
-        var campaign = Campaign.Create(name, messageText);
-        var channelSnapshot = new List<CampaignChannel>(selectedChannels.Length);
+        var channelSnapshot = new List<string>(selectedChannels.Length);
         foreach (var channel in selectedChannels)
         {
             if (channel is null || !ContactChannel.SupportedChannels.Contains(channel, StringComparer.Ordinal))
                 throw new ArgumentException($"Неизвестный канал: '{channel}'.", nameof(channels));
-            channelSnapshot.Add(new CampaignChannel(campaign.Id, channel));
+            channelSnapshot.Add(channel);
         }
 
+        var campaign = Campaign.Create(name, messageText);
         campaign.StatusFromDraftToForming();
         await _campaignRepository.CreateWithSnapshotAsync(campaign, selectedContacts, channelSnapshot, ct);
         return campaign.Id;
@@ -75,7 +75,7 @@ public sealed class CampaignService : ICampaignService
                 var now = DateTime.UtcNow;
                 var deliveries = recipients.Select(recipient => Delivery.Create(campaign, recipient, now)).ToList();
                 ct.ThrowIfCancellationRequested();
-                await _deliveryRepository.AddBatchAsync(deliveries, ct);
+                await _deliveryRepository.AddLegacyEmailBatchAsync(deliveries, ct);
                 offset = checked(offset + recipients.Count);
                 if (recipients.Count < FormationBatchSize)
                     break;

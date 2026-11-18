@@ -8,7 +8,7 @@ namespace PackCall.Infrastructure.Repositories;
 // Здесь PostgreSQL координирует захват, возврат и фиксацию результата между несколькими воркерами.
 public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory<AppDbContext> contextFactory) : IDeliveryRepository
 {
-    public async Task AddBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct)
+    public async Task AddLegacyEmailBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(deliveries);
         if (deliveries.Count == 0)
