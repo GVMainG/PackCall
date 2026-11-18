@@ -87,6 +87,54 @@ public sealed class CampaignLifecyclePostgresTests : PostgresTestBase
         await repository.DeleteIfFormingAsync(publicEmailId, ct);
         await writer.ServiceProvider.GetRequiredService<AppDbContext>().SaveChangesAsync(ct);
         Assert.Equal(CampaignStatus.InProgress, (await campaigns.GetCampaignAsync(publicEmailId, ct))!.Status);
+        AssertFormation(await ReadDetails(client, publicEmailId, ct), 2, ["email"], 2, 0);
+    }
+
+    [PostgresFact]
+    public async Task DetailsKeepTheSameSnapshotWhenPublicationCommitsDuringRead()
+    {
+        using var deadline = new CancellationTokenSource(Timeout);
+        var ct = deadline.Token;
+        await using var app = await StartApiAsync();
+        using var client = CreateClient(app);
+        await using var scope = _provider!.CreateAsyncScope();
+        var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
+        var contact = await campaigns.CreateRecipientAsync("email@example.com", ct);
+        var id = await campaigns.CreateCampaignSnapshotAsync("Snapshot", "Text", [contact.Id], ["email"], ct);
+
+        await using var writer = new NpgsqlConnection(_connectionString);
+        await writer.OpenAsync(ct);
+        await using var transaction = await writer.BeginTransactionAsync(ct);
+        await using var publish = new NpgsqlCommand("""
+            LOCK TABLE campaign_channels IN ACCESS EXCLUSIVE MODE;
+            INSERT INTO deliveries (id, campaign_id, contact_id, channel, address_snapshot, delivery_status, created_at, updated_at)
+            VALUES (gen_random_uuid(), @id, @contact, 'email', 'email@example.com', @waiting, now(), now());
+            UPDATE campaigns SET status = @draft WHERE id = @id;
+            """, writer, transaction);
+        publish.Parameters.AddWithValue("id", id);
+        publish.Parameters.AddWithValue("contact", contact.Id);
+        publish.Parameters.AddWithValue("waiting", (int)DeliveryStatus.Waiting);
+        publish.Parameters.AddWithValue("draft", (int)CampaignStatus.Draft);
+        await publish.ExecuteNonQueryAsync(ct);
+
+        var reading = ReadDetails(client, id, ct);
+        await using var waiting = new NpgsqlCommand("""
+            SELECT EXISTS (SELECT FROM pg_locks
+                WHERE relation = 'campaign_channels'::regclass AND mode = 'AccessShareLock' AND NOT granted)
+            """, writer, transaction);
+        while (!(bool)(await waiting.ExecuteScalarAsync(ct))!)
+        {
+            Assert.False(reading.IsCompleted);
+            await Task.Delay(10, ct);
+        }
+        await transaction.CommitAsync(ct);
+
+        var before = await reading;
+        Assert.Equal("Forming", before.GetProperty("campaign").GetProperty("status").GetString());
+        AssertFormation(before, 1, ["email"], 0, null);
+        var after = await ReadDetails(client, id, ct);
+        Assert.Equal("Draft", after.GetProperty("campaign").GetProperty("status").GetString());
+        AssertFormation(after, 1, ["email"], 1, 0);
     }
 
     [PostgresFact]
