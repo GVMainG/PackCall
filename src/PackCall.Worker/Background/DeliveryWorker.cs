@@ -9,7 +9,7 @@ using ILogger = Serilog.ILogger;
 
 namespace PackCall.Worker.Background;
 
-/// <summary>Захватывает и обрабатывает доставки, отдельно возвращая просроченные закрепления.</summary>
+/// <summary>Обрабатывает доставки, отдельно возвращает просроченные закрепления и сверяет завершённость кампаний.</summary>
 public sealed class DeliveryWorker : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
@@ -90,7 +90,7 @@ public sealed class DeliveryWorker : BackgroundService
                     _logger.Error(exception, "Ошибка обработки доставок. WorkerId={WorkerId}, Lane={Lane}",
                         _workerId, lane);
                 else
-                    _logger.Error(exception, "Ошибка возврата просроченных доставок");
+                    _logger.Error(exception, "Ошибка прохода recovery: возврат просроченных доставок и сверка кампаний");
 
                 await DelayAfterErrorAsync(ct);
             }

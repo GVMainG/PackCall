@@ -97,6 +97,23 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         return true;
     }
 
+    public async Task<int> CompleteFinishedCampaignsAsync(CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        var completed = 0;
+        foreach (var campaign in _store.Values.Where(campaign => campaign.Status == CampaignStatus.InProgress).ToArray())
+        {
+            IEnumerable<Delivery> deliveries = _deliveries is null ? campaign.Deliveries : _deliveries.Items;
+            if (deliveries.Any(delivery => delivery.CampaignId == campaign.Id &&
+                    delivery.DeliveryStatus is DeliveryStatus.Waiting or DeliveryStatus.InProgress))
+                continue;
+            campaign.StatusFromInProgressToCompleted(DateTime.UtcNow);
+            await Update(campaign, ct);
+            completed++;
+        }
+        return completed;
+    }
+
     public Task<CampaignDeleteResult> DeleteIfInactiveAsync(Guid id, CancellationToken ct)
     {
         if (!_statuses.TryGetValue(id, out var status))

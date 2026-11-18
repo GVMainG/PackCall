@@ -25,6 +25,7 @@ SCENARIOS = (
 WAITING, IN_PROGRESS, SENT, FAILED = 0, 1, 2, -1
 CAMPAIGN_RUNNING = 1
 COMPLETED = 2
+EMAIL_ADDRESS = "sm6@example.test"
 
 
 def require(condition, message):
@@ -110,7 +111,9 @@ class Stand:
         port = self.compose("port", "api", "8080").rsplit(":", 1)[1]
         self.api_root = f"http://127.0.0.1:{port}/api/"
         wait_for(self.api_ready, "API readiness", timeout=40)
-        self.api("recipients", {"email": "sm6@example.test"})
+        self.contact_id = str(UUID(self.api("contacts", {
+            "channels": [{"channel": "email", "address": EMAIL_ADDRESS}],
+        })["id"]))
 
     def api(self, path, body=None):
         request = urllib.request.Request(self.api_root + path,
@@ -197,6 +200,8 @@ def run_case(stand, scenario, mode, outcome):
     captured = stand.snapshot(campaign_id)
     save(folder / "captured.json", captured)
     original = delivery(captured)
+    require(original["contact_id"] == stand.contact_id and original["channel"] == "email"
+            and original["address_snapshot"] == EMAIL_ADDRESS, "Unexpected delivery snapshot")
     delivery_id = original["id"]
     expected_journal = [(WAITING, IN_PROGRESS, None)]
     check_active_lease(captured, worker)
@@ -246,16 +251,17 @@ def run_case(stand, scenario, mode, outcome):
         if mode == "http":
             check_wire(folder, scenario, delivery_id)
 
+    operator_result = "AcceptedByProvider" if terminal == SENT else "SimulatedOperatorRejected"
+    expected_journal.append((IN_PROGRESS, terminal, operator_result))
+
     def completed():
         snapshot = stand.snapshot(campaign_id)
-        return snapshot if snapshot["campaign_status"] == COMPLETED else None
+        return snapshot if snapshot["campaign_status"] == COMPLETED and journal(snapshot) == expected_journal else None
 
-    wait_for(completed, f"{scenario}: campaign completion")
+    wait_for(completed, f"{scenario}: campaign completion and terminal journal entry")
     stand.command(["docker", "stop", "--time", "10", worker])
     final = stand.snapshot(campaign_id)
     save(folder / "final.json", final)
-    operator_result = "AcceptedByProvider" if terminal == SENT else "SimulatedOperatorRejected"
-    expected_journal.append((IN_PROGRESS, terminal, operator_result))
     result = delivery(final)
     require(final["campaign_status"] == COMPLETED and result["id"] == delivery_id and result["delivery_status"] == terminal
             and result["worker_id"] is None and result["lock_expires_at"] is None and result["completed_at"] is not None,

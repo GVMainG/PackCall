@@ -110,6 +110,26 @@ public sealed class DeliveryMeasurementTests
         Assert.Equal(0, Count(collector.Close()!, Event.CampaignCompleted));
     }
 
+    [Fact]
+    public async Task RecoveryCountsEveryCompletedCampaignOnce()
+    {
+        using var collector = Collector();
+        var fixture = await Create(true);
+        var first = Assert.IsType<Campaign>(await fixture.Campaigns.Get(fixture.Delivery.CampaignId, default));
+        fixture.Delivery.StatusFromInProgressToSent(DateTime.UtcNow);
+        var second = Campaign.Create("second", "synthetic");
+        second.StatusFromDraftToInProgress();
+        await fixture.Campaigns.Create(second, default);
+
+        Assert.Equal(0, await fixture.Service.ReleaseExpiredLocksAsync(default));
+        Assert.Equal(2, Count(collector.Close()!, Event.CampaignCompleted));
+        Assert.Equal(CampaignStatus.Completed, first.Status);
+        Assert.Equal(CampaignStatus.Completed, second.Status);
+
+        Assert.Equal(0, await fixture.Service.ReleaseExpiredLocksAsync(default));
+        Assert.Equal(0, Count(collector.Close()!, Event.CampaignCompleted));
+    }
+
     [Theory]
     [InlineData(false)] [InlineData(true)]
     public async Task PauseReturnIsNotTerminal(bool missingOwner)
@@ -158,8 +178,8 @@ public sealed class DeliveryMeasurementTests
 
     private static async Task<Fixture> Create(bool accepted, TimeProvider? time = null)
     {
-        var campaigns = new FakeCampaignRepository();
         var deliveries = new FakeDeliveryRepository();
+        var campaigns = new FakeCampaignRepository(deliveries);
         var sender = new FakeMessageSender { Handler = _ => accepted ? SendResult.Success() : SendResult.Failure("SimulatedOperatorRejected") };
         var journal = new Journal();
         var campaign = Campaign.Create("synthetic", "synthetic");

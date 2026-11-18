@@ -191,6 +191,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
 
     /// <summary>
     /// Возвращает доставки с истёкшим сроком закрепления из "Отправляется" в "Ожидает".
+    /// Завершает активные кампании, в которых больше нет незавершённых доставок.
     /// </summary>
     /// <returns>Количество возвращённых доставок.</returns>
     public Task<int> ReleaseExpiredLocksAsync(CancellationToken ct)
@@ -221,6 +222,10 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
                 OperatorResult: null), ct, Purpose.Recovery);
         }
 
+        var completed = await _campaignRepository.CompleteFinishedCampaignsAsync(ct);
+        if (completed > 0)
+            PerformanceMetrics.Count(Event.CampaignCompleted, value: completed);
+
         return released.Count;
     }
 
@@ -238,8 +243,8 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     {
         ct.ThrowIfCancellationRequested();
 
-        var campaign = await GetCampaignAsync(campaignId, ct);
-        if (campaign.Status != CampaignStatus.InProgress)
+        var campaign = await _campaignRepository.Get(campaignId, ct);
+        if (campaign is null || campaign.Status != CampaignStatus.InProgress)
             return false;
 
         ct.ThrowIfCancellationRequested();

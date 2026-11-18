@@ -4,7 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 from run import (
-    CAMPAIGN_RUNNING, COMPLETED, IN_PROGRESS, SENT, WAITING, check_active_lease, check_attempt,
+    CAMPAIGN_RUNNING, COMPLETED, EMAIL_ADDRESS, IN_PROGRESS, SENT, WAITING, check_active_lease, check_attempt,
     delivery, journal, marker, read_json, require, run_stand, save, wait_for,
 )
 
@@ -80,8 +80,11 @@ def run_cases(stand, report):
     captured = read_json(original_folder / "captured-delivery.json")
     require(captured["Id"] == delivery_id and captured["CampaignId"] == str(campaign_id)
             and captured["WorkerId"] == original_worker and captured["DeliveryStatus"] == IN_PROGRESS
-            and datetime.fromisoformat(captured["LockExpiresAt"].replace("Z", "+00:00")) == expiry,
-            "Original Worker snapshot does not match the original lease")
+            and datetime.fromisoformat(captured["LockExpiresAt"].replace("Z", "+00:00")) == expiry
+            and captured["ContactId"] == original_row["contact_id"] == stand.contact_id
+            and captured["Channel"] == original_row["channel"] == "email"
+            and captured["AddressSnapshot"] == original_row["address_snapshot"] == EMAIL_ADDRESS,
+            "Original Worker snapshot does not match the original delivery and lease")
 
     def recovered_waiting():
         state = stand.snapshot(campaign_id)
@@ -138,12 +141,14 @@ def run_cases(stand, report):
     same_state(before_stale, after_stale)
 
     (recovery_folder / "allow-result").touch()
+    transitions.append((IN_PROGRESS, SENT, "AcceptedByProvider"))
+    workers.append(successor)
 
     def completed():
         state = stand.snapshot(campaign_id)
-        return state if state["campaign_status"] == COMPLETED else None
+        return state if state["campaign_status"] == COMPLETED and journal(state) == transitions else None
 
-    wait_for(completed, "Campaign completion after release of the successor's result")
+    wait_for(completed, "Campaign completion and terminal journal entry after release of the successor's result")
     report["worker_runtime"] = stand.command(["docker", "exec", successor, "dotnet", "--list-runtimes"])
     stand.command(["docker", "stop", "--time", "10", successor])
     final = snapshot(stand, campaign_id, recovery_folder, "final")
@@ -152,8 +157,6 @@ def run_cases(stand, report):
             and final_row["delivery_status"] == SENT and final_row["completed_at"] is not None
             and final_row["worker_id"] is None and final_row["lock_expires_at"] is None,
             "Unexpected terminal delivery")
-    transitions.append((IN_PROGRESS, SENT, "AcceptedByProvider"))
-    workers.append(successor)
     assert_journal(final, delivery_id, transitions, workers)
     for folder in (original_folder, recovery_folder, stale_folder):
         require({path.name for path in folder.glob("attempt-*.json")}
@@ -163,6 +166,7 @@ def run_cases(stand, report):
                             "update_affected_rows": processing["affectedRows"],
                             "row_and_journal_unchanged": True, "terminal_entries": 1, "campaign": "Completed"}
     report.pop("current_case")
+    report.update(false_sent=0, false_failed=0)
     print("PASS C: stale result rejected, row and journal unchanged, one terminal entry, campaign Completed", flush=True)
 
 

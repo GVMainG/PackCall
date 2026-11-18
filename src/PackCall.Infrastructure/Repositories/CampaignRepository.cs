@@ -108,6 +108,25 @@ public sealed class CampaignRepository(AppDbContext dbContext, IDbContextFactory
         return updated == 1;
     }
 
+    public Task<int> CompleteFinishedCampaignsAsync(CancellationToken ct) =>
+        dbContext.Database.ExecuteSqlInterpolatedAsync($"""
+            WITH ready AS MATERIALIZED (
+                SELECT campaign.id, clock_timestamp() AS completed_at
+                FROM campaigns campaign
+                WHERE campaign.status = {(int)CampaignStatus.InProgress}
+                  AND NOT EXISTS (
+                      SELECT 1 FROM deliveries delivery
+                      WHERE delivery.campaign_id = campaign.id
+                        AND delivery.delivery_status IN ({(int)DeliveryStatus.Waiting}, {(int)DeliveryStatus.InProgress})
+                  )
+            )
+            UPDATE campaigns campaign
+            SET status = {(int)CampaignStatus.Completed},
+                completed_at = ready.completed_at, updated_at = ready.completed_at
+            FROM ready
+            WHERE campaign.id = ready.id AND campaign.status = {(int)CampaignStatus.InProgress}
+            """, ct);
+
     public async Task<CampaignDeleteResult> DeleteIfInactiveAsync(Guid id, CancellationToken ct)
     {
         // Блокировка строки привязывает причину отказа к тому же статусу, по которому решается удаление.

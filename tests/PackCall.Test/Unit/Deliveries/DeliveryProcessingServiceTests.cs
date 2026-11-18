@@ -1,5 +1,6 @@
 using PackCall.Core.Entities;
 using PackCall.Core.Exceptions;
+using PackCall.Core.Repositorys;
 using PackCall.Core.Sending;
 using PackCall.Core.Services;
 
@@ -9,15 +10,18 @@ namespace PackCall.Core.Test;
 [Trait("Module", "Deliveries")]
 public class DeliveryProcessingServiceTests
 {
-    private readonly FakeCampaignRepository _campaignRepository = new();
+    private readonly FakeCampaignRepository _campaignRepository;
     private readonly FakeDeliveryRepository _deliveryRepository = new();
     private readonly FakeMessageSender _sender = new();
     private readonly FakeJournal _journal = new();
     private readonly IDeliveryProcessingService _service;
 
-    public DeliveryProcessingServiceTests() =>
+    public DeliveryProcessingServiceTests()
+    {
+        _campaignRepository = new FakeCampaignRepository(_deliveryRepository);
         _service = new DeliveryProcessingService(
             _deliveryRepository, _campaignRepository, channel => channel == ContactChannel.Email ? _sender : null, _journal);
+    }
 
     private Campaign CreateStartedCampaign()
     {
@@ -32,6 +36,18 @@ public class DeliveryProcessingServiceTests
         var delivery = Delivery.Create(campaign.Id, Guid.NewGuid(), "user@example.com", DateTime.UtcNow);
         _deliveryRepository.Add(delivery);
         return delivery;
+    }
+
+    [Fact]
+    public async Task CompletionCheck_WhenCampaignWasDeleted_ReturnsFalse()
+    {
+        var ct = CancellationToken.None;
+        var campaign = CreateStartedCampaign();
+        campaign.StatusFromInProgressToCompleted(DateTime.UtcNow);
+        Assert.True(await _campaignRepository.TryUpdateStatusAsync(campaign, CampaignStatus.InProgress, ct));
+        Assert.Equal(CampaignDeleteResult.Deleted, await _campaignRepository.DeleteIfInactiveAsync(campaign.Id, ct));
+
+        Assert.False(await _service.CompleteCampaignIfFinishedAsync(campaign.Id, ct));
     }
 
     [Fact]
@@ -122,6 +138,7 @@ public class DeliveryProcessingServiceTests
         Assert.Equal(1, released);
         Assert.Equal(DeliveryStatus.Waiting, expired.DeliveryStatus);
         Assert.Equal(DeliveryStatus.InProgress, active.DeliveryStatus);
+        Assert.Equal(CampaignStatus.InProgress, campaign.Status);
     }
 
     [Theory]

@@ -12,8 +12,8 @@ if __name__=="__main__":
     summary=analyze(output)
     manifest=json.loads((output/"manifest.json").read_text())
     final=json.loads((output/"final.json").read_text())
-    assert final["sent"]==1 and final["campaign_status"]==1
-    assert manifest["workload_status"]=="completion_stalled"
+    assert final["sent"]==1 and final["campaign_status"]==2
+    assert manifest["workload_status"]=="completed"
     assert summary["reconciliation_difference"]==0
     assert json.loads((output/"final-journal.json").read_text())["terminal_entries"]==0
-    print("PASS: terminal commit + journal failure, no false completion, 120s completion_stalled, no automatic repair")
+    print("PASS: terminal commit + journal failure, Worker recovery completed the campaign without a terminal journal entry")

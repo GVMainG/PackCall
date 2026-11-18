@@ -32,7 +32,10 @@ public interface IDeliveryProcessingService
     /// <exception cref="KeyNotFoundException">Кампания доставки не найдена.</exception>
     Task ProcessAsync(Delivery delivery, CancellationToken ct);
 
-    /// <summary>Возвращает доставки с истёкшим закреплением в Waiting, фиксирует возврат в журнале.</summary>
+    /// <summary>
+    /// Возвращает доставки с истёкшим закреплением в Waiting, записывает возврат в журнал
+    /// и завершает активные кампании без незавершённых доставок.
+    /// </summary>
     /// <returns>Количество возвращённых доставок; повторный вызов не затрагивает уже возвращённые доставки.</returns>
     Task<int> ReleaseExpiredLocksAsync(CancellationToken ct);
 

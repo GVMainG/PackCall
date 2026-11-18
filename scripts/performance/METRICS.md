@@ -14,7 +14,7 @@
 | AfterTerminalApplied | Ошибка/отмена после true persistence; terminal counter сохраняется |
 | JournalFinished | Success/Error/Cancelled, назначение Capture/Terminal/Recovery/Pause |
 | CampaignChecks | Вход проверки кампании, в том числе no-op |
-| CampaignCompleted | Только true условного сохранения Completed |
+| CampaignCompleted | Число кампаний, переведённых в Completed после результата доставки или при recovery |
 
 | Таймер | Граница |
 |---|---|
@@ -47,6 +47,7 @@ RecoveryStorage заканчиваются при материализованн
 CaptureRows/RecoveryRows записываются сразу, прежде cancellation/journal.
 CaptureEmpty увеличивается только при успешном возврате пустого пакета.
 CaptureTotal/RecoveryTotal включают журнал и заканчиваются в finally.
+SQL сверки завершённости кампаний входит только в RecoveryTotal.
 
 BatchWait начинается сразу после возврата репозитория, включает capture journal
 и предыдущие строки пакета. Ссылка на доставку хранится только слабо и удаляется

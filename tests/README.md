@@ -20,7 +20,7 @@
 | Smoke измерений | `tests/acceptance/measurements` | `python tests/acceptance/measurements/crash_smoke.py` | SDK и Docker; SIGKILL и сохранённый префикс телеметрии |
 | Smoke измерений | `tests/acceptance/measurements` | `python tests/acceptance/measurements/resource_smoke.py` | Docker; реальные collector-снимки |
 | Smoke измерений | `tests/acceptance/measurements` | `python tests/acceptance/measurements/control_smoke.py` | Docker и SDK; stop/cleanup владельца сессии |
-| Smoke измерений | `tests/acceptance/measurements` | `python tests/acceptance/measurements/stall_smoke.py` | Docker и SDK; terminal journal failure, ожидание stall 120s |
+| Smoke измерений | `tests/acceptance/measurements` | `python tests/acceptance/measurements/stall_smoke.py` | Docker и SDK, восстановление завершения кампании после сбоя записи журнала |
 | Smoke измерений | `tests/acceptance/measurements` | `python tests/acceptance/measurements/two_worker_crash.py` | Docker и SDK; малая нагрузка, два worker и SIGKILL |
 
 `PACKCALL_TEST_POSTGRES` должен указывать на выделенную тестовую PostgreSQL БД с правами создания/удаления схем. Каждый PostgreSQL тест создаёт отдельную случайную схему и удаляет её при disposal. При отсутствии строки подключения тесты явно пропускаются; это неполная проверка. Коллекция `Measurement` сохраняет сериализацию сценариев измерений.
