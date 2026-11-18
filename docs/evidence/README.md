@@ -12,3 +12,5 @@ commit SHA, версию окружения и команду воспроизв
 [эксперимент с индексом захвата](beta3/capture-index-experiment.md),
 [проверка миграции индекса](beta3/capture-index-migration.md) и
 [восстановление кампаний и повтор SM-6](beta3/sm6-recovery.md).
+
+[Матрица выборки, попытки и снимок кампании SM-2](beta3/sm2-audience.md).
