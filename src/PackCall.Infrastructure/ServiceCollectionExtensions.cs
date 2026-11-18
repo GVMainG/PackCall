@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PackCall.Core.Entities;
 using PackCall.Core.Journaling;
 using PackCall.Core.Repositorys;
 using PackCall.Core.Sending;
@@ -35,14 +36,29 @@ namespace PackCall.Infrastructure
         public static IServiceCollection AddDeliveryProcessing(this IServiceCollection services, Hosting.TestOperatorSettings settings)
         {
             services.AddRepositories()
-                .AddScoped<IDeliveryProcessingService, DeliveryProcessingService>()
+                .AddChannelOperators(settings)
+                .AddScoped<DeliveryProcessingService>(provider => new DeliveryProcessingService(
+                    provider.GetRequiredService<IDeliveryRepository>(),
+                    provider.GetRequiredService<ICampaingRepository>(),
+                    provider.GetRequiredKeyedService<IMessageSender>(ContactChannel.Email),
+                    provider.GetRequiredService<IDeliveryStatusJournal>(),
+                    provider.GetRequiredService<SendPolicy>(),
+                    provider.GetService<TimeProvider>()))
+                .AddScoped<IDeliveryProcessingService>(provider => provider.GetRequiredService<DeliveryProcessingService>())
                 .AddSingleton<PackCall.Core.ILeaseClock, PostgresLeaseClock>()
                 .AddSingleton<IDeliveryStatusJournal, DeliveryStatusJournal>()
                 .AddSingleton(new SendPolicy(settings.SimulateErrors));
+            return services;
+        }
+
+        public static IServiceCollection AddChannelOperators(this IServiceCollection services, Hosting.TestOperatorSettings settings)
+        {
+            services.AddSingleton<IChannelOperatorAvailability, KeyedChannelOperatorAvailability>();
             if (settings.Mode == Hosting.TestSenderMode.Inprocess)
-                services.AddSingleton<IOperatorRandom, OperatorRandom>().AddSingleton<IMessageSender, MockEmailSender>();
+                services.AddSingleton<IOperatorRandom, OperatorRandom>()
+                    .AddKeyedSingleton<IMessageSender, MockEmailSender>(ContactChannel.Email);
             else
-                services.AddSingleton<IMessageSender>(_ => new HttpTestEmailSender(settings));
+                services.AddKeyedSingleton<IMessageSender>(ContactChannel.Email, (_, _) => new HttpTestEmailSender(settings));
             return services;
         }
     }

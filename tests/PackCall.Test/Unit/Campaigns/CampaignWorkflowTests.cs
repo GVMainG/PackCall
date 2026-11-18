@@ -16,7 +16,7 @@ public class CampaignWorkflowTests
         var campaigns = new FakeCampaignRepository(deliveries);
         var recipients = new FakeContactRepository();
         recipients.Items.Add(Contact.Create([(ContactChannel.Email, "user@example.com")], DateTime.UtcNow));
-        var service = new CampaignService(campaigns, deliveries, recipients);
+        var service = new CampaignService(campaigns, deliveries, recipients, new EmailOperatorAvailability());
         var sender = new FakeMessageSender();
         var processing = new DeliveryProcessingService(deliveries, campaigns, sender, new FakeJournal(), new SendPolicy(false));
         var id = await service.CreateCampaignAsync("Рассылка", "Сообщение", CancellationToken.None);
@@ -55,7 +55,8 @@ public class CampaignWorkflowTests
         var recipients = new FakeContactRepository();
         recipients.Items.Add(Contact.Create([(ContactChannel.Email, "first@example.com")], DateTime.UtcNow));
         recipients.Items.Add(Contact.Create([(ContactChannel.Email, "second@example.com")], DateTime.UtcNow));
-        ICampaignService campaignService = new CampaignService(campaigns, deliveries, recipients);
+        ICampaignService campaignService = new CampaignService(campaigns, deliveries, recipients,
+            new EmailOperatorAvailability());
         var sender = new FakeMessageSender();
         var journal = new FakeJournal();
         IDeliveryProcessingService processing = new DeliveryProcessingService(deliveries, campaigns, sender, journal, new SendPolicy(false));

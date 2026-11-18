@@ -23,12 +23,12 @@ builder.Services.AddStorage(PackCallHosting.ConnectionString(builder.Configurati
 builder.Services.AddDeliveryProcessing(PackCall.Infrastructure.Hosting.TestOperatorSettings.Parse(builder.Configuration));
 builder.Services.AddSingleton(new WorkerIdentity(id));
 var settings = TestOperatorSettings.Parse(builder.Configuration);
-builder.Services.RemoveAll<IMessageSender>();
+builder.Services.RemoveAllKeyed<IMessageSender>(ContactChannel.Email);
 IMessageSender CreateSender() => settings.Mode == TestSenderMode.Http
     ? new HttpTestEmailSender(settings) : new MockEmailSender(new OperatorRandom());
 var sm6Case = Environment.GetEnvironmentVariable("SM6_CASE");
 if (sm6Case is null)
-    builder.Services.AddSingleton<IMessageSender>(sp => new BarrierSender(sp.GetRequiredService<IServiceScopeFactory>(),
+    builder.Services.AddKeyedSingleton<IMessageSender>(ContactChannel.Email, (sp, _) => new BarrierSender(sp.GetRequiredService<IServiceScopeFactory>(),
         sp.GetRequiredService<WorkerIdentity>(), CreateSender()));
 else
     Sm6Controls.Register(builder.Services, sm6Case, CreateSender);

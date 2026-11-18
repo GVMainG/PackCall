@@ -28,6 +28,9 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         return Task.FromResult(_store.GetValueOrDefault(id));
     }
 
+    public Task<IReadOnlyList<string>> GetChannelsAsync(Guid id, CancellationToken ct) =>
+        Task.FromResult<IReadOnlyList<string>>([]);
+
     public Task<PageResult<Campaign>> GetPage(int pageNumber, int pageSize, CancellationToken ct)
     {
         var items = _store.Values
@@ -75,6 +78,11 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         _deliveries?.RemoveByCampaign(id);
         return Task.FromResult(true);
     }
+}
+
+internal sealed class EmailOperatorAvailability : IChannelOperatorAvailability
+{
+    public bool HasOperator(string channel) => channel == ContactChannel.Email;
 }
 
 internal sealed class FakeContactRepository : IContactRepository

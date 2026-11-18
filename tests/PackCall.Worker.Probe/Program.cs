@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using PackCall.Core;
+using PackCall.Core.Entities;
 using PackCall.Core.Sending;
 using PackCall.Infrastructure;
 using PackCall.Infrastructure.Hosting;
@@ -17,7 +19,11 @@ builder.Services.Configure<HostOptions>(o => o.ShutdownTimeout = TimeSpan.FromSe
 builder.Services.Configure<DeliveryWorkerOptions>(o => { o.Parallelism = 1; o.BatchSize = 1; });
 var mode = Environment.GetEnvironmentVariable("PROBE_MODE");
 if (mode == "before") builder.Services.AddSingleton<ILeaseClock, BarrierClock>();
-else builder.Services.AddSingleton<IMessageSender, UncooperativeSender>();
+else
+{
+    builder.Services.RemoveAllKeyed<IMessageSender>(ContactChannel.Email);
+    builder.Services.AddKeyedSingleton<IMessageSender, UncooperativeSender>(ContactChannel.Email);
+}
 builder.Services.AddHostedService<DeliveryWorker>();
 await builder.Build().RunAsync();
 

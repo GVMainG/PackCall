@@ -88,11 +88,19 @@ public class TestOperatorTests : OperatorTestBase
 
     [Theory]
     [InlineData("inprocess", typeof(MockEmailSender))] [InlineData("http", typeof(HttpTestEmailSender))]
-    public void OneSender(string mode, Type expected)
+    public void RegistersExactlyOneKeyedEmailSender(string mode, Type expected)
     {
         var services = new ServiceCollection().AddDeliveryProcessing(TestOperatorSettings.Parse(Config(mode: mode)));
         using var provider = services.BuildServiceProvider();
-        Assert.IsType(expected, Assert.Single(provider.GetServices<IMessageSender>()));
+        Assert.IsType(expected, Assert.Single(provider.GetKeyedServices<IMessageSender>(ContactChannel.Email)));
+        Assert.Empty(provider.GetServices<IMessageSender>());
+        foreach (var channel in new[] { ContactChannel.Telegram, "sms" })
+            Assert.Null(provider.GetKeyedService<IMessageSender>(channel));
+
+        var availability = provider.GetRequiredService<IChannelOperatorAvailability>();
+        Assert.True(availability.HasOperator(ContactChannel.Email));
+        Assert.False(availability.HasOperator(ContactChannel.Telegram));
+        Assert.False(availability.HasOperator("sms"));
     }
 
     [Theory]

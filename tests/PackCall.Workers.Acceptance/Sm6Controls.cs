@@ -29,9 +29,9 @@ sealed class Sm6Controls
             throw new InvalidOperationException("Unknown SM-6 scenario");
 
         services.AddSingleton(new Sm6Controls(scenario));
-        services.AddSingleton<IMessageSender>(sp => new Sm6Sender(sp.GetRequiredService<Sm6Controls>(), createSender()));
+        services.AddKeyedSingleton<IMessageSender>(ContactChannel.Email,
+            (sp, _) => new Sm6Sender(sp.GetRequiredService<Sm6Controls>(), createSender()));
         services.RemoveAll<IDeliveryProcessingService>();
-        services.AddScoped<DeliveryProcessingService>();
         services.AddScoped<IDeliveryProcessingService, CaptureBarrier>();
     }
 

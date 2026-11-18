@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using PackCall.Api.Controllers;
 using PackCall.Core.Entities;
@@ -17,6 +18,7 @@ using PackCall.Core.Repositorys;
 using PackCall.Core.Sending;
 using PackCall.Core.Services;
 using PackCall.Infrastructure;
+using PackCall.Infrastructure.Hosting;
 using Serilog;
 using System.Text.Json;
 
@@ -63,9 +65,37 @@ public abstract class PostgresTestBase : IAsyncLifetime
     private protected void AddServices(IServiceCollection services)
     {
         services.AddInfrastructure(_connectionString, new PackCall.Infrastructure.Hosting.TestOperatorSettings(PackCall.Infrastructure.Hosting.TestSenderMode.Inprocess, false));
-        services.AddSingleton<IMessageSender>(_sender);
+        services.RemoveAllKeyed<IMessageSender>(ContactChannel.Email);
+        services.AddKeyedSingleton<IMessageSender>(ContactChannel.Email, _sender);
         services.AddScoped<ICampaignService, CampaignService>();
-        services.AddScoped<IDeliveryProcessingService, DeliveryProcessingService>();
+    }
+
+    private protected async Task<WebApplication> StartApiAsync(TestSenderMode mode = TestSenderMode.Inprocess)
+    {
+        var builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseUrls("http://127.0.0.1:0");
+        builder.Services.AddStorage(_connectionString).AddCampaignManagement()
+            .AddChannelOperators(new TestOperatorSettings(mode, false,
+                new Uri("http://localhost:12345"), TimeSpan.FromSeconds(5)));
+        builder.Services.AddSingleton<ILogger>(Log.Logger);
+        builder.Services.AddControllers().AddApplicationPart(typeof(ContactsController).Assembly)
+            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+        builder.Services.AddProblemDetails();
+        var handler = typeof(ContactsController).Assembly.GetType(
+            "PackCall.Api.Middleware.ApiExceptionHandler", throwOnError: true)!;
+        builder.Services.AddSingleton(typeof(IExceptionHandler), handler);
+        var app = builder.Build();
+        app.UseExceptionHandler();
+        app.UseStatusCodePages();
+        app.MapControllers();
+        await app.StartAsync();
+        return app;
+    }
+
+    private protected static HttpClient CreateClient(WebApplication app)
+    {
+        var server = app.Services.GetRequiredService<IServer>();
+        return new HttpClient { BaseAddress = new Uri(server.Features.Get<IServerAddressesFeature>()!.Addresses.Single()) };
     }
 
     private protected async Task<Guid> CreateStartedCampaignAsync(int recipients = 1)

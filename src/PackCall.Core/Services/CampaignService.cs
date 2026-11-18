@@ -1,5 +1,6 @@
 using PackCall.Core.Entities;
 using PackCall.Core.Repositorys;
+using PackCall.Core.Sending;
 using PackCall.Core.Exceptions;
 
 namespace PackCall.Core.Services;
@@ -11,15 +12,18 @@ public sealed class CampaignService : ICampaignService
     private readonly ICampaingRepository _campaignRepository;
     private readonly IDeliveryRepository _deliveryRepository;
     private readonly IContactRepository _recipientRepository;
+    private readonly IChannelOperatorAvailability _operators;
 
     public CampaignService(
         ICampaingRepository campaignRepository,
         IDeliveryRepository deliveryRepository,
-        IContactRepository recipientRepository)
+        IContactRepository recipientRepository,
+        IChannelOperatorAvailability operators)
     {
         _campaignRepository = campaignRepository;
         _deliveryRepository = deliveryRepository;
         _recipientRepository = recipientRepository;
+        _operators = operators;
     }
 
     public async Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct)
@@ -100,6 +104,17 @@ public sealed class CampaignService : ICampaignService
 
         ct.ThrowIfCancellationRequested();
         var previousStatus = campaign.Status;
+        if (previousStatus == CampaignStatus.Draft)
+        {
+            var channels = await _campaignRepository.GetChannelsAsync(campaignId, ct);
+            if (channels.Count == 0)
+                channels = [ContactChannel.Email];
+
+            foreach (var channel in channels)
+                if (!_operators.HasOperator(channel))
+                    throw new ChannelOperatorUnavailableException(channel);
+        }
+        ct.ThrowIfCancellationRequested();
         campaign.StatusFromDraftToInProgress();
         ct.ThrowIfCancellationRequested();
 

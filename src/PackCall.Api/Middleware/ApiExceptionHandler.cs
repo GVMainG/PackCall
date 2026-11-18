@@ -20,6 +20,7 @@ internal sealed class ApiExceptionHandler(Serilog.ILogger logger) : IExceptionHa
             ContactAddressConflictException => (StatusCodes.Status409Conflict, "Адрес канала уже занят"),
             ContactWriteDeadlockException => (StatusCodes.Status503ServiceUnavailable, "Повторите запрос"),
             RecipientAlreadyExistsException => (StatusCodes.Status409Conflict, "Получатель с таким email уже существует"),
+            ChannelOperatorUnavailableException => (StatusCodes.Status409Conflict, "Оператор канала недоступен"),
             DomainException or InvalidOperationException =>
                 (StatusCodes.Status409Conflict, "Операция недоступна в текущем состоянии"),
             _ => (0, null)
@@ -33,9 +34,11 @@ internal sealed class ApiExceptionHandler(Serilog.ILogger logger) : IExceptionHa
         {
             Status = status,
             Title = title,
+            Detail = exception is ChannelOperatorUnavailableException ? exception.Message : null,
             Instance = httpContext.Request.Path
         }, options: null,
-            contentType: httpContext.Request.Path.StartsWithSegments("/api/contacts", StringComparison.OrdinalIgnoreCase)
+            contentType: exception is ChannelOperatorUnavailableException ||
+                httpContext.Request.Path.StartsWithSegments("/api/contacts", StringComparison.OrdinalIgnoreCase)
                 ? "application/problem+json"
                 : "application/json; charset=utf-8",
             cancellationToken);

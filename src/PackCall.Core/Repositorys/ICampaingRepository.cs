@@ -5,6 +5,7 @@ namespace PackCall.Core.Repositorys
     public interface ICampaingRepository
     {
         Task<Campaign?> Get(Guid id, CancellationToken ct);
+        Task<IReadOnlyList<string>> GetChannelsAsync(Guid id, CancellationToken ct);
         /// <summary>
         /// Возвращает страницу в порядке Id и общее число кампаний; нумерация с 1.
         /// </summary>

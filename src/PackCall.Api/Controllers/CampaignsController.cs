@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PackCall.Api.Models;
+using PackCall.Core.Entities;
 using PackCall.Core.Services;
 
 namespace PackCall.Api.Controllers;
@@ -41,6 +42,19 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
     public async Task<ActionResult<CampaignResponse>> CreateCampaign(
         CreateCampaignRequest request, CancellationToken ct)
     {
+        if (request.Channels is { } channels)
+        {
+            if (channels.Count == 0)
+                ModelState.AddModelError("channels", "Укажите хотя бы один канал.");
+            else if (channels.Any(channel => channel is null || !ContactChannel.SupportedChannels.Contains(channel)))
+                ModelState.AddModelError("channels", "Укажите известные каналы в нижнем регистре: email, telegram.");
+            else if (channels.Contains(ContactChannel.Telegram))
+                ModelState.AddModelError("channels", "Создание кампаний для telegram появится после перехода на снимки.");
+
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+        }
+
         var id = await campaigns.CreateCampaignAsync(request.Name ?? "", request.MessageText ?? "", ct);
         var campaign = await campaigns.GetCampaignAsync(id, ct)
             ?? throw new InvalidOperationException("Созданная кампания не найдена.");

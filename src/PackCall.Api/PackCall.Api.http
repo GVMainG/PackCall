@@ -18,6 +18,9 @@ GET {{baseUrl}}/api/recipients/{{createRecipient.response.body.$.id}}
 ### Список кампаний
 GET {{baseUrl}}/api/campaigns?pageNumber=1&pageSize=20
 
+### Каналы, поддерживаемые моделью
+GET {{baseUrl}}/api/channels
+
 ### Кампания со статистикой
 GET {{baseUrl}}/api/campaigns/{{campaignId}}
 
@@ -27,7 +30,18 @@ Content-Type: application/json
 
 {
   "name": "Первая рассылка",
-  "messageText": "Добрый день!"
+  "messageText": "Добрый день!",
+  "channels": ["email"]
+}
+
+### Неизвестный канал (400)
+POST {{baseUrl}}/api/campaigns
+Content-Type: application/json
+
+{
+  "name": "Первая рассылка",
+  "messageText": "Добрый день!",
+  "channels": ["sms"]
 }
 
 ### Изменить черновик

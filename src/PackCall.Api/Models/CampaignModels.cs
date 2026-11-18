@@ -7,6 +7,8 @@ public sealed record CreateCampaignRequest
 {
     public string? Name { get; init; }
     public string? MessageText { get; init; }
+    /// <summary>Каналы кампании. Если поле пропущено или равно null, используется email.</summary>
+    public IReadOnlyList<string?>? Channels { get; init; }
 }
 
 /// <summary>Изменяемые поля черновика кампании; пропущенное поле сохраняет прежнее значение.</summary>

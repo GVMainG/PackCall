@@ -127,7 +127,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
             if (campaign.Status != CampaignStatus.InProgress)
                 throw new DomainException("Обрабатывать доставки можно только у запущенной кампании.");
 
-            if (delivery.Channel != "email" || string.IsNullOrWhiteSpace(delivery.AddressSnapshot))
+            if (delivery.Channel != ContactChannel.Email || string.IsNullOrWhiteSpace(delivery.AddressSnapshot))
                 throw new DomainException("Доставка не имеет доступного email-снимка; отправка запрещена.");
             var request = new SendRequest(
                 delivery.Id,

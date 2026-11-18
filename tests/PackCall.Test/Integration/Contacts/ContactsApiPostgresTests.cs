@@ -1,14 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PackCall.Api.Controllers;
 using PackCall.Api.Models;
 using PackCall.Infrastructure;
 
@@ -145,28 +139,4 @@ public sealed class ContactsApiPostgresTests : PostgresTestBase
         Assert.Equal((int)status, body.GetProperty("status").GetInt32());
     }
 
-    private async Task<WebApplication> StartApiAsync()
-    {
-        var builder = WebApplication.CreateBuilder();
-        builder.WebHost.UseUrls("http://127.0.0.1:0");
-        AddServices(builder.Services);
-        builder.Services.AddSingleton<Serilog.ILogger>(Serilog.Log.Logger);
-        builder.Services.AddControllers().AddApplicationPart(typeof(ContactsController).Assembly);
-        builder.Services.AddProblemDetails();
-        var handler = typeof(ContactsController).Assembly.GetType(
-            "PackCall.Api.Middleware.ApiExceptionHandler", throwOnError: true)!;
-        builder.Services.AddSingleton(typeof(IExceptionHandler), handler);
-        var app = builder.Build();
-        app.UseExceptionHandler();
-        app.UseStatusCodePages();
-        app.MapControllers();
-        await app.StartAsync();
-        return app;
-    }
-
-    private static HttpClient CreateClient(WebApplication app)
-    {
-        var server = app.Services.GetRequiredService<IServer>();
-        return new HttpClient { BaseAddress = new Uri(server.Features.Get<IServerAddressesFeature>()!.Addresses.Single()) };
-    }
 }

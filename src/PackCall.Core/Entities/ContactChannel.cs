@@ -8,6 +8,7 @@ public sealed class ContactChannel
 {
     public const string Email = "email";
     public const string Telegram = "telegram";
+    public static IReadOnlyList<string> SupportedChannels { get; } = Array.AsReadOnly(new[] { Email, Telegram });
 
     private ContactChannel() { }
 

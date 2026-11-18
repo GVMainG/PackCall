@@ -12,6 +12,10 @@ public sealed class CampaignRepository(AppDbContext dbContext) : ICampaingReposi
             .AsNoTracking()
             .SingleOrDefaultAsync(campaign => campaign.Id == id, ct);
 
+    public async Task<IReadOnlyList<string>> GetChannelsAsync(Guid id, CancellationToken ct) =>
+        await dbContext.CampaignChannels.Where(channel => channel.CampaignId == id)
+            .Select(channel => channel.Channel).ToListAsync(ct);
+
     public async Task<PageResult<Campaign>> GetPage(
         int pageNumber,
         int pageSize,

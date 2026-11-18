@@ -9,7 +9,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     PackCallHosting.LoadConfiguration(builder.Configuration, builder.Environment.EnvironmentName, args);
-    TestOperatorSettings.Parse(builder.Configuration);
+    var operatorSettings = TestOperatorSettings.Parse(builder.Configuration);
     builder.Services.AddPackCallLogging(builder.Configuration, "PackCall.Api");
 
     builder.Services.AddControllers().AddJsonOptions(options =>
@@ -20,6 +20,7 @@ try
 
     builder.Services.AddStorage(PackCallHosting.ConnectionString(builder.Configuration));
     builder.Services.AddCampaignManagement();
+    builder.Services.AddChannelOperators(operatorSettings);
     builder.Services.AddSchemaGate();
     builder.Services.AddPerformanceMeasurement(builder.Configuration, "api");
 

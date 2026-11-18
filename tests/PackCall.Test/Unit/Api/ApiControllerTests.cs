@@ -16,7 +16,8 @@ public class ApiControllerTests
 
     public ApiControllerTests()
     {
-        _service = new CampaignService(new FakeCampaignRepository(_deliveries), _deliveries, _recipients);
+        _service = new CampaignService(new FakeCampaignRepository(_deliveries), _deliveries, _recipients,
+            new EmailOperatorAvailability());
     }
 
     [Fact]

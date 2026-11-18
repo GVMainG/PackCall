@@ -16,7 +16,8 @@ public class CampaignServiceTests
     public CampaignServiceTests()
     {
         _campaignRepository = new FakeCampaignRepository(_deliveryRepository);
-        _service = new CampaignService(_campaignRepository, _deliveryRepository, _recipientRepository);
+        _service = new CampaignService(_campaignRepository, _deliveryRepository, _recipientRepository,
+            new EmailOperatorAvailability());
     }
 
     private Task<Guid> CreateCampaignAsync() =>
