@@ -16,6 +16,9 @@ internal sealed class ApiExceptionHandler(Serilog.ILogger logger) : IExceptionHa
         {
             KeyNotFoundException => (StatusCodes.Status404NotFound, "Ресурс не найден"),
             ArgumentException => (StatusCodes.Status400BadRequest, "Некорректный запрос"),
+            ContactValidationException => (StatusCodes.Status400BadRequest, "Некорректные адреса контакта"),
+            ContactAddressConflictException => (StatusCodes.Status409Conflict, "Адрес канала уже занят"),
+            ContactWriteDeadlockException => (StatusCodes.Status503ServiceUnavailable, "Повторите запрос"),
             RecipientAlreadyExistsException => (StatusCodes.Status409Conflict, "Получатель с таким email уже существует"),
             DomainException or InvalidOperationException =>
                 (StatusCodes.Status409Conflict, "Операция недоступна в текущем состоянии"),
@@ -26,13 +29,16 @@ internal sealed class ApiExceptionHandler(Serilog.ILogger logger) : IExceptionHa
 
         _logger.Warning(exception, "Ошибка запроса API: {StatusCode}", status);
         httpContext.Response.StatusCode = status;
-        httpContext.Response.ContentType = "application/problem+json";
         await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
         {
             Status = status,
             Title = title,
             Instance = httpContext.Request.Path
-        }, cancellationToken);
+        }, options: null,
+            contentType: httpContext.Request.Path.StartsWithSegments("/api/contacts", StringComparison.OrdinalIgnoreCase)
+                ? "application/problem+json"
+                : "application/json; charset=utf-8",
+            cancellationToken);
         return true;
     }
 }

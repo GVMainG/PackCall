@@ -81,6 +81,13 @@ internal sealed class FakeContactRepository : IContactRepository
 {
     public List<Contact> Items { get; } = new();
 
+    public Task<Contact?> GetContactAsync(Guid id, CancellationToken ct) => GetAsync(id, ct);
+
+    public Task<PageResult<Contact>> GetContactsAsync(int pageNumber, int pageSize, CancellationToken ct) =>
+        Task.FromResult(new PageResult<Contact>(
+            Items.OrderBy(contact => contact.Id).Skip((int)Math.Min((pageNumber - 1L) * pageSize, Items.Count))
+                .Take(pageSize).ToList(), Items.Count));
+
     public Task<Contact> CreateAsync(Contact recipient, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();

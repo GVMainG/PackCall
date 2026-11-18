@@ -7,6 +7,8 @@ namespace PackCall.Core.Repositorys;
 /// </summary>
 public interface IContactRepository
 {
+    Task<Contact?> GetContactAsync(Guid id, CancellationToken ct);
+    Task<PageResult<Contact>> GetContactsAsync(int pageNumber, int pageSize, CancellationToken ct);
     /// <summary>Сохраняет контакт. Адрес, занятый в том же канале, отклоняется.</summary>
     Task<Contact> CreateAsync(Contact contact, CancellationToken ct);
     /// <summary>Атомарно заменяет адреса. Возвращает null, если контакт не найден.</summary>

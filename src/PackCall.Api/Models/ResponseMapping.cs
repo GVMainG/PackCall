@@ -18,6 +18,11 @@ internal static class ResponseMapping
     public static RecipientResponse ToResponse(this Contact recipient) => new(
         recipient.Id, recipient.Email, ToOffset(recipient.CreatedAt), ToOffset(recipient.UpdatedAt));
 
+    public static ContactResponse ToContactResponse(this Contact contact) => new(
+        contact.Id, contact.DisplayName, ToOffset(contact.CreatedAt), ToOffset(contact.UpdatedAt),
+        contact.Channels.OrderBy(channel => channel.Channel, StringComparer.Ordinal)
+            .Select(channel => new ContactChannelResponse(channel.Channel, channel.Address)).ToArray());
+
     public static DeliveryStatisticsResponse ToResponse(this DeliveryStatusCounts counts) => new(
         counts.Total, counts.Waiting, counts.InProgress, counts.Sent, counts.Failed);
 

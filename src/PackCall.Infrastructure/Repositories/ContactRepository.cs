@@ -21,6 +21,19 @@ public sealed class ContactRepository(AppDbContext dbContext, IDbContextFactory<
     public async Task<Contact?> ReplaceAddressesAsync(Guid id,
         IEnumerable<(string Channel, string? Address)> addresses, CancellationToken ct)
     {
+        try
+        {
+            return await ReplaceInTransactionAsync(id, addresses, ct);
+        }
+        catch (Exception exception) when (IsDeadlock(exception))
+        {
+            throw new ContactWriteDeadlockException(exception);
+        }
+    }
+
+    private async Task<Contact?> ReplaceInTransactionAsync(Guid id,
+        IEnumerable<(string Channel, string? Address)> addresses, CancellationToken ct)
+    {
         await using var db = await factory.CreateDbContextAsync(ct);
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
         // Сериализуем замены одного контакта до чтения его текущих адресов.
@@ -47,6 +60,34 @@ public sealed class ContactRepository(AppDbContext dbContext, IDbContextFactory<
         {
             throw new ContactAddressConflictException(exception);
         }
+        catch (Exception exception) when (IsDeadlock(exception))
+        {
+            throw new ContactWriteDeadlockException(exception);
+        }
+    }
+
+    private static bool IsDeadlock(Exception? exception) => exception switch
+    {
+        PostgresException { SqlState: PostgresErrorCodes.DeadlockDetected } => true,
+        DbUpdateException or InvalidOperationException => IsDeadlock(exception.InnerException),
+        _ => false
+    };
+
+    public Task<Contact?> GetContactAsync(Guid id, CancellationToken ct) =>
+        dbContext.Contacts.AsNoTracking().Include(contact => contact.Channels)
+            .SingleOrDefaultAsync(contact => contact.Id == id, ct);
+
+    public async Task<PageResult<Contact>> GetContactsAsync(int pageNumber, int pageSize, CancellationToken ct)
+    {
+        var query = dbContext.Contacts.AsNoTracking();
+        var totalCount = await query.CountAsync(ct);
+        var offset = (pageNumber - 1L) * pageSize;
+        if (offset >= totalCount)
+            return new PageResult<Contact>([], totalCount);
+
+        var items = await query.Include(contact => contact.Channels)
+            .OrderBy(contact => contact.Id).Skip((int)offset).Take(pageSize).ToListAsync(ct);
+        return new PageResult<Contact>(items, totalCount);
     }
 
     public Task<Contact?> GetByEmailAsync(string email, CancellationToken ct)

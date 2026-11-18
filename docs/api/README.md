@@ -1,12 +1,27 @@
 # Контракт API
 
-Baseline контракта API — [`docs/api/openapi.v1.json`](openapi.v1.json). Он снят с API на HEAD
-(`beta.2`) и отражает текущие эндпоинты и схемы. До `beta.3` API оперирует `recipients`
-(`contacts`/`contact_channels` придут в `beta.3`, ADR 0001); изменение API диффится против
+Baseline контракта API — [`docs/api/openapi.v1.json`](openapi.v1.json). Он отражает эндпоинты
+и схемы релиза `beta.2`. Изменение API диффится против
 baseline, намеренные breaking changes записываются в release notes. До 0.5 API не объявляется
 стабильным.
 
-Wire-спеллинг (AD-7): статусы — PascalCase, будущий `Channel` — lowercase (`email`|`telegram`).
+Wire-спеллинг (AD-7) использует PascalCase для статусов и нижний регистр для каналов.
+
+## API контактов
+
+- `POST /api/contacts` принимает `{"displayName":"Анна","channels":[{"channel":"telegram","address":"-100123"}]}`.
+  `displayName` необязателен, длина до 255 символов. Ответ `201` содержит контакт и заголовок `Location`.
+- `GET /api/contacts/{id}` возвращает `id`, `displayName`, `createdAt`, `updatedAt` и `channels`.
+  У исторических контактов даты могут быть `null`.
+- `GET /api/contacts` возвращает `items`, `pageNumber`, `pageSize`, `totalCount`, `totalPages`.
+  По умолчанию возвращается страница 1 по 20 контактов, допустимый размер страницы 1–100.
+- `PATCH /api/contacts/{id}` принимает `channels` в том же формате и заменяет весь набор адресов.
+  Ответ `200` содержит обновлённый контакт. Снимки существующих доставок сохраняются.
+
+Контакт включает хотя бы один адрес канала `email` или `telegram`. Telegram chat ID передаётся строкой.
+Ошибки возвращаются как ProblemDetails. Некорректные данные дают `400`, отсутствующий контакт — `404`,
+занятый адрес — `409`, откат записи из-за дедлока — `503` с возможностью повторить запрос.
+`/api/recipients` по-прежнему обслуживает email-получателей.
 
 ## Регенерация
 
