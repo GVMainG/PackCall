@@ -70,13 +70,19 @@ public abstract class PostgresTestBase : IAsyncLifetime
         services.AddScoped<ICampaignService, CampaignService>();
     }
 
-    private protected async Task<WebApplication> StartApiAsync(TestSenderMode mode = TestSenderMode.Inprocess)
+    private protected async Task<WebApplication> StartApiAsync(TestSenderMode mode = TestSenderMode.Inprocess,
+        bool recordEmailRequests = false)
     {
         var builder = WebApplication.CreateBuilder();
         builder.WebHost.UseUrls("http://127.0.0.1:0");
         builder.Services.AddStorage(_connectionString).AddCampaignManagement()
             .AddChannelOperators(new TestOperatorSettings(mode, false,
                 new Uri("http://localhost:12345"), TimeSpan.FromSeconds(5)));
+        if (recordEmailRequests)
+        {
+            builder.Services.RemoveAllKeyed<IMessageSender>(ContactChannel.Email);
+            builder.Services.AddKeyedSingleton<IMessageSender>(ContactChannel.Email, _sender);
+        }
         builder.Services.AddSingleton<ILogger>(Log.Logger);
         builder.Services.AddControllers().AddApplicationPart(typeof(ContactsController).Assembly)
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));

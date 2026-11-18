@@ -155,7 +155,7 @@ public sealed class ChannelsApiPostgresTests : PostgresTestBase
     [InlineData(true)]
     public async Task StartRejectsMissingOperatorBeforeWorkerCanCapture(bool mixed)
     {
-        await using var app = await StartApiAsync();
+        await using var app = await StartApiAsync(recordEmailRequests: true);
         using var client = CreateClient(app);
         await using var scope = _provider!.CreateAsyncScope();
         var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
@@ -184,6 +184,7 @@ public sealed class ChannelsApiPostgresTests : PostgresTestBase
 
         var processing = scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
         Assert.Empty(await processing.CaptureBatchAsync(1, "worker", TimeSpan.FromSeconds(60), default));
+        Assert.Empty(_sender.Requests);
         var deliveries = await db.Deliveries.AsNoTracking().Where(d => d.CampaignId == campaignId).ToListAsync();
         Assert.Equal(channels, deliveries.Select(delivery => delivery.Channel).Order());
         Assert.All(deliveries, delivery =>

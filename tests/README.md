@@ -6,6 +6,7 @@
 |---|---|---|---|
 | Unit C# | `tests/PackCall.Test/Unit/<Module>` | `dotnet test tests/PackCall.Test --filter "Category=Unit"` | Все выбранные проверки проходят; PostgreSQL, Docker и внешний HTTP не нужны |
 | Integration C# | `tests/PackCall.Test/Integration/<Module>` | `dotnet test tests/PackCall.Test --filter "Category=Integration"` | Локальный HTTP, файловая система, host; PostgreSQL-проверки требуют `PACKCALL_TEST_POSTGRES` |
+| SM-2 (FR-9) | `Integration/Campaigns` | `dotnet test tests/PackCall.Test --filter "FullyQualifiedName~CampaignAudiencePostgresTests&#124;FullyQualifiedName~StartRejectsMissingOperatorBeforeWorkerCanCapture" --logger trx` | С выделенной PostgreSQL БД проходят три случая. В выводе теста Worker ожидаются 2 попытки по 2 ID, 0 повторов и вызовов вне выборки, 1 Sent и 1 Failed. Смешанная кампания остаётся Draft |
 | C# по модулю | Api, Campaigns, Deliveries, Workers, Operators, Measurements | `dotnet test tests/PackCall.Test --filter "Module=Workers"` | Можно сочетать: `"Category=Unit&Module=Workers"` |
 | C# с изолированной БД | `tests/PackCall.Test` | `python scripts/performance/postgres_tests.py` | Docker Engine и временный PostgreSQL. Полноту прогона проверьте по числу пропусков в TRX; в CI интеграционные тесты прогоняются с запретом скипов (`--forbid-skipped`) |
 | Offline Python | `tests/tools/performance` | `python -m pytest tests/tools/performance -q` | Проверки инструментов анализа, чтения и сбора (`jsonschema`, `pytest` из `scripts/performance/requirements.txt`); в CI прогоняется в job `python_offline` с запретом скипов |
