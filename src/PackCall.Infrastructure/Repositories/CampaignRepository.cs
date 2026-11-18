@@ -54,7 +54,7 @@ public sealed class CampaignRepository(AppDbContext dbContext, IDbContextFactory
         return campaign;
     }
 
-    public async Task CreateWithSnapshotAsync(Campaign campaign, Guid[]? contactIds,
+    public async Task<bool> CreateWithSnapshotAsync(Campaign campaign, Guid[]? contactIds,
         IReadOnlyList<string> channels, CancellationToken ct)
     {
         await using var db = await factory.CreateDbContextAsync(ct);
@@ -77,10 +77,12 @@ public sealed class CampaignRepository(AppDbContext dbContext, IDbContextFactory
                 SELECT {campaign.Id}, id FROM contacts WHERE id = ANY({contactIds})
                 """, ct);
             if (inserted != contactIds.Length)
-                throw new ArgumentException("Один или несколько выбранных контактов не найдены.", nameof(contactIds));
+                return false;
         }
 
-        await transaction.CommitAsync(ct);
+        ct.ThrowIfCancellationRequested();
+        await transaction.CommitAsync(CancellationToken.None);
+        return true;
     }
 
     public async Task<Campaign> Update(Campaign campaign, CancellationToken ct)
@@ -113,6 +115,18 @@ public sealed class CampaignRepository(AppDbContext dbContext, IDbContextFactory
             .ExecuteDeleteAsync(ct);
 
         return deleted > 0;
+    }
+
+    public async Task<bool> TryPublishDraftAsync(Campaign campaign, CancellationToken ct)
+    {
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(ct);
+        if (!await TryUpdateStatusAsync(campaign, CampaignStatus.Forming, ct))
+            return false;
+
+        // После отправки COMMIT нужно дождаться результата независимо от отмены запроса.
+        ct.ThrowIfCancellationRequested();
+        await transaction.CommitAsync(CancellationToken.None);
+        return true;
     }
 
     public async Task DeleteIfFormingAsync(Guid id, CancellationToken ct) =>

@@ -27,25 +27,33 @@ public sealed class CampaignService : ICampaignService
     }
 
     public async Task<Guid> CreateCampaignSnapshotAsync(string name, string messageText,
-        IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct) =>
-        (await SaveCampaignSnapshotAsync(name, messageText, contactIds, channels, ct)).Id;
+        IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct)
+    {
+        var (contacts, channelSnapshot) = ValidateSelection(contactIds, channels, ct);
+        var campaign = CreateFormingCampaign(name, messageText);
+        if (!await _campaignRepository.CreateWithSnapshotAsync(campaign, contacts, channelSnapshot, ct))
+            throw MissingContacts();
+        return campaign.Id;
+    }
 
     public async Task<Guid> CreateCampaignAsync(string name, string messageText,
         IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct)
     {
-        Campaign campaign;
-        try
+        var (contacts, channelSnapshot) = ValidateSelection(contactIds, channels, ct);
+        var campaign = CreateFormingCampaign(name, messageText);
+        var formed = await CompleteFormationAsync(campaign, async () =>
         {
-            campaign = await SaveCampaignSnapshotAsync(name, messageText, contactIds, channels, ct);
-        }
-        catch (Exception error) when (error is not (ArgumentException or OperationCanceledException))
-        {
-            throw new CampaignFormationException(error);
-        }
-        return await CompleteFormationAsync(campaign, () => FormDeliveriesFromSnapshotAsync(campaign.Id, ct), ct);
+            if (!await _campaignRepository.CreateWithSnapshotAsync(campaign, contacts, channelSnapshot, ct))
+                return false;
+            await FormDeliveriesFromSnapshotAsync(campaign.Id, ct);
+            return true;
+        }, ct);
+        if (!formed)
+            throw MissingContacts();
+        return campaign.Id;
     }
 
-    private async Task<Campaign> SaveCampaignSnapshotAsync(string name, string messageText,
+    private static (Guid[]? Contacts, List<string> Channels) ValidateSelection(
         IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
@@ -66,11 +74,11 @@ public sealed class CampaignService : ICampaignService
             channelSnapshot.Add(channel);
         }
 
-        var campaign = Campaign.Create(name, messageText);
-        campaign.StatusFromDraftToForming();
-        await _campaignRepository.CreateWithSnapshotAsync(campaign, selectedContacts, channelSnapshot, ct);
-        return campaign;
+        return (selectedContacts, channelSnapshot);
     }
+
+    private static ArgumentException MissingContacts() =>
+        new("Один или несколько выбранных контактов не найдены.", "contactIds");
 
     public Task<int> FormDeliveriesFromSnapshotAsync(Guid campaignId, CancellationToken ct) =>
         _deliveryRepository.FormDeliveriesFromSnapshotAsync(campaignId, ct);
@@ -78,31 +86,34 @@ public sealed class CampaignService : ICampaignService
     public async Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        var campaign = Campaign.Create(name, messageText);
-        // Кампанию можно запустить только после записи последнего пакета доставок.
-        campaign.StatusFromDraftToForming();
-        try
+        var campaign = CreateFormingCampaign(name, messageText);
+        await CompleteFormationAsync(campaign, async () =>
         {
             await _campaignRepository.Create(campaign, ct);
-        }
-        catch (Exception error) when (error is not OperationCanceledException)
-        {
-            throw new CampaignFormationException(error);
-        }
-
-        return await CompleteFormationAsync(campaign, () => FormLegacyEmailDeliveriesAsync(campaign, ct), ct);
+            await FormLegacyEmailDeliveriesAsync(campaign, ct);
+            return true;
+        }, ct);
+        return campaign.Id;
     }
 
-    private async Task<Guid> CompleteFormationAsync(Campaign campaign, Func<Task> formDeliveries, CancellationToken ct)
+    private static Campaign CreateFormingCampaign(string name, string messageText)
+    {
+        var campaign = Campaign.Create(name, messageText);
+        campaign.StatusFromDraftToForming();
+        return campaign;
+    }
+
+    private async Task<bool> CompleteFormationAsync(Campaign campaign, Func<Task<bool>> saveAndForm, CancellationToken ct)
     {
         try
         {
-            await formDeliveries();
+            if (!await saveAndForm())
+                return false;
             ct.ThrowIfCancellationRequested();
             campaign.StatusFromFormingToDraft();
-            if (!await _campaignRepository.TryUpdateStatusAsync(campaign, CampaignStatus.Forming, ct))
+            if (!await _campaignRepository.TryPublishDraftAsync(campaign, ct))
                 throw new InvalidOperationException("Не удалось перевести формируемую кампанию в черновик.");
-            return campaign.Id;
+            return true;
         }
         catch (Exception creationError)
         {

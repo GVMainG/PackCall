@@ -20,6 +20,7 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
     public int CreateCount { get; private set; }
     public int UpdateCount { get; private set; }
     public Action? OnGet { get; set; }
+    public Action? AfterCreate { get; set; }
     public Action? OnTryUpdateStatus { get; set; }
 
     public Task<Campaign?> Get(Guid id, CancellationToken ct)
@@ -61,11 +62,15 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         foreach (var delivery in campaign.Deliveries)
             _deliveries?.Add(delivery);
         CreateCount++;
+        AfterCreate?.Invoke();
         return Task.FromResult(campaign);
     }
 
-    public Task CreateWithSnapshotAsync(Campaign campaign, Guid[]? contactIds,
+    public Task<bool> CreateWithSnapshotAsync(Campaign campaign, Guid[]? contactIds,
         IReadOnlyList<string> channels, CancellationToken ct) => throw new NotSupportedException();
+
+    public Task<bool> TryPublishDraftAsync(Campaign campaign, CancellationToken ct) =>
+        TryUpdateStatusAsync(campaign, CampaignStatus.Forming, ct);
 
     public Task<Campaign> Update(Campaign campaign, CancellationToken ct)
     {

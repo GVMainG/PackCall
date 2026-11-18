@@ -113,6 +113,18 @@ public class CampaignServiceTests
     }
 
     [Fact]
+    public async Task CreateCampaign_WhenInitialWriteLosesAcknowledgment_RemovesStoredCampaign()
+    {
+        var writeError = new OperationCanceledException("Внутренняя отмена записи.");
+        _campaignRepository.AfterCreate = () => throw writeError;
+
+        var error = await Assert.ThrowsAsync<CampaignFormationException>(CreateCampaignAsync);
+
+        Assert.Same(writeError, error.InnerException);
+        Assert.Empty((await _service.GetCampaignsAsync(1, 10, CancellationToken.None)).Items);
+    }
+
+    [Fact]
     public async Task CreateCampaign_WhenLaterBatchFails_RemovesPartialCampaign()
     {
         _recipientRepository.Items.AddRange(Enumerable.Range(0, 501)
