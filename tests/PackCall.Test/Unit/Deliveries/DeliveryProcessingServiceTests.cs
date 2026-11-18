@@ -17,18 +17,7 @@ public class DeliveryProcessingServiceTests
 
     public DeliveryProcessingServiceTests() =>
         _service = new DeliveryProcessingService(
-            _deliveryRepository, _campaignRepository, _sender, _journal, new SendPolicy(false));
-
-    [Theory]
-    [InlineData(false)] [InlineData(true)]
-    public async Task PolicyExplicitlyReachesEverySenderCall(bool simulate)
-    {
-        var campaign=CreateStartedCampaign(); AddWaitingDelivery(campaign); AddWaitingDelivery(campaign);
-        var service=new DeliveryProcessingService(_deliveryRepository,_campaignRepository,_sender,_journal,new SendPolicy(simulate));
-        var batch=await service.CaptureBatchAsync(2,"worker",TimeSpan.FromSeconds(90),default);
-        foreach(var delivery in batch) await service.ProcessAsync(delivery,default);
-        Assert.Equal(new[]{simulate,simulate},_sender.SimulateErrors);
-    }
+            _deliveryRepository, _campaignRepository, channel => channel == ContactChannel.Email ? _sender : null, _journal);
 
     private Campaign CreateStartedCampaign()
     {

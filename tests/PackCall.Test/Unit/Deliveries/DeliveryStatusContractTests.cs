@@ -28,16 +28,15 @@ public sealed class DeliveryStatusContractTests
 
     [Theory]
     [InlineData(DeliveryStatus.Waiting, DeliveryStatus.InProgress)]
-    [InlineData(DeliveryStatus.InProgress, DeliveryStatus.Sent, DeliveryStatus.Failed, DeliveryStatus.Waiting)]
+    [InlineData(DeliveryStatus.InProgress, DeliveryStatus.Waiting, DeliveryStatus.Sent, DeliveryStatus.Failed)]
     [InlineData(DeliveryStatus.Sent)]
     [InlineData(DeliveryStatus.Failed)]
     [InlineData((DeliveryStatus)99)]
     public void DeliveryTransitionsMatchContract(DeliveryStatus from, params DeliveryStatus[] targets)
     {
-        Assert.Equal(targets, DeliveryStatusTransitions.GetAllowedTargets(from).ToArray());
-        foreach (var to in Enum.GetValues<DeliveryStatus>())
+        Assert.True(DeliveryStatusTransitions.GetAllowedTargets(from).SetEquals(targets));
+        foreach (var to in Enum.GetValues<DeliveryStatus>().Append((DeliveryStatus)99))
             Assert.Equal(targets.Contains(to), DeliveryStatusTransitions.CanTransition(from, to));
-        Assert.False(DeliveryStatusTransitions.CanTransition(from, (DeliveryStatus)99));
     }
 
     [Theory]

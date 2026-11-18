@@ -14,7 +14,8 @@ namespace PackCall.Core.Test;
 internal sealed class OperatorServer(WebApplication app, Uri url) : IAsyncDisposable
 {
     public Uri Url => url;
-    public HttpTestEmailSender Sender(double seconds=5) => new(new(TestSenderMode.Http,false,url,TimeSpan.FromSeconds(seconds)));
+    public HttpTestEmailSender Sender(double seconds = 5, bool simulateErrors = false) =>
+        new(new(TestSenderMode.Http, simulateErrors, url, TimeSpan.FromSeconds(seconds)));
     public static async Task<OperatorServer> Start(RequestDelegate handler)
     {
         var builder=WebApplication.CreateBuilder();

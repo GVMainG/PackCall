@@ -29,7 +29,7 @@ public class PerformancePostgresTests : PostgresTestBase
         expire.Parameters.AddWithValue("id", delivery.Id);
         await expire.ExecuteNonQueryAsync();
         var service = new DeliveryProcessingService(scope.ServiceProvider.GetRequiredService<IDeliveryRepository>(),
-            scope.ServiceProvider.GetRequiredService<ICampaingRepository>(), _sender, new FailingRecoveryJournal(), new(false));
+            scope.ServiceProvider.GetRequiredService<ICampaingRepository>(), _ => _sender, new FailingRecoveryJournal());
         await Assert.ThrowsAsync<IOException>(() => service.ReleaseExpiredLocksAsync(default));
         Assert.Equal(DeliveryStatus.Waiting, (await ReadDelivery(delivery.Id)).DeliveryStatus);
         var window = measurements.Close()!;
@@ -65,7 +65,7 @@ public class PerformancePostgresTests : PostgresTestBase
         proxy.Scenario = scenario;
         IDeliveryStatusJournal journal = scope.ServiceProvider.GetRequiredService<IDeliveryStatusJournal>();
         if (scenario == "journal_error") journal = new FailingTerminalJournal(journal);
-        var service = new DeliveryProcessingService(repository, scope.ServiceProvider.GetRequiredService<ICampaingRepository>(), sender, journal, new(false));
+        var service = new DeliveryProcessingService(repository, scope.ServiceProvider.GetRequiredService<ICampaingRepository>(), _ => sender, journal);
         var delivery = Assert.Single(await service.CaptureBatchAsync(1, "performance-fixture", TimeSpan.FromSeconds(90), default));
         var exception = await Record.ExceptionAsync(() => service.ProcessAsync(delivery, default));
         var window = collector.Close()!;

@@ -38,7 +38,7 @@ sealed class BarrierClock : ILeaseClock
 }
 sealed class UncooperativeSender : IMessageSender
 {
-    public async Task<SendResult> SendAsync(SendRequest request, bool simulateErrors, CancellationToken ct)
+    public async Task<SendResult> SendAsync(SendRequest request, CancellationToken ct)
     {
         File.WriteAllText("/tmp/packcall-probe-entered", "sender ignoring cancellation");
         await Task.Delay(Timeout.InfiniteTimeSpan);

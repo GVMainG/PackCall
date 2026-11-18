@@ -14,9 +14,11 @@ public sealed class HttpTestEmailSender : IMessageSender, IDisposable
     private readonly HttpMessageInvoker _client;
     private readonly Uri _endpoint;
     private readonly TimeSpan _timeout;
+    private readonly bool _simulateErrors;
 
     public HttpTestEmailSender(TestOperatorSettings settings)
     {
+        _simulateErrors = settings.SimulateErrors;
         _endpoint = new Uri(settings.OperatorUrl!, "v1/email/send");
         _timeout = settings.Timeout ?? TimeSpan.FromSeconds(5);
         _client = new HttpMessageInvoker(new SocketsHttpHandler
@@ -26,7 +28,7 @@ public sealed class HttpTestEmailSender : IMessageSender, IDisposable
         });
     }
 
-    public async Task<SendResult> SendAsync(SendRequest request, bool simulateErrors, CancellationToken ct)
+    public async Task<SendResult> SendAsync(SendRequest request, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         MockEmailSender.Validate(request);
@@ -39,8 +41,8 @@ public sealed class HttpTestEmailSender : IMessageSender, IDisposable
                 Content = JsonContent.Create(new
                 {
                     delivery_id = request.DeliveryId, campaign_id = request.CampaignId,
-                    recipient_id = request.RecipientId, recipient_email = request.RecipientEmail,
-                    message_text = request.MessageText, simulate_errors = simulateErrors
+                    recipient_id = request.ContactId, recipient_email = request.Address,
+                    message_text = request.MessageText, simulate_errors = _simulateErrors
                 })
             };
             using var response = await _client.SendAsync(message, deadline.Token);

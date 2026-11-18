@@ -9,30 +9,28 @@ namespace PackCall.Core.Services;
 
 /// <summary>
 /// Сценарий обработки доставок: атомарный захват пакета, передача сообщения
-/// mock-оператору, фиксация результата, возврат истёкших закреплений
+/// оператору канала, фиксация результата, возврат истёкших закреплений
 /// и завершение кампании.
 /// </summary>
 public sealed class DeliveryProcessingService : IDeliveryProcessingService
 {
     private readonly IDeliveryRepository _deliveryRepository;
     private readonly ICampaingRepository _campaignRepository;
-    private readonly IMessageSender _messageSender;
+    private readonly Func<string, IMessageSender?> _resolveSender;
     private readonly IDeliveryStatusJournal _journal;
-    private readonly SendPolicy _policy;
     private readonly TimeProvider _time;
 
     public DeliveryProcessingService(
         IDeliveryRepository deliveryRepository,
         ICampaingRepository campaignRepository,
-        IMessageSender messageSender,
+        Func<string, IMessageSender?> resolveSender,
         IDeliveryStatusJournal journal,
-        SendPolicy policy, TimeProvider? timeProvider = null)
+        TimeProvider? timeProvider = null)
     {
         _deliveryRepository = deliveryRepository;
         _campaignRepository = campaignRepository;
-        _messageSender = messageSender;
+        _resolveSender = resolveSender;
         _journal = journal;
-        _policy = policy;
         _time = timeProvider ?? TimeProvider.System;
     }
 
@@ -83,7 +81,7 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     }
 
     /// <summary>
-    /// Обрабатывает одну захваченную доставку: передаёт сообщение mock-оператору,
+    /// Обрабатывает одну захваченную доставку: передаёт сообщение оператору канала,
     /// фиксирует ответ и проверяет завершение кампании.
     /// </summary>
     public async Task ProcessAsync(Delivery delivery, CancellationToken ct)
@@ -127,18 +125,21 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
             if (campaign.Status != CampaignStatus.InProgress)
                 throw new DomainException("Обрабатывать доставки можно только у запущенной кампании.");
 
-            if (delivery.Channel != ContactChannel.Email || string.IsNullOrWhiteSpace(delivery.AddressSnapshot))
-                throw new DomainException("Доставка не имеет доступного email-снимка; отправка запрещена.");
+            if (string.IsNullOrWhiteSpace(delivery.AddressSnapshot))
+                throw new DomainException("Доставка не имеет снимка адреса; отправка запрещена.");
+            var sender = _resolveSender(delivery.Channel)
+                ?? throw new ChannelOperatorUnavailableException(delivery.Channel);
             var request = new SendRequest(
                 delivery.Id,
                 delivery.CampaignId,
                 delivery.ContactId,
+                delivery.Channel,
                 delivery.AddressSnapshot,
                 campaign.MessageText);
 
             ct.ThrowIfCancellationRequested();
             var result = await MeasuredOperation.Run(Operation.OperatorCall,
-                () => _messageSender.SendAsync(request, _policy.SimulateErrors, ct),
+                () => sender.SendAsync(request, ct),
                 value => value.IsSuccess ? Outcome.Accepted : Outcome.Rejected, Event.OperatorFinished, time: _time);
 
             ct.ThrowIfCancellationRequested();

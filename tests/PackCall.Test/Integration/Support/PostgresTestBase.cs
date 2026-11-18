@@ -116,7 +116,7 @@ public abstract class PostgresTestBase : IAsyncLifetime
         await using var scope = _provider!.CreateAsyncScope();
         return await scope.ServiceProvider.GetRequiredService<AppDbContext>().Deliveries.AsNoTracking().SingleAsync(d => d.Id == id);
     }
-    private protected static string Snapshot(Delivery d) => JsonSerializer.Serialize(new { d.Id, d.CampaignId, d.ContactId, d.AddressSnapshot, d.CreatedAt, d.DeliveryStatus, d.UpdatedAt, d.CompletedAt, d.WorkerId, d.LockExpiresAt });
+    private protected static string Snapshot(Delivery d) => JsonSerializer.Serialize(new { d.Id, d.CampaignId, d.ContactId, d.Channel, d.AddressSnapshot, d.CreatedAt, d.DeliveryStatus, d.UpdatedAt, d.CompletedAt, d.WorkerId, d.LockExpiresAt });
     private protected async Task<string> Journal(Guid id, NpgsqlConnection? observer = null)
     {
         await using var owned = observer is null ? new NpgsqlConnection(_connectionString) : null;

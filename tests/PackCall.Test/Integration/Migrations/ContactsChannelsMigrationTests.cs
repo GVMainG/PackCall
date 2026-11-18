@@ -83,7 +83,7 @@ public sealed class ContactsChannelsMigrationTests : IAsyncLifetime
             VALUES (gen_random_uuid(), '00000000-0000-0000-0000-000000000003',
                 '00000000-0000-0000-0000-000000000002', 'telegram', '12345', 0, now(), now());
             """);
-        var repository = new DeliveryRepository(db, new MigrationContextFactory(ConnectionString));
+        var repository = new DeliveryRepository(db, new MigrationContextFactory(ConnectionString), new EmailOperatorAvailability());
         Assert.Empty(await repository.CaptureBatchAsync(10, "test-worker", TimeSpan.FromMinutes(1), CancellationToken.None));
     }
 

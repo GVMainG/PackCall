@@ -144,8 +144,10 @@ public sealed class ChannelsApiPostgresTests : PostgresTestBase
         Assert.False(await db.Deliveries.AnyAsync());
     }
 
-    [PostgresFact]
-    public async Task StartRejectsMissingOperatorBeforeWorkerCanCapture()
+    [PostgresTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task StartRejectsMissingOperatorBeforeWorkerCanCapture(bool mixed)
     {
         await using var app = await StartApiAsync();
         using var client = CreateClient(app);
@@ -158,11 +160,13 @@ public sealed class ChannelsApiPostgresTests : PostgresTestBase
         Assert.Equal(HttpStatusCode.OK, legacy.StatusCode);
         Assert.Equal(CampaignStatus.InProgress, (await campaigns.GetCampaignAsync(legacyId, default))!.Status);
 
-        await campaigns.CreateRecipientAsync("test@example.com", default);
+        var contacts = scope.ServiceProvider.GetRequiredService<IContactRepository>();
+        await contacts.CreateAsync(Contact.Create([("email", "test@example.com"), ("telegram", "42")], DateTime.UtcNow), default);
+        var channels = mixed ? new[] { "email", "telegram" } : ["telegram"];
         using var created = await client.PostAsJsonAsync("/api/campaigns", new
         {
             name = "Multiple channels", messageText = "text", selection = "all",
-            channels = new[] { "email", "telegram" }
+            channels
         });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
         var campaignId = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("id").GetGuid();
@@ -179,9 +183,14 @@ public sealed class ChannelsApiPostgresTests : PostgresTestBase
 
         var processing = scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
         Assert.Empty(await processing.CaptureBatchAsync(1, "worker", TimeSpan.FromSeconds(60), default));
-        var delivery = await db.Deliveries.AsNoTracking().SingleAsync(d => d.CampaignId == campaignId);
-        Assert.Equal(DeliveryStatus.Waiting, delivery.DeliveryStatus);
-        Assert.Null(delivery.WorkerId);
+        var deliveries = await db.Deliveries.AsNoTracking().Where(d => d.CampaignId == campaignId).ToListAsync();
+        Assert.Equal(channels, deliveries.Select(delivery => delivery.Channel).Order());
+        Assert.All(deliveries, delivery =>
+        {
+            Assert.Equal(DeliveryStatus.Waiting, delivery.DeliveryStatus);
+            Assert.Null(delivery.WorkerId);
+            Assert.Null(delivery.LockExpiresAt);
+        });
     }
 
     private static StringContent CampaignRequest(string fields) =>

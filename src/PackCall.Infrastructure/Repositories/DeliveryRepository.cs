@@ -2,11 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using PackCall.Core;
 using PackCall.Core.Entities;
 using PackCall.Core.Repositorys;
+using PackCall.Core.Sending;
 
 namespace PackCall.Infrastructure.Repositories;
 
 // Здесь PostgreSQL координирует захват, возврат и фиксацию результата между несколькими воркерами.
-public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory<AppDbContext> contextFactory) : IDeliveryRepository
+public sealed class DeliveryRepository(
+    AppDbContext dbContext, IDbContextFactory<AppDbContext> contextFactory, IChannelOperatorAvailability operators) : IDeliveryRepository
 {
     public async Task AddLegacyEmailBatchAsync(IReadOnlyList<Delivery> deliveries, CancellationToken ct)
     {
@@ -108,9 +110,13 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         if (lockDuration <= TimeSpan.Zero)
             throw new ArgumentOutOfRangeException(nameof(lockDuration));
 
+        ct.ThrowIfCancellationRequested();
         var waiting = (int)DeliveryStatus.Waiting;
         var inProgress = (int)DeliveryStatus.InProgress;
         var campaignInProgress = (int)CampaignStatus.InProgress;
+        var channels = ContactChannel.SupportedChannels.Where(operators.HasOperator).ToArray();
+        if (channels.Length == 0)
+            return [];
 
         // SKIP LOCKED позволяет воркерам брать непересекающиеся пакеты без ожидания чужих блокировок.
         // Срок закрепления отсчитывается после блокировки всего пакета.
@@ -122,9 +128,9 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
                     INNER JOIN campaigns AS campaign ON campaign.id = delivery.campaign_id
                     WHERE delivery.delivery_status = {{waiting}}
                       AND campaign.status = {{campaignInProgress}}
-                      AND delivery.channel = 'email'
+                      AND delivery.channel = ANY ({{channels}})
                       AND delivery.address_snapshot IS NOT NULL
-                      AND delivery.address_snapshot !~ '^[[:space:]]*$'
+                      AND btrim(delivery.address_snapshot, U&'\0009\000A\000B\000C\000D\0020\0085\00A0\1680\2000\2001\2002\2003\2004\2005\2006\2007\2008\2009\200A\2028\2029\202F\205F\3000') <> ''
                     ORDER BY delivery.id
                     LIMIT {{batchSize}}
                     FOR UPDATE OF delivery SKIP LOCKED

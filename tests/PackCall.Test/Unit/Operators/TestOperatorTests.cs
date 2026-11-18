@@ -17,7 +17,7 @@ namespace PackCall.Core.Test;
 [Trait("Module", "Operators")]
 public class TestOperatorTests : OperatorTestBase
 {
-    public static SendRequest Request => new(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "test+tag@example.test", "text");
+    public static SendRequest Request => new(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), ContactChannel.Email, "test+tag@example.test", "text");
     [Theory]
     [InlineData(null)] [InlineData("")] [InlineData(" ")] [InlineData("unknown")]
     public void RequiredKeysNeverFallback(string? value)
@@ -69,12 +69,13 @@ public class TestOperatorTests : OperatorTestBase
     public async Task MockIndependentDrawPerCallAndExplicitFalse()
     {
         var random = new SequenceRandom(0, .009999, .01, .999999, 0, .5);
-        var sender = new MockEmailSender(random);
+        var sender = new MockEmailSender(random, simulateErrors: true);
+        var disabled = new MockEmailSender(random, simulateErrors: false);
         var request = Request;
         foreach (var expected in new[] { false, false, true, true, false, true })
-            Assert.Equal(expected, (await sender.SendAsync(request, true, default)).IsSuccess);
-        Assert.True((await sender.SendAsync(request, false, default)).IsSuccess);
-        Assert.True((await sender.SendAsync(request, false, default)).IsSuccess);
+            Assert.Equal(expected, (await sender.SendAsync(request, default)).IsSuccess);
+        Assert.True((await disabled.SendAsync(request, default)).IsSuccess);
+        Assert.True((await disabled.SendAsync(request, default)).IsSuccess);
         Assert.Equal(6, random.Calls);
     }
 
@@ -82,8 +83,16 @@ public class TestOperatorTests : OperatorTestBase
     [InlineData(false)] [InlineData(true)]
     public async Task InvalidRequestIsNeverConfirmedRejection(bool simulate)
     {
-        var sender = new MockEmailSender(new SequenceRandom());
-        await Assert.ThrowsAsync<TestOperatorValidationException>(() => sender.SendAsync(Request with { RecipientEmail = "payload\r\n@example.test" }, simulate, default));
+        var sender = new MockEmailSender(new SequenceRandom(), simulate);
+        await Assert.ThrowsAsync<TestOperatorValidationException>(() => sender.SendAsync(Request with { Address = "payload\r\n@example.test" }, default));
+    }
+
+    [Fact]
+    public async Task MockRejectsTelegramEvenWhenAddressIsValidEmail()
+    {
+        var sender = new MockEmailSender(new SequenceRandom(), simulateErrors: false);
+        var request = Request with { Channel = ContactChannel.Telegram };
+        await Assert.ThrowsAsync<TestOperatorValidationException>(() => sender.SendAsync(request, default));
     }
 
     [Theory]

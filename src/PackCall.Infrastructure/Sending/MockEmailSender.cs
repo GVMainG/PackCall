@@ -1,4 +1,5 @@
 using System.Net.Mail;
+using PackCall.Core.Entities;
 using PackCall.Core.Sending;
 
 namespace PackCall.Infrastructure.Sending;
@@ -9,9 +10,9 @@ public sealed class OperatorRandom : IOperatorRandom
     public double NextDouble() => Random.Shared.NextDouble();
 }
 
-public sealed class MockEmailSender(IOperatorRandom random) : IMessageSender
+public sealed class MockEmailSender(IOperatorRandom random, bool simulateErrors) : IMessageSender
 {
-    public Task<SendResult> SendAsync(SendRequest request, bool simulateErrors, CancellationToken ct)
+    public Task<SendResult> SendAsync(SendRequest request, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         Validate(request);
@@ -23,11 +24,12 @@ public sealed class MockEmailSender(IOperatorRandom random) : IMessageSender
 
     internal static void Validate(SendRequest request)
     {
-        if (request is null || request.DeliveryId == Guid.Empty || request.CampaignId == Guid.Empty
-            || request.RecipientId == Guid.Empty || string.IsNullOrWhiteSpace(request.MessageText)
-            || string.IsNullOrEmpty(request.RecipientEmail) || request.RecipientEmail.Length > 255
-            || request.RecipientEmail.Contains('\r') || request.RecipientEmail.Contains('\n')
-            || !MailAddress.TryCreate(request.RecipientEmail, out var address) || address.Address != request.RecipientEmail)
+        if (request is null || request.Channel != ContactChannel.Email
+            || request.DeliveryId == Guid.Empty || request.CampaignId == Guid.Empty || request.ContactId == Guid.Empty
+            || string.IsNullOrWhiteSpace(request.MessageText)
+            || string.IsNullOrEmpty(request.Address) || request.Address.Length > 255
+            || request.Address.Contains('\r') || request.Address.Contains('\n')
+            || !MailAddress.TryCreate(request.Address, out var address) || address.Address != request.Address)
             throw new TestOperatorValidationException();
     }
 }

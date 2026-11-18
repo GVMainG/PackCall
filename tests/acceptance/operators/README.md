@@ -1,5 +1,7 @@
 # Приёмка оператора
 
+Worker передаёт в `IMessageSender.SendAsync(SendRequest, ct)` идентификаторы доставки, кампании и контакта, сохранённые канал и адрес, текст сообщения. HTTP email-адаптер преобразует этот запрос в `POST /v1/email/send` с полями `delivery_id`, `campaign_id`, `recipient_id`, `recipient_email`, `message_text` и `simulate_errors`. Email-адаптеры читают `TEST_SIMULATE_ERRORS` из своих настроек.
+
 Все команды — из корня PackCall, Windows/PowerShell, Python 3.11+, .NET SDK 10, Docker Engine с Linux containers и Compose v2. Используйте только выделенные тестовые БД/проекты. `run.py` не запускает остальные файлы этой папки.
 
 Сначала создайте локальный `.env` с тестовыми значениями ниже. Существующий `.env` с рабочими настройками не используйте и не перезаписывайте. Не добавляйте в этот файл `PACKCALL_ENVIRONMENT`/`TEST_SENDER_MODE`: отрицательные проверки runner удаляют эти переменные из process environment и требуют отсутствия fallback.

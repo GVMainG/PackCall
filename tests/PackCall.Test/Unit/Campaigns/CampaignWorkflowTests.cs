@@ -18,7 +18,7 @@ public class CampaignWorkflowTests
         recipients.Items.Add(Contact.Create([(ContactChannel.Email, "user@example.com")], DateTime.UtcNow));
         var service = new CampaignService(campaigns, deliveries, recipients, new EmailOperatorAvailability());
         var sender = new FakeMessageSender();
-        var processing = new DeliveryProcessingService(deliveries, campaigns, sender, new FakeJournal(), new SendPolicy(false));
+        var processing = new DeliveryProcessingService(deliveries, campaigns, _ => sender, new FakeJournal());
         var id = await service.CreateCampaignAsync("Рассылка", "Сообщение", CancellationToken.None);
         await service.StartCampaignAsync(id, CancellationToken.None);
         var batch = await processing.CaptureBatchAsync(10, "worker-1", TimeSpan.FromSeconds(90), CancellationToken.None);
@@ -59,7 +59,7 @@ public class CampaignWorkflowTests
             new EmailOperatorAvailability());
         var sender = new FakeMessageSender();
         var journal = new FakeJournal();
-        IDeliveryProcessingService processing = new DeliveryProcessingService(deliveries, campaigns, sender, journal, new SendPolicy(false));
+        IDeliveryProcessingService processing = new DeliveryProcessingService(deliveries, campaigns, _ => sender, journal);
 
         var id = await campaignService.CreateCampaignAsync("Рассылка", "Сообщение", CancellationToken.None);
         var campaign = (await campaignService.GetCampaignAsync(id, CancellationToken.None))!;
@@ -98,14 +98,14 @@ public class CampaignWorkflowTests
             Assert.Null(delivery.LockExpiresAt);
         });
         Assert.Equal(2, sender.Requests.Count);
-        Assert.Contains(sender.Requests, request => request.RecipientEmail == "first@example.com");
-        Assert.DoesNotContain(sender.Requests, request => request.RecipientEmail == "changed@example.com");
+        Assert.Contains(sender.Requests, request => request.Address == "first@example.com");
+        Assert.DoesNotContain(sender.Requests, request => request.Address == "changed@example.com");
         Assert.All(sender.Requests, request =>
         {
             Assert.Equal(id, request.CampaignId);
             Assert.Equal("Сообщение", request.MessageText);
             Assert.Contains(batch, delivery => delivery.Id == request.DeliveryId &&
-                delivery.ContactId == request.RecipientId && delivery.AddressSnapshot == request.RecipientEmail);
+                delivery.ContactId == request.ContactId && delivery.AddressSnapshot == request.Address);
         });
 
         var completedAt = campaign.CompletedAt;

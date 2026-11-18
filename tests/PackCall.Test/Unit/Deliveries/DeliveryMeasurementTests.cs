@@ -168,7 +168,7 @@ public sealed class DeliveryMeasurementTests
         var delivery = Delivery.Create(campaign.Id, Guid.NewGuid(), "synthetic@example.invalid", DateTime.UtcNow);
         deliveries.Add(delivery);
         delivery.SetCapturedForTest("worker", DateTime.UtcNow.AddMinutes(2));
-        return new(new(deliveries, campaigns, sender, journal, new(false), time), deliveries, sender, journal, delivery, campaigns);
+        return new(new(deliveries, campaigns, _ => sender, journal, time), deliveries, sender, journal, delivery, campaigns);
     }
 
     private sealed record Fixture(DeliveryProcessingService Service, FakeDeliveryRepository Deliveries, FakeMessageSender Sender, Journal Journal, Delivery Delivery, FakeCampaignRepository Campaigns);

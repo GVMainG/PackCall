@@ -106,7 +106,7 @@ sealed class CaptureBarrier(DeliveryProcessingService inner, Sm6Controls control
 
 sealed class Sm6Sender(Sm6Controls controls, IMessageSender inner) : IMessageSender, IDisposable
 {
-    public async Task<SendResult> SendAsync(SendRequest request, bool simulateErrors, CancellationToken ct)
+    public async Task<SendResult> SendAsync(SendRequest request, CancellationToken ct)
     {
         var attempt = controls.StartAttempt();
         controls.Record(attempt, request.DeliveryId, "entered");
@@ -126,7 +126,7 @@ sealed class Sm6Sender(Sm6Controls controls, IMessageSender inner) : IMessageSen
         SendResult result;
         try
         {
-            result = await SendScriptedAsync(attempt, request, simulateErrors, ct);
+            result = await SendScriptedAsync(attempt, request, ct);
         }
         catch (Exception error)
         {
@@ -145,7 +145,7 @@ sealed class Sm6Sender(Sm6Controls controls, IMessageSender inner) : IMessageSen
         return result;
     }
 
-    private async Task<SendResult> SendScriptedAsync(int attempt, SendRequest request, bool simulateErrors, CancellationToken ct)
+    private async Task<SendResult> SendScriptedAsync(int attempt, SendRequest request, CancellationToken ct)
     {
         if (attempt == 1)
         {
@@ -160,7 +160,7 @@ sealed class Sm6Sender(Sm6Controls controls, IMessageSender inner) : IMessageSen
                     return SendResult.Failure("SimulatedOperatorRejected");
             }
         }
-        return await inner.SendAsync(request, simulateErrors, ct);
+        return await inner.SendAsync(request, ct);
     }
 
     public void Dispose() => (inner as IDisposable)?.Dispose();

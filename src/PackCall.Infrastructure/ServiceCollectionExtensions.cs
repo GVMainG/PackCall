@@ -40,14 +40,12 @@ namespace PackCall.Infrastructure
                 .AddScoped<DeliveryProcessingService>(provider => new DeliveryProcessingService(
                     provider.GetRequiredService<IDeliveryRepository>(),
                     provider.GetRequiredService<ICampaingRepository>(),
-                    provider.GetRequiredKeyedService<IMessageSender>(ContactChannel.Email),
+                    channel => provider.GetKeyedService<IMessageSender>(channel),
                     provider.GetRequiredService<IDeliveryStatusJournal>(),
-                    provider.GetRequiredService<SendPolicy>(),
                     provider.GetService<TimeProvider>()))
                 .AddScoped<IDeliveryProcessingService>(provider => provider.GetRequiredService<DeliveryProcessingService>())
                 .AddSingleton<PackCall.Core.ILeaseClock, PostgresLeaseClock>()
-                .AddSingleton<IDeliveryStatusJournal, DeliveryStatusJournal>()
-                .AddSingleton(new SendPolicy(settings.SimulateErrors));
+                .AddSingleton<IDeliveryStatusJournal, DeliveryStatusJournal>();
             return services;
         }
 
@@ -56,7 +54,8 @@ namespace PackCall.Infrastructure
             services.AddSingleton<IChannelOperatorAvailability, KeyedChannelOperatorAvailability>();
             if (settings.Mode == Hosting.TestSenderMode.Inprocess)
                 services.AddSingleton<IOperatorRandom, OperatorRandom>()
-                    .AddKeyedSingleton<IMessageSender, MockEmailSender>(ContactChannel.Email);
+                    .AddKeyedSingleton<IMessageSender>(ContactChannel.Email, (provider, _) =>
+                        new MockEmailSender(provider.GetRequiredService<IOperatorRandom>(), settings.SimulateErrors));
             else
                 services.AddKeyedSingleton<IMessageSender>(ContactChannel.Email, (_, _) => new HttpTestEmailSender(settings));
             return services;

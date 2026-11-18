@@ -25,7 +25,7 @@ builder.Services.AddSingleton(new WorkerIdentity(id));
 var settings = TestOperatorSettings.Parse(builder.Configuration);
 builder.Services.RemoveAllKeyed<IMessageSender>(ContactChannel.Email);
 IMessageSender CreateSender() => settings.Mode == TestSenderMode.Http
-    ? new HttpTestEmailSender(settings) : new MockEmailSender(new OperatorRandom());
+    ? new HttpTestEmailSender(settings) : new MockEmailSender(new OperatorRandom(), settings.SimulateErrors);
 var sm6Case = Environment.GetEnvironmentVariable("SM6_CASE");
 if (sm6Case is null)
     builder.Services.AddKeyedSingleton<IMessageSender>(ContactChannel.Email, (sp, _) => new BarrierSender(sp.GetRequiredService<IServiceScopeFactory>(),
@@ -74,7 +74,7 @@ sealed class CompletionUpdateObserver : DbCommandInterceptor
 
 sealed class BarrierSender(IServiceScopeFactory scopes, WorkerIdentity identity, IMessageSender inner) : IMessageSender, IDisposable
 {
-    public async Task<SendResult> SendAsync(SendRequest request, bool simulateErrors, CancellationToken ct)
+    public async Task<SendResult> SendAsync(SendRequest request, CancellationToken ct)
     {
         using var scope = scopes.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -88,7 +88,7 @@ sealed class BarrierSender(IServiceScopeFactory scopes, WorkerIdentity identity,
         await File.WriteAllTextAsync(snapshot + ".tmp", JsonSerializer.Serialize(new { row, appNow = DateTime.UtcNow, dbNow, pid = Environment.ProcessId }, JsonOptions.Value), ct);
         File.Move(snapshot + ".tmp", snapshot);
         while (!File.Exists(directory + "/release")) await Task.Delay(25, ct);
-        return await inner.SendAsync(request, simulateErrors, ct);
+        return await inner.SendAsync(request, ct);
     }
     public void Dispose() { (inner as IDisposable)?.Dispose(); }
 }
