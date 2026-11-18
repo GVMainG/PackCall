@@ -309,6 +309,126 @@ public sealed class CampaignLifecyclePostgresTests : PostgresTestBase
         await sql.ExecuteNonQueryAsync(ct);
     }
 
+    [PostgresTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task StartAndDeleteObserveTheFirstCommittedWrite(bool startFirst)
+    {
+        using var deadline = new CancellationTokenSource(Timeout);
+        var ct = deadline.Token;
+        await using var app = await StartApiAsync();
+        using var client = CreateClient(app);
+        await using var scope = _provider!.CreateAsyncScope();
+        var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
+        var contact = await campaigns.CreateRecipientAsync("winner@example.com", ct);
+        var id = (await campaigns.CreateCampaignAsync("Race", "Text", [contact.Id], ["email"], ct)).Id;
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var deliveryId = await db.Deliveries.Select(delivery => delivery.Id).SingleAsync(ct);
+
+        await using var transaction = await db.Database.BeginTransactionAsync(ct);
+        var winnerPid = ((NpgsqlConnection)db.Database.GetDbConnection()).ProcessID;
+        if (startFirst)
+            await campaigns.StartCampaignAsync(id, ct);
+        else
+            Assert.True(await campaigns.DeleteCampaignAsync(id, ct));
+
+        var competingRequest = startFirst
+            ? client.DeleteAsync($"/api/campaigns/{id}", ct)
+            : client.PostAsync($"/api/campaigns/{id}/start", null, ct);
+        await WaitForBlockedRequest(winnerPid, competingRequest, ct);
+
+        await transaction.CommitAsync(ct);
+        using var response = await competingRequest;
+        Assert.Equal(startFirst ? HttpStatusCode.Conflict : HttpStatusCode.NotFound, response.StatusCode);
+        if (startFirst)
+        {
+            var stored = Assert.IsType<Campaign>(await campaigns.GetCampaignAsync(id, ct));
+            Assert.Equal(CampaignStatus.InProgress, stored.Status);
+            var delivery = await db.Deliveries.AsNoTracking().SingleAsync(ct);
+            Assert.Equal(deliveryId, delivery.Id);
+            Assert.Equal(DeliveryStatus.Waiting, delivery.DeliveryStatus);
+            using var repeatedStart = await client.PostAsync($"/api/campaigns/{id}/start", null, ct);
+            Assert.Equal(HttpStatusCode.OK, repeatedStart.StatusCode);
+            var body = await repeatedStart.Content.ReadFromJsonAsync<JsonElement>(ct);
+            Assert.Equal(stored.StartedAt, body.GetProperty("startedAt").GetDateTime());
+        }
+        else
+        {
+            await AssertEmptyCampaigns(db);
+            using var repeatedDelete = await client.DeleteAsync($"/api/campaigns/{id}", ct);
+            Assert.Equal(HttpStatusCode.NotFound, repeatedDelete.StatusCode);
+        }
+    }
+
+    [PostgresFact]
+    public async Task ConcurrentStartsOfEmptyDraftOnlyCompleteOnce()
+    {
+        using var deadline = new CancellationTokenSource(Timeout);
+        var ct = deadline.Token;
+        await using var app = await StartApiAsync();
+        using var client = CreateClient(app);
+        await using var scope = _provider!.CreateAsyncScope();
+        var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var id = (await campaigns.CreateCampaignAsync("Empty", "Text", null, ["email"], ct)).Id;
+        await using var transaction = await db.Database.BeginTransactionAsync(ct);
+        var winnerPid = ((NpgsqlConnection)db.Database.GetDbConnection()).ProcessID;
+
+        var first = await campaigns.StartCampaignAsync(id, ct);
+        Assert.Equal(CampaignStatus.Completed, first.Status);
+        Assert.NotNull(first.StartedAt);
+        Assert.NotNull(first.CompletedAt);
+        var competing = client.PostAsync($"/api/campaigns/{id}/start", null, ct);
+        await WaitForBlockedRequest(winnerPid, competing, ct);
+        await transaction.CommitAsync(ct);
+
+        using var response = await competing;
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        var stored = Assert.IsType<Campaign>(await campaigns.GetCampaignAsync(id, ct));
+        Assert.Equal(CampaignStatus.Completed, stored.Status);
+        Assert.Equal(first.StartedAt!.Value.Ticks / 10, stored.StartedAt!.Value.Ticks / 10);
+        Assert.Equal(first.CompletedAt!.Value.Ticks / 10, stored.CompletedAt!.Value.Ticks / 10);
+        Assert.False(await db.Deliveries.AnyAsync(ct));
+    }
+
+    private async Task WaitForBlockedRequest(int winnerPid, Task competingRequest, CancellationToken ct)
+    {
+        await using var observer = new NpgsqlConnection(_connectionString);
+        await observer.OpenAsync(ct);
+        await using var waiting = new NpgsqlCommand("""
+            SELECT EXISTS (SELECT FROM pg_stat_activity WHERE @winner = ANY(pg_blocking_pids(pid)))
+            """, observer);
+        waiting.Parameters.AddWithValue("winner", winnerPid);
+        while (!(bool)(await waiting.ExecuteScalarAsync(ct))!)
+        {
+            Assert.False(competingRequest.IsCompleted);
+            await Task.Delay(10, ct);
+        }
+    }
+
+    [PostgresFact]
+    public async Task DeleteCompletedCampaignCascadesSnapshotAndDeliveriesButRetainsJournal()
+    {
+        var id = await CreateStartedCampaignAsync();
+        await using var scope = _provider!.CreateAsyncScope();
+        var processing = scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
+        var delivery = Assert.Single(await processing.CaptureBatchAsync(1, "worker", TimeSpan.FromMinutes(1), default));
+        await processing.ProcessAsync(delivery, default);
+        var journal = await Journal(delivery.Id);
+        using var entries = JsonDocument.Parse(journal);
+        Assert.Equal(2, entries.RootElement.GetArrayLength());
+
+        await using var app = await StartApiAsync();
+        using var client = CreateClient(app);
+        var details = await ReadDetails(client, id, default);
+        Assert.Equal("Completed", details.GetProperty("campaign").GetProperty("status").GetString());
+        AssertFormation(details, 1, ["email"], 1, 0);
+        using var deleted = await client.DeleteAsync($"/api/campaigns/{id}");
+        Assert.Equal(HttpStatusCode.NoContent, deleted.StatusCode);
+        await AssertEmptyCampaigns(scope.ServiceProvider.GetRequiredService<AppDbContext>());
+        Assert.Equal(journal, await Journal(delivery.Id));
+    }
+
     private static async Task WaitForDeliveryInsert(NpgsqlConnection blocker, NpgsqlTransaction transaction,
         Task creation, CancellationToken ct)
     {

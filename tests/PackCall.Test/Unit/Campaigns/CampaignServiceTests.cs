@@ -1,5 +1,9 @@
+using Microsoft.AspNetCore.Mvc;
+using PackCall.Api.Controllers;
+using PackCall.Api.Models;
 using PackCall.Core.Entities;
 using PackCall.Core.Exceptions;
+using PackCall.Core.Sending;
 using PackCall.Core.Services;
 
 namespace PackCall.Core.Test;
@@ -189,7 +193,6 @@ public class CampaignServiceTests
         var id = await CreateCampaignAsync();
         await _service.StartCampaignAsync(id, CancellationToken.None);
         var campaign = (await _service.GetCampaignAsync(id, CancellationToken.None))!;
-        campaign.StatusFromInProgressToCompleted(DateTime.UtcNow);
 
         await Assert.ThrowsAsync<InvalidStatusTransitionException>(() =>
             _service.StartCampaignAsync(id, CancellationToken.None));
@@ -200,11 +203,82 @@ public class CampaignServiceTests
     [Fact]
     public async Task DeleteCampaign_InProgress_Throws()
     {
+        _recipientRepository.Items.Add(Contact.Create([(ContactChannel.Email, "user@example.com")], DateTime.UtcNow));
         var id = await CreateCampaignAsync();
         await _service.StartCampaignAsync(id, CancellationToken.None);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _service.DeleteCampaignAsync(id, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task StartCampaign_EmptySnapshotCompletesWithNoOperatorsAvailable()
+    {
+        var service = new CampaignService(_campaignRepository, _deliveryRepository, _recipientRepository,
+            new NoOperatorAvailability());
+        var id = await CreateCampaignAsync();
+
+        var result = await service.StartCampaignAsync(id, default);
+
+        Assert.Equal(CampaignStatus.Completed, result.Status);
+        Assert.NotNull(result.StartedAt);
+        Assert.NotNull(result.CompletedAt);
+        Assert.Empty(_deliveryRepository.Items);
+    }
+
+    [Fact]
+    public async Task StartResponseUsesSavedCompletionWhenCampaignIsDeletedBeforeReread()
+    {
+        var id = await CreateCampaignAsync();
+        var reads = 0;
+        _campaignRepository.OnGet = () =>
+        {
+            if (++reads == 2)
+                _ = _campaignRepository.DeleteIfInactiveAsync(id, default);
+        };
+
+        var response = await new CampaignsController(_service).StartCampaign(id, default);
+
+        var ok = Assert.IsType<OkObjectResult>(response.Result);
+        var body = Assert.IsType<CampaignResponse>(ok.Value);
+        Assert.Equal(id, body.Id);
+        Assert.Equal(CampaignStatus.Completed, body.Status);
+        Assert.NotNull(body.StartedAt);
+        Assert.NotNull(body.CompletedAt);
+        Assert.Null(await _service.GetCampaignAsync(id, default));
+    }
+
+    [Fact]
+    public async Task ResumeFinishesAfterCancellationAtSuccessfulStatusWrite()
+    {
+        _recipientRepository.Items.Add(Contact.Create([(ContactChannel.Email, "user@example.com")], DateTime.UtcNow));
+        var id = await CreateCampaignAsync();
+        var started = await _service.StartCampaignAsync(id, default);
+        var startedAt = started.StartedAt;
+        var delivery = Assert.Single(_deliveryRepository.Items);
+        delivery.SetCapturedForTest("worker", DateTime.UtcNow.AddMinutes(1));
+        await _service.PauseCampaignAsync(id, default);
+
+        using var request = new CancellationTokenSource();
+        _campaignRepository.OnTryUpdateStatus = () =>
+        {
+            _campaignRepository.OnTryUpdateStatus = null;
+            delivery.StatusFromInProgressToSent(DateTime.UtcNow);
+            request.Cancel();
+        };
+
+        var resumed = await _service.ResumeCampaignAsync(id, request.Token);
+
+        Assert.True(request.IsCancellationRequested);
+        Assert.Equal(CampaignStatus.Completed, resumed.Status);
+        Assert.Equal(startedAt, resumed.StartedAt);
+        Assert.NotNull(resumed.CompletedAt);
+        Assert.Equal(CampaignStatus.Completed, (await _service.GetCampaignAsync(id, default))!.Status);
+    }
+
+    private sealed class NoOperatorAvailability : IChannelOperatorAvailability
+    {
+        public bool HasOperator(string channel) => false;
     }
 
 }

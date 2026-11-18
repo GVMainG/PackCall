@@ -104,7 +104,8 @@ public abstract class PostgresTestBase : IAsyncLifetime
         var service = scope.ServiceProvider.GetRequiredService<ICampaignService>();
         for (var i = 0; i < recipients; i++)
             await service.CreateRecipientAsync($"user{i}@example.com", CancellationToken.None);
-        var id = await service.CreateCampaignAsync("Рассылка", "Сообщение", CancellationToken.None);
+        var id = (await service.CreateCampaignAsync(
+            "Рассылка", "Сообщение", null, [ContactChannel.Email], CancellationToken.None)).Id;
         await service.StartCampaignAsync(id, CancellationToken.None);
         return id;
     }

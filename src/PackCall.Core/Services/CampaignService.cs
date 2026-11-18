@@ -164,76 +164,88 @@ public sealed class CampaignService : ICampaignService
 
     public async Task<bool> DeleteCampaignAsync(Guid campaignId, CancellationToken ct)
     {
-        var campaign = await GetCampaignAsync(campaignId, ct);
-        if (campaign is null)
-            return false;
-        if (campaign.Status is CampaignStatus.InProgress or CampaignStatus.Paused)
-            throw new InvalidOperationException("Нельзя удалить запущенную или приостановленную кампанию.");
-
         ct.ThrowIfCancellationRequested();
-        return await _campaignRepository.Delete(campaignId, ct);
+        var result = await _campaignRepository.DeleteIfInactiveAsync(campaignId, ct);
+        if (result == CampaignDeleteResult.Active)
+            throw new InvalidOperationException("Нельзя удалить запущенную или приостановленную кампанию.");
+        return result == CampaignDeleteResult.Deleted;
     }
 
-    public async Task StartCampaignAsync(Guid campaignId, CancellationToken ct)
+    public async Task<Campaign> StartCampaignAsync(Guid campaignId, CancellationToken ct)
     {
         var campaign = await GetRequiredCampaignAsync(campaignId, ct);
 
         if (campaign.Status == CampaignStatus.InProgress)
-            return;
+            return campaign;
 
         ct.ThrowIfCancellationRequested();
         var previousStatus = campaign.Status;
         if (previousStatus == CampaignStatus.Draft)
         {
             var channels = await _campaignRepository.GetChannelsAsync(campaignId, ct);
-            if (channels.Count == 0)
-                channels = [ContactChannel.Email];
-
             foreach (var channel in channels)
                 if (!_operators.HasOperator(channel))
                     throw new ChannelOperatorUnavailableException(channel);
         }
         ct.ThrowIfCancellationRequested();
         campaign.StatusFromDraftToInProgress();
-        ct.ThrowIfCancellationRequested();
-
-        await SaveStatusChangeAsync(campaign, previousStatus, ct);
+        return await ActivateCampaignAsync(campaign, previousStatus, ct);
     }
 
-    public async Task PauseCampaignAsync(Guid campaignId, CancellationToken ct)
+    public async Task<Campaign> PauseCampaignAsync(Guid campaignId, CancellationToken ct)
     {
         var campaign = await GetRequiredCampaignAsync(campaignId, ct);
         var previousStatus = campaign.Status;
         campaign.StatusFromInProgressToPaused(DateTime.UtcNow);
-        await SaveStatusChangeAsync(campaign, previousStatus, ct);
+        return await SaveStatusChangeAsync(campaign, previousStatus, ct);
     }
 
-    public async Task ResumeCampaignAsync(Guid campaignId, CancellationToken ct)
+    public async Task<Campaign> ResumeCampaignAsync(Guid campaignId, CancellationToken ct)
     {
         var campaign = await GetRequiredCampaignAsync(campaignId, ct);
         var previousStatus = campaign.Status;
         campaign.StatusFromPausedToInProgress(DateTime.UtcNow);
-        await SaveStatusChangeAsync(campaign, previousStatus, ct);
-
-        // Если последние отправки завершились на паузе, после возобновления воркеру уже нечего захватывать.
-        if (!await _deliveryRepository.HasPendingDeliveriesAsync(campaignId, ct))
-        {
-            campaign.StatusFromInProgressToCompleted(DateTime.UtcNow);
-            await _campaignRepository.TryUpdateStatusAsync(campaign, CampaignStatus.InProgress, ct);
-        }
+        return await ActivateCampaignAsync(campaign, previousStatus, ct);
     }
 
-    private async Task SaveStatusChangeAsync(Campaign campaign, CampaignStatus previousStatus, CancellationToken ct)
+    private async Task<Campaign> ActivateCampaignAsync(Campaign campaign, CampaignStatus previousStatus, CancellationToken ct)
+    {
+        if (!await _deliveryRepository.HasPendingDeliveriesAsync(campaign.Id, ct))
+            campaign.StatusFromInProgressToCompleted(DateTime.UtcNow);
+
+        var saved = await SaveStatusChangeAsync(campaign, previousStatus, ct);
+        if (previousStatus != CampaignStatus.Paused || saved.Status != CampaignStatus.InProgress)
+            return saved;
+
+        // Последнее подтверждение могло прийти на паузе. После записи возобновления завершаем проверку независимо от запроса.
+        if (await _deliveryRepository.HasPendingDeliveriesAsync(saved.Id, CancellationToken.None))
+            return saved;
+
+        var current = await _campaignRepository.Get(saved.Id, CancellationToken.None);
+        if (current?.Status != CampaignStatus.InProgress)
+            return current ?? saved;
+
+        current.StatusFromInProgressToCompleted(DateTime.UtcNow);
+        if (await _campaignRepository.TryUpdateStatusAsync(current, CampaignStatus.InProgress, CancellationToken.None))
+            return current;
+        return await _campaignRepository.Get(saved.Id, CancellationToken.None) ?? saved;
+    }
+
+    private async Task<Campaign> SaveStatusChangeAsync(Campaign campaign, CampaignStatus previousStatus, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         if (previousStatus == campaign.Status ||
             await _campaignRepository.TryUpdateStatusAsync(campaign, previousStatus, ct))
-            return;
+            return campaign;
 
-        // При гонке считаем переход успешным, если другой запрос уже установил нужный статус.
         var current = await GetRequiredCampaignAsync(campaign.Id, ct);
-        if (current.Status != campaign.Status)
-            throw new DomainException("Статус кампании изменился другим запросом. Повторите операцию.");
+        if (previousStatus == CampaignStatus.Paused &&
+            current.Status is CampaignStatus.InProgress or CampaignStatus.Completed)
+            return current;
+        if (current.Status == campaign.Status &&
+            (previousStatus != CampaignStatus.Draft || campaign.Status != CampaignStatus.Completed))
+            return current;
+        throw new DomainException("Статус кампании изменился другим запросом. Повторите операцию.");
     }
 
     public async Task<Campaign?> GetCampaignAsync(Guid campaignId, CancellationToken ct)

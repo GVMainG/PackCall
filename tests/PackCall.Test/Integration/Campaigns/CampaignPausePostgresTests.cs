@@ -40,7 +40,8 @@ public class CampaignPausePostgresTests : PostgresTestBase
         await db.SaveChangesAsync();
 
         var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
-        var campaignId = await campaigns.CreateCampaignAsync("Batch", "Message", CancellationToken.None);
+        var campaignId = (await campaigns.CreateCampaignAsync(
+            "Batch", "Message", null, [ContactChannel.Email], CancellationToken.None)).Id;
         var selected = await db.CampaignContacts.Where(c => c.CampaignId == campaignId).Select(c => c.ContactId).ToArrayAsync();
         Assert.Equal(contacts.Select(c => c.Id).Order(), selected.Order());
         Assert.Equal("email", await db.CampaignChannels.Where(c => c.CampaignId == campaignId).Select(c => c.Channel).SingleAsync());
@@ -78,6 +79,7 @@ public class CampaignPausePostgresTests : PostgresTestBase
         var processing = workerScope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
         var campaigns = workerScope.ServiceProvider.GetRequiredService<ICampaignService>();
         var startedAt = (await campaigns.GetCampaignAsync(id, CancellationToken.None))!.StartedAt;
+        var before = await campaigns.GetDeliveriesAsync(id, 1, 10, CancellationToken.None);
         var batch = await processing.CaptureBatchAsync(3, "worker-1", TimeSpan.FromSeconds(90), CancellationToken.None);
         Assert.Equal(3, batch.Count);
 
@@ -94,6 +96,7 @@ public class CampaignPausePostgresTests : PostgresTestBase
             await pauseScope.ServiceProvider.GetRequiredService<ICampaignService>().PauseCampaignAsync(id, CancellationToken.None);
         acknowledgement.SetResult(SendResult.Success());
         await inFlight.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal(DeliveryStatus.Sent, (await ReadDelivery(batch[0].Id)).DeliveryStatus);
         foreach (var delivery in batch.Skip(1))
             await processing.ProcessAsync(delivery, CancellationToken.None);
 
@@ -124,7 +127,8 @@ public class CampaignPausePostgresTests : PostgresTestBase
         Assert.Equal(CampaignStatus.Completed, completed.Status);
         Assert.Equal(startedAt, completed.StartedAt);
         Assert.Equal(4, _sender.Requests.Count);
-        Assert.Equal(4, _sender.Requests.Select(request => request.DeliveryId).Distinct().Count());
+        Assert.Equal(before.Items.Select(delivery => delivery.Id).Order(),
+            _sender.Requests.Select(request => request.DeliveryId).Order());
     }
 
     [PostgresFact]
@@ -148,12 +152,74 @@ public class CampaignPausePostgresTests : PostgresTestBase
         await operation.WaitAsync(Timeout);
         Assert.Equal(CampaignStatus.Paused, (await control.GetCampaignAsync(id, CancellationToken.None))!.Status);
         Assert.Equal(DeliveryStatus.Sent, (await ReadDelivery(delivery.Id)).DeliveryStatus);
-        await control.ResumeCampaignAsync(id, CancellationToken.None);
-        var final = (await control.GetCampaignAsync(id, CancellationToken.None))!;
-        Assert.Equal(CampaignStatus.Completed, final.Status);
-        Assert.Equal(startedAt, final.StartedAt);
+        await using var app = await StartApiAsync();
+        using var client = CreateClient(app);
+        using var resumed = await client.PostAsync($"/api/campaigns/{id}/resume", null);
+        Assert.Equal(HttpStatusCode.OK, resumed.StatusCode);
+        var body = await resumed.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+        Assert.Equal("Completed", body.GetProperty("status").GetString());
+        Assert.Equal(startedAt, body.GetProperty("startedAt").GetDateTime());
+        Assert.True(body.GetProperty("completedAt").GetDateTime() >= startedAt);
         Assert.Single(_sender.Requests);
         Assert.Empty(await processing.CaptureBatchAsync(1, "worker-B", TimeSpan.FromMinutes(2), CancellationToken.None));
+    }
+
+    [PostgresFact]
+    public async Task ConcurrentResumesCompleteWhenLastDeliveryFinishesWhileResumeIsBlocked()
+    {
+        using var deadline = new CancellationTokenSource(Timeout);
+        var ct = deadline.Token;
+        var id = await CreateStartedCampaignAsync();
+        await using var worker = _provider!.CreateAsyncScope();
+        var processing = worker.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
+        var campaigns = worker.ServiceProvider.GetRequiredService<ICampaignService>();
+        var startedAt = (await campaigns.GetCampaignAsync(id, ct))!.StartedAt;
+        var delivery = Assert.Single(await processing.CaptureBatchAsync(1, "worker", TimeSpan.FromMinutes(1), ct));
+        var sending = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var acknowledgement = new TaskCompletionSource<SendResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _sender.AsyncHandler = (_, _) =>
+        {
+            sending.SetResult();
+            return acknowledgement.Task;
+        };
+        var inFlight = processing.ProcessAsync(delivery, ct);
+        await sending.Task.WaitAsync(ct);
+        await campaigns.PauseCampaignAsync(id, ct);
+
+        await using var blocker = new NpgsqlConnection(_connectionString);
+        await blocker.OpenAsync(ct);
+        await using var transaction = await blocker.BeginTransactionAsync(ct);
+        await using var lockCommand = new NpgsqlCommand("SELECT id FROM campaigns WHERE id = @id FOR UPDATE",
+            blocker, transaction);
+        lockCommand.Parameters.AddWithValue("id", id);
+        Assert.Equal(id, await lockCommand.ExecuteScalarAsync(ct));
+        await using var first = _provider!.CreateAsyncScope();
+        var firstDb = first.ServiceProvider.GetRequiredService<AppDbContext>();
+        await firstDb.Database.OpenConnectionAsync(ct);
+        var firstResume = first.ServiceProvider.GetRequiredService<ICampaignService>().ResumeCampaignAsync(id, ct);
+        await WaitBlocked(((NpgsqlConnection)firstDb.Database.GetDbConnection()).ProcessID);
+
+        acknowledgement.SetResult(SendResult.Success());
+        await inFlight.WaitAsync(ct);
+        Assert.Equal(DeliveryStatus.Sent, (await ReadDelivery(delivery.Id)).DeliveryStatus);
+
+        await using var second = _provider!.CreateAsyncScope();
+        var secondDb = second.ServiceProvider.GetRequiredService<AppDbContext>();
+        await secondDb.Database.OpenConnectionAsync(ct);
+        var secondResume = second.ServiceProvider.GetRequiredService<ICampaignService>().ResumeCampaignAsync(id, ct);
+        await WaitBlocked(((NpgsqlConnection)secondDb.Database.GetDbConnection()).ProcessID);
+        await transaction.CommitAsync(ct);
+
+        Assert.All(await Task.WhenAll(firstResume, secondResume).WaitAsync(ct), result =>
+        {
+            Assert.Equal(CampaignStatus.Completed, result.Status);
+            Assert.Equal(startedAt, result.StartedAt);
+            Assert.NotNull(result.CompletedAt);
+        });
+        var stored = Assert.IsType<Campaign>(await campaigns.GetCampaignAsync(id, ct));
+        Assert.Equal(CampaignStatus.Completed, stored.Status);
+        Assert.Equal(startedAt, stored.StartedAt);
+        Assert.NotNull(stored.CompletedAt);
     }
 
     [PostgresFact]
@@ -178,6 +244,35 @@ public class CampaignPausePostgresTests : PostgresTestBase
         Assert.Equal(results[0] ? CampaignStatus.Paused : CampaignStatus.Completed, current.Status);
         Assert.False(await firstRepository.TryUpdateStatusAsync(results[0] ? completed : paused,
             CampaignStatus.InProgress, CancellationToken.None));
+    }
+
+    [PostgresFact]
+    public async Task HistoricalDeliveriesWithoutAddressStillCountAsPending()
+    {
+        await using var scope = _provider!.CreateAsyncScope();
+        var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var contact = await campaigns.CreateRecipientAsync("historical@example.com", default);
+        var id = (await campaigns.CreateCampaignAsync("Historical", "Text", [contact.Id], ["email"], default)).Id;
+
+        await db.Database.ExecuteSqlInterpolatedAsync($"UPDATE deliveries SET address_snapshot = NULL WHERE campaign_id = {id}");
+        await campaigns.StartCampaignAsync(id, default);
+        var started = Assert.IsType<Campaign>(await campaigns.GetCampaignAsync(id, default));
+        Assert.Equal(CampaignStatus.InProgress, started.Status);
+
+        await db.Database.ExecuteSqlInterpolatedAsync($"""
+            UPDATE deliveries SET delivery_status = {(int)DeliveryStatus.InProgress}, worker_id = 'historical',
+                lock_expires_at = clock_timestamp() + interval '1 minute'
+            WHERE campaign_id = {id}
+            """);
+        await campaigns.PauseCampaignAsync(id, default);
+        await campaigns.ResumeCampaignAsync(id, default);
+        var resumed = Assert.IsType<Campaign>(await campaigns.GetCampaignAsync(id, default));
+        Assert.Equal(CampaignStatus.InProgress, resumed.Status);
+        Assert.Equal(started.StartedAt, resumed.StartedAt);
+        var delivery = await db.Deliveries.AsNoTracking().SingleAsync();
+        Assert.Equal(DeliveryStatus.InProgress, delivery.DeliveryStatus);
+        Assert.Null(delivery.AddressSnapshot);
     }
 
     [PostgresFact]

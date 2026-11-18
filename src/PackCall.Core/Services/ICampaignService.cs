@@ -54,19 +54,19 @@ public interface ICampaignService
     /// <exception cref="KeyNotFoundException">Кампания не найдена.</exception>
     /// <exception cref="InvalidStatusTransitionException">Текущий статус не допускает запуск.</exception>
     /// <exception cref="ArgumentException">Название или сообщение не заполнены.</exception>
-    Task StartCampaignAsync(Guid campaignId, CancellationToken ct);
+    Task<Campaign> StartCampaignAsync(Guid campaignId, CancellationToken ct);
 
     /// <summary>Приостанавливает запущенную кампанию; уже начатые отправки могут завершиться.</summary>
     /// <remarks>Повторная пауза не меняет даты. Остальные доставки сохраняются для возобновления.</remarks>
     /// <exception cref="KeyNotFoundException">Кампания не найдена.</exception>
     /// <exception cref="DomainException">Текущий статус не допускает паузу или изменился конкурентно.</exception>
-    Task PauseCampaignAsync(Guid campaignId, CancellationToken ct);
+    Task<Campaign> PauseCampaignAsync(Guid campaignId, CancellationToken ct);
 
     /// <summary>Возобновляет приостановленную кампанию, сохраняя дату первого запуска.</summary>
     /// <remarks>Если все доставки уже завершены, кампания завершается сразу.</remarks>
     /// <exception cref="KeyNotFoundException">Кампания не найдена.</exception>
     /// <exception cref="DomainException">Текущий статус не допускает возобновление или изменился конкурентно.</exception>
-    Task ResumeCampaignAsync(Guid campaignId, CancellationToken ct);
+    Task<Campaign> ResumeCampaignAsync(Guid campaignId, CancellationToken ct);
 
     /// <summary>Возвращает кампанию или null, если она не найдена.</summary>
     Task<Campaign?> GetCampaignAsync(Guid campaignId, CancellationToken ct);

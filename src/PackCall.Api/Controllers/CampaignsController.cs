@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PackCall.Api.Models;
+using PackCall.Core.Entities;
 using PackCall.Core.Exceptions;
 using PackCall.Core.Services;
 
@@ -136,12 +137,10 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
     }
 
     private async Task<ActionResult<CampaignResponse>> ApplyTransitionAsync(
-        Func<Guid, CancellationToken, Task> transition, Guid id, CancellationToken ct)
+        Func<Guid, CancellationToken, Task<Campaign>> transition, Guid id, CancellationToken ct)
     {
-        await transition(id, ct);
-        // Читаем сохранённый статус: например, возобновление может сразу завершить кампанию.
-        var campaign = await campaigns.GetCampaignAsync(id, ct)
-            ?? throw new KeyNotFoundException("Кампания не найдена.");
+        var saved = await transition(id, ct);
+        var campaign = await campaigns.GetCampaignAsync(id, ct) ?? saved;
         return Ok(campaign.ToResponse());
     }
 }

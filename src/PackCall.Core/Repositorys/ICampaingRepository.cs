@@ -19,7 +19,14 @@ namespace PackCall.Core.Repositorys
         /// <summary>Сохраняет только статус и даты, если статус в БД всё ещё равен ожидаемому.</summary>
         Task<bool> TryUpdateStatusAsync(Campaign campaign, CampaignStatus expectedStatus, CancellationToken ct);
         Task<bool> TryPublishDraftAsync(Campaign campaign, CancellationToken ct);
-        Task<bool> Delete(Guid id, CancellationToken ct);
+        Task<CampaignDeleteResult> DeleteIfInactiveAsync(Guid id, CancellationToken ct);
         Task DeleteIfFormingAsync(Guid id, CancellationToken ct);
+    }
+
+    public enum CampaignDeleteResult
+    {
+        NotFound,
+        Deleted,
+        Active
     }
 }

@@ -97,19 +97,22 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         return true;
     }
 
-    public Task<bool> Delete(Guid id, CancellationToken ct)
+    public Task<CampaignDeleteResult> DeleteIfInactiveAsync(Guid id, CancellationToken ct)
     {
-        if (!_store.Remove(id))
-            return Task.FromResult(false);
+        if (!_statuses.TryGetValue(id, out var status))
+            return Task.FromResult(CampaignDeleteResult.NotFound);
+        if (status is CampaignStatus.InProgress or CampaignStatus.Paused)
+            return Task.FromResult(CampaignDeleteResult.Active);
+        _store.Remove(id);
         _statuses.Remove(id);
         _deliveries?.RemoveByCampaign(id);
-        return Task.FromResult(true);
+        return Task.FromResult(CampaignDeleteResult.Deleted);
     }
 
     public async Task DeleteIfFormingAsync(Guid id, CancellationToken ct)
     {
         if (_statuses.TryGetValue(id, out var status) && status == CampaignStatus.Forming)
-            await Delete(id, ct);
+            await DeleteIfInactiveAsync(id, ct);
     }
 }
 
@@ -272,6 +275,7 @@ internal sealed class FakeDeliveryRepository : IDeliveryRepository
 
     public Task<bool> HasPendingDeliveriesAsync(Guid campaignId, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
         PendingChecks++;
         return Task.FromResult(_store.Any(d => d.CampaignId == campaignId &&
             d.DeliveryStatus is DeliveryStatus.Waiting or DeliveryStatus.InProgress));

@@ -56,6 +56,12 @@ public sealed class ChannelsApiPostgresTests : PostgresTestBase
             Assert.Equal(1, formation.GetProperty("selectedContactCount").GetInt32());
             Assert.Equal(0, formation.GetProperty("createdDeliveryCount").GetInt32());
             Assert.Equal(1, formation.GetProperty("skippedDeliveryCount").GetInt32());
+
+            using var started = await client.PostAsync($"/api/campaigns/{campaignId}/start", null);
+            await AssertImmediatelyCompleted(started);
+            Assert.False(await db.Deliveries.AnyAsync(d => d.CampaignId == campaignId));
+            using var repeatedStart = await client.PostAsync($"/api/campaigns/{campaignId}/start", null);
+            Assert.Equal(HttpStatusCode.Conflict, repeatedStart.StatusCode);
         }
     }
 
@@ -153,12 +159,7 @@ public sealed class ChannelsApiPostgresTests : PostgresTestBase
         using var client = CreateClient(app);
         await using var scope = _provider!.CreateAsyncScope();
         var campaigns = scope.ServiceProvider.GetRequiredService<ICampaignService>();
-        var legacyId = await campaigns.CreateCampaignAsync("Empty email draft", "text", default);
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        Assert.False(await db.CampaignChannels.AnyAsync(c => c.CampaignId == legacyId));
-        using var legacy = await client.PostAsync($"/api/campaigns/{legacyId}/start", null);
-        Assert.Equal(HttpStatusCode.OK, legacy.StatusCode);
-        Assert.Equal(CampaignStatus.InProgress, (await campaigns.GetCampaignAsync(legacyId, default))!.Status);
 
         var contacts = scope.ServiceProvider.GetRequiredService<IContactRepository>();
         await contacts.CreateAsync(Contact.Create([("email", "test@example.com"), ("telegram", "42")], DateTime.UtcNow), default);
@@ -191,6 +192,57 @@ public sealed class ChannelsApiPostgresTests : PostgresTestBase
             Assert.Null(delivery.WorkerId);
             Assert.Null(delivery.LockExpiresAt);
         });
+    }
+
+    [PostgresFact]
+    public async Task EmptyMigratedSnapshotStartsAndCompletesWithoutInventingDeliveries()
+    {
+        await using var scope = _provider!.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var campaign = Campaign.Create("Migrated draft", "Text");
+        db.Campaigns.Add(campaign);
+        await db.SaveChangesAsync();
+
+        await using var app = await StartApiAsync();
+        using var client = CreateClient(app);
+        using var started = await client.PostAsync($"/api/campaigns/{campaign.Id}/start", null);
+        await AssertImmediatelyCompleted(started);
+        Assert.False(await db.CampaignChannels.AnyAsync());
+        Assert.False(await db.CampaignContacts.AnyAsync());
+        Assert.False(await db.Deliveries.AnyAsync());
+    }
+
+    [PostgresFact]
+    public async Task UnavailableSavedChannelBlocksStartEvenWithoutDeliveries()
+    {
+        await using var app = await StartApiAsync();
+        using var client = CreateClient(app);
+        using var request = CampaignRequest(""", "selection":"all", "channels":["telegram"]""");
+        using var created = await client.PostAsync("/api/campaigns", request);
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        var id = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("id").GetGuid();
+        await using var scope = _provider!.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Assert.Equal("telegram", await db.CampaignChannels.Where(row => row.CampaignId == id)
+            .Select(row => row.Channel).SingleAsync());
+        Assert.False(await db.Deliveries.AnyAsync(row => row.CampaignId == id));
+
+        using var result = await client.PostAsync($"/api/campaigns/{id}/start", null);
+
+        Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
+        var problem = await result.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Contains("telegram", problem.GetProperty("detail").GetString());
+        var stored = await db.Campaigns.SingleAsync(row => row.Id == id);
+        Assert.Equal(CampaignStatus.Draft, stored.Status);
+        Assert.Null(stored.StartedAt);
+    }
+
+    private static async Task AssertImmediatelyCompleted(HttpResponseMessage response)
+    {
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("Completed", body.GetProperty("status").GetString());
+        Assert.True(body.GetProperty("completedAt").GetDateTime() >= body.GetProperty("startedAt").GetDateTime());
     }
 
     private static StringContent CampaignRequest(string fields) =>

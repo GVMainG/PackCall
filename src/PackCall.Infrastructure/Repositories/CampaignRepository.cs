@@ -108,13 +108,25 @@ public sealed class CampaignRepository(AppDbContext dbContext, IDbContextFactory
         return updated == 1;
     }
 
-    public async Task<bool> Delete(Guid id, CancellationToken ct)
+    public async Task<CampaignDeleteResult> DeleteIfInactiveAsync(Guid id, CancellationToken ct)
     {
-        var deleted = await dbContext.Campaigns
-            .Where(campaign => campaign.Id == id)
-            .ExecuteDeleteAsync(ct);
-
-        return deleted > 0;
+        // Блокировка строки привязывает причину отказа к тому же статусу, по которому решается удаление.
+        var results = await dbContext.Database.SqlQuery<int>($"""
+            WITH current_campaign AS (
+                SELECT id, status FROM campaigns WHERE id = {id} FOR UPDATE
+            ), deleted AS (
+                DELETE FROM campaigns USING current_campaign
+                WHERE campaigns.id = current_campaign.id
+                    AND current_campaign.status NOT IN ({(int)CampaignStatus.InProgress}, {(int)CampaignStatus.Paused})
+                RETURNING campaigns.id
+            )
+            SELECT CASE
+                WHEN EXISTS (SELECT 1 FROM deleted) THEN {(int)CampaignDeleteResult.Deleted}
+                WHEN EXISTS (SELECT 1 FROM current_campaign) THEN {(int)CampaignDeleteResult.Active}
+                ELSE {(int)CampaignDeleteResult.NotFound}
+            END
+            """).ToListAsync(ct);
+        return (CampaignDeleteResult)results.Single();
     }
 
     public async Task<bool> TryPublishDraftAsync(Campaign campaign, CancellationToken ct)
