@@ -24,6 +24,7 @@ public sealed class ChannelsApiPostgresTests : PostgresTestBase
             using var client = CreateClient(app);
             using var response = await client.GetAsync("/api/channels");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
             Assert.Equal(new[] { "email", "telegram" }, await response.Content.ReadFromJsonAsync<string[]>());
         }
     }
@@ -70,7 +71,8 @@ public sealed class ChannelsApiPostgresTests : PostgresTestBase
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
             var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
-            var error = Assert.Single(problem.GetProperty("errors").GetProperty("channels").EnumerateArray()).GetString();
+            Assert.Equal(400, problem.GetProperty("status").GetInt32());
+            var error = problem.GetProperty("detail").GetString();
             Assert.False(string.IsNullOrWhiteSpace(error));
             if (channels.Contains("telegram", StringComparison.Ordinal))
                 Assert.Contains("снимки", error);

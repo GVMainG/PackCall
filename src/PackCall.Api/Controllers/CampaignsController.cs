@@ -38,21 +38,21 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
     /// <summary>Создаёт черновик кампании и доставки для статичной аудитории.</summary>
     [HttpPost]
     [ProducesResponseType(typeof(CampaignResponse), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest,
+        "text/plain", "application/json", "text/json", "application/problem+json")]
     public async Task<ActionResult<CampaignResponse>> CreateCampaign(
         CreateCampaignRequest request, CancellationToken ct)
     {
         if (request.Channels is { } channels)
         {
             if (channels.Count == 0)
-                ModelState.AddModelError("channels", "Укажите хотя бы один канал.");
-            else if (channels.Any(channel => channel is null || !ContactChannel.SupportedChannels.Contains(channel)))
-                ModelState.AddModelError("channels", "Укажите известные каналы в нижнем регистре: email, telegram.");
-            else if (channels.Contains(ContactChannel.Telegram))
-                ModelState.AddModelError("channels", "Создание кампаний для telegram появится после перехода на снимки.");
-
-            if (!ModelState.IsValid)
-                return ValidationProblem(ModelState);
+                return Problem("Укажите хотя бы один канал.", statusCode: StatusCodes.Status400BadRequest);
+            if (channels.Any(channel => channel is null || !ContactChannel.SupportedChannels.Contains(channel)))
+                return Problem("Укажите известные каналы в нижнем регистре: email, telegram.",
+                    statusCode: StatusCodes.Status400BadRequest);
+            if (channels.Contains(ContactChannel.Telegram))
+                return Problem("Создание кампаний для telegram появится после перехода на снимки.",
+                    statusCode: StatusCodes.Status400BadRequest);
         }
 
         var id = await campaigns.CreateCampaignAsync(request.Name ?? "", request.MessageText ?? "", ct);
@@ -86,7 +86,8 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
     [ProducesResponseType(typeof(CampaignResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict,
+        "text/plain", "application/json", "text/json", "application/problem+json")]
     public Task<ActionResult<CampaignResponse>> StartCampaign(Guid id, CancellationToken ct) =>
         ApplyTransitionAsync(campaigns.StartCampaignAsync, id, ct);
 
