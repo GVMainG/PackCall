@@ -77,7 +77,8 @@ public class CampaignServiceTests
         typeof(ContactChannel).GetProperty(nameof(ContactChannel.Address))!.SetValue(invalid.Channels.Single(), " ");
         _recipientRepository.Items.Add(invalid);
 
-        await Assert.ThrowsAsync<ArgumentException>(() => CreateCampaignAsync());
+        var error = await Assert.ThrowsAsync<CampaignFormationException>(() => CreateCampaignAsync());
+        Assert.IsType<ArgumentException>(error.InnerException);
 
         Assert.Empty((await _service.GetCampaignsAsync(1, 10, CancellationToken.None)).Items);
         Assert.Empty(_deliveryRepository.Items);
@@ -124,7 +125,8 @@ public class CampaignServiceTests
             return Task.CompletedTask;
         };
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => CreateCampaignAsync());
+        var error = await Assert.ThrowsAsync<CampaignFormationException>(() => CreateCampaignAsync());
+        Assert.IsType<InvalidOperationException>(error.InnerException);
 
         Assert.Empty((await _service.GetCampaignsAsync(1, 10, CancellationToken.None)).Items);
         Assert.Empty(_deliveryRepository.Items);

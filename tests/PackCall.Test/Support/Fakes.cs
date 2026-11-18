@@ -31,6 +31,19 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
     public Task<IReadOnlyList<string>> GetChannelsAsync(Guid id, CancellationToken ct) =>
         Task.FromResult<IReadOnlyList<string>>([]);
 
+    public async Task<CampaignDetails?> GetDetailsAsync(Guid id, CancellationToken ct)
+    {
+        var campaign = await Get(id, ct);
+        if (campaign is null)
+            return null;
+
+        var counts = _deliveries is null ? new DeliveryStatusCounts(0, 0, 0, 0, 0)
+            : await _deliveries.GetStatusCountsAsync(id, ct);
+        var rows = _deliveries?.Items.Where(delivery => delivery.CampaignId == id).ToArray() ?? [];
+        return new CampaignDetails(campaign, counts, rows.Select(delivery => delivery.ContactId).Distinct().LongCount(),
+            rows.Select(delivery => delivery.Channel).Distinct().Order(StringComparer.Ordinal).ToArray());
+    }
+
     public Task<PageResult<Campaign>> GetPage(int pageNumber, int pageSize, CancellationToken ct)
     {
         var items = _store.Values
@@ -80,6 +93,12 @@ internal sealed class FakeCampaignRepository : ICampaingRepository
         _statuses.Remove(id);
         _deliveries?.RemoveByCampaign(id);
         return Task.FromResult(true);
+    }
+
+    public async Task DeleteIfFormingAsync(Guid id, CancellationToken ct)
+    {
+        if (_statuses.TryGetValue(id, out var status) && status == CampaignStatus.Forming)
+            await Delete(id, ct);
     }
 }
 

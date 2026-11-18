@@ -21,18 +21,19 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
         return Ok(page.ToResponse(pageNumber, pageSize, campaign => campaign.ToResponse()));
     }
 
-    /// <summary>Возвращает кампанию и число доставок по статусам.</summary>
+    /// <summary>Возвращает кампанию, число доставок по статусам и итоги формирования.</summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(CampaignDetailsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<CampaignDetailsResponse>> GetCampaign(Guid id, CancellationToken ct)
     {
-        var campaign = await campaigns.GetCampaignAsync(id, ct);
-        if (campaign is null)
+        var details = await campaigns.GetCampaignDetailsAsync(id, ct);
+        if (details is null)
             return NotFound();
 
-        var counts = await campaigns.GetDeliveryStatusCountsAsync(id, ct);
-        return Ok(new CampaignDetailsResponse(campaign.ToResponse(), counts.ToResponse()));
+        return Ok(new CampaignDetailsResponse(details.Campaign.ToResponse(), details.Deliveries.ToResponse(),
+            new CampaignFormationResponse(details.SelectedContactCount, details.Channels,
+                details.Deliveries.Total, details.SkippedDeliveryCount)));
     }
 
     /// <summary>Создаёт черновик кампании и доставки для статичной аудитории.</summary>
@@ -40,6 +41,7 @@ public sealed class CampaignsController(ICampaignService campaigns) : Controller
     [ProducesResponseType(typeof(CampaignResponse), StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest,
         "text/plain", "application/json", "text/json", "application/problem+json")]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError, "application/problem+json")]
     public async Task<ActionResult<CampaignResponse>> CreateCampaign(
         CreateCampaignRequest request, CancellationToken ct)
     {

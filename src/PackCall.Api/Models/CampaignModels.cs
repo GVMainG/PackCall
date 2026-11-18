@@ -33,5 +33,11 @@ public sealed record CampaignResponse(
 public sealed record DeliveryStatisticsResponse(
     int Total, int Waiting, int InProgress, int Sent, int Failed);
 
-/// <summary>Кампания со статистикой доставок.</summary>
-public sealed record CampaignDetailsResponse(CampaignResponse Campaign, DeliveryStatisticsResponse Deliveries);
+/// <summary>Итоги формирования по сохранённым контактам, каналам и доставкам.</summary>
+/// <param name="SkippedDeliveryCount">Число выбранных пар без доставки. В статусе Forming равно null.</param>
+public sealed record CampaignFormationResponse(
+    long SelectedContactCount, IReadOnlyList<string> Channels, int CreatedDeliveryCount, long? SkippedDeliveryCount);
+
+/// <summary>Кампания со статистикой доставок и итогами формирования.</summary>
+public sealed record CampaignDetailsResponse(
+    CampaignResponse Campaign, DeliveryStatisticsResponse Deliveries, CampaignFormationResponse Formation);

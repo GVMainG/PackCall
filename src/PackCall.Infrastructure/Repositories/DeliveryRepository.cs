@@ -79,7 +79,11 @@ public sealed class DeliveryRepository(AppDbContext dbContext, IDbContextFactory
         return new PageResult<Delivery>(items, totalCount);
     }
 
-    public async Task<DeliveryStatusCounts> GetStatusCountsAsync(Guid campaignId, CancellationToken ct)
+    public Task<DeliveryStatusCounts> GetStatusCountsAsync(Guid campaignId, CancellationToken ct) =>
+        ReadStatusCountsAsync(dbContext, campaignId, ct);
+
+    internal static async Task<DeliveryStatusCounts> ReadStatusCountsAsync(
+        AppDbContext dbContext, Guid campaignId, CancellationToken ct)
     {
         var counts = await dbContext.Deliveries.AsNoTracking()
             .Where(delivery => delivery.CampaignId == campaignId)

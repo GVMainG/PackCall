@@ -1,3 +1,4 @@
+using System.Data;
 using Microsoft.EntityFrameworkCore;
 using PackCall.Core;
 using PackCall.Core.Entities;
@@ -11,6 +12,20 @@ public sealed class CampaignRepository(AppDbContext dbContext, IDbContextFactory
         dbContext.Campaigns
             .AsNoTracking()
             .SingleOrDefaultAsync(campaign => campaign.Id == id, ct);
+
+    public async Task<CampaignDetails?> GetDetailsAsync(Guid id, CancellationToken ct)
+    {
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead, ct);
+        var campaign = await Get(id, ct);
+        if (campaign is null)
+            return null;
+
+        var contacts = await dbContext.CampaignContacts.LongCountAsync(contact => contact.CampaignId == id, ct);
+        var channels = await GetChannelsAsync(id, ct);
+        var deliveries = await DeliveryRepository.ReadStatusCountsAsync(dbContext, id, ct);
+        await transaction.CommitAsync(ct);
+        return new CampaignDetails(campaign, deliveries, contacts, channels.Order(StringComparer.Ordinal).ToArray());
+    }
 
     public async Task<IReadOnlyList<string>> GetChannelsAsync(Guid id, CancellationToken ct) =>
         await dbContext.CampaignChannels.Where(channel => channel.CampaignId == id)
@@ -33,8 +48,9 @@ public sealed class CampaignRepository(AppDbContext dbContext, IDbContextFactory
     {
         ArgumentNullException.ThrowIfNull(campaign);
 
-        await dbContext.Campaigns.AddAsync(campaign, ct);
-        await dbContext.SaveChangesAsync(ct);
+        await using var db = await factory.CreateDbContextAsync(ct);
+        await db.Campaigns.AddAsync(campaign, ct);
+        await db.SaveChangesAsync(ct);
         return campaign;
     }
 
@@ -98,4 +114,9 @@ public sealed class CampaignRepository(AppDbContext dbContext, IDbContextFactory
 
         return deleted > 0;
     }
+
+    public async Task DeleteIfFormingAsync(Guid id, CancellationToken ct) =>
+        await dbContext.Campaigns
+            .Where(campaign => campaign.Id == id && campaign.Status == CampaignStatus.Forming)
+            .ExecuteDeleteAsync(ct);
 }

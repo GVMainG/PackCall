@@ -14,6 +14,7 @@ internal sealed class ApiExceptionHandler(Serilog.ILogger logger) : IExceptionHa
     {
         var (status, title) = exception switch
         {
+            CampaignFormationException => (StatusCodes.Status500InternalServerError, "Не удалось сформировать кампанию"),
             KeyNotFoundException => (StatusCodes.Status404NotFound, "Ресурс не найден"),
             ArgumentException => (StatusCodes.Status400BadRequest, "Некорректный запрос"),
             ContactValidationException => (StatusCodes.Status400BadRequest, "Некорректные адреса контакта"),
@@ -37,7 +38,7 @@ internal sealed class ApiExceptionHandler(Serilog.ILogger logger) : IExceptionHa
             Detail = exception is ChannelOperatorUnavailableException ? exception.Message : null,
             Instance = httpContext.Request.Path
         }, options: null,
-            contentType: exception is ChannelOperatorUnavailableException ||
+            contentType: exception is ChannelOperatorUnavailableException or CampaignFormationException ||
                 httpContext.Request.Path.StartsWithSegments("/api/contacts", StringComparison.OrdinalIgnoreCase)
                 ? "application/problem+json"
                 : "application/json; charset=utf-8",

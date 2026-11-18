@@ -27,6 +27,25 @@ public sealed class CampaignService : ICampaignService
     }
 
     public async Task<Guid> CreateCampaignSnapshotAsync(string name, string messageText,
+        IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct) =>
+        (await SaveCampaignSnapshotAsync(name, messageText, contactIds, channels, ct)).Id;
+
+    public async Task<Guid> CreateCampaignAsync(string name, string messageText,
+        IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct)
+    {
+        Campaign campaign;
+        try
+        {
+            campaign = await SaveCampaignSnapshotAsync(name, messageText, contactIds, channels, ct);
+        }
+        catch (Exception error) when (error is not (ArgumentException or OperationCanceledException))
+        {
+            throw new CampaignFormationException(error);
+        }
+        return await CompleteFormationAsync(campaign, () => FormDeliveriesFromSnapshotAsync(campaign.Id, ct), ct);
+    }
+
+    private async Task<Campaign> SaveCampaignSnapshotAsync(string name, string messageText,
         IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
@@ -50,7 +69,7 @@ public sealed class CampaignService : ICampaignService
         var campaign = Campaign.Create(name, messageText);
         campaign.StatusFromDraftToForming();
         await _campaignRepository.CreateWithSnapshotAsync(campaign, selectedContacts, channelSnapshot, ct);
-        return campaign.Id;
+        return campaign;
     }
 
     public Task<int> FormDeliveriesFromSnapshotAsync(Guid campaignId, CancellationToken ct) =>
@@ -62,31 +81,27 @@ public sealed class CampaignService : ICampaignService
         var campaign = Campaign.Create(name, messageText);
         // Кампанию можно запустить только после записи последнего пакета доставок.
         campaign.StatusFromDraftToForming();
-        await _campaignRepository.Create(campaign, ct);
-
         try
         {
-            // Пакеты ограничивают объём контактов и доставок в памяти одного запроса.
-            var offset = 0;
-            while (true)
-            {
-                ct.ThrowIfCancellationRequested();
-                var recipients = await _recipientRepository.GetBatchAsync(offset, FormationBatchSize, ct);
-                if (recipients.Count == 0)
-                    break;
+            await _campaignRepository.Create(campaign, ct);
+        }
+        catch (Exception error) when (error is not OperationCanceledException)
+        {
+            throw new CampaignFormationException(error);
+        }
 
-                var now = DateTime.UtcNow;
-                var deliveries = recipients.Select(recipient => Delivery.Create(campaign, recipient, now)).ToList();
-                ct.ThrowIfCancellationRequested();
-                await _deliveryRepository.AddLegacyEmailBatchAsync(deliveries, ct);
-                offset = checked(offset + recipients.Count);
-                if (recipients.Count < FormationBatchSize)
-                    break;
-            }
+        return await CompleteFormationAsync(campaign, () => FormLegacyEmailDeliveriesAsync(campaign, ct), ct);
+    }
 
+    private async Task<Guid> CompleteFormationAsync(Campaign campaign, Func<Task> formDeliveries, CancellationToken ct)
+    {
+        try
+        {
+            await formDeliveries();
             ct.ThrowIfCancellationRequested();
             campaign.StatusFromFormingToDraft();
-            await _campaignRepository.Update(campaign, ct);
+            if (!await _campaignRepository.TryUpdateStatusAsync(campaign, CampaignStatus.Forming, ct))
+                throw new InvalidOperationException("Не удалось перевести формируемую кампанию в черновик.");
             return campaign.Id;
         }
         catch (Exception creationError)
@@ -94,14 +109,37 @@ public sealed class CampaignService : ICampaignService
             try
             {
                 // Отмена запроса не должна прерывать удаление уже сохранённой части кампании.
-                await _campaignRepository.Delete(campaign.Id, CancellationToken.None);
+                await _campaignRepository.DeleteIfFormingAsync(campaign.Id, CancellationToken.None);
             }
             catch (Exception cleanupError)
             {
-                throw new AggregateException("Не удалось удалить частично сформированную кампанию.",
-                    creationError, cleanupError);
+                throw new CampaignFormationException(new AggregateException(
+                    "Не удалось удалить частично сформированную кампанию.", creationError, cleanupError));
             }
-            throw;
+            if (creationError is OperationCanceledException && ct.IsCancellationRequested)
+                throw;
+            throw new CampaignFormationException(creationError);
+        }
+    }
+
+    private async Task FormLegacyEmailDeliveriesAsync(Campaign campaign, CancellationToken ct)
+    {
+        // Пакеты ограничивают объём контактов и доставок в памяти одного запроса.
+        var offset = 0;
+        while (true)
+        {
+            ct.ThrowIfCancellationRequested();
+            var recipients = await _recipientRepository.GetBatchAsync(offset, FormationBatchSize, ct);
+            if (recipients.Count == 0)
+                break;
+
+            var now = DateTime.UtcNow;
+            var deliveries = recipients.Select(recipient => Delivery.Create(campaign, recipient, now)).ToList();
+            ct.ThrowIfCancellationRequested();
+            await _deliveryRepository.AddLegacyEmailBatchAsync(deliveries, ct);
+            offset = checked(offset + recipients.Count);
+            if (recipients.Count < FormationBatchSize)
+                break;
         }
     }
 
@@ -192,6 +230,9 @@ public sealed class CampaignService : ICampaignService
         ct.ThrowIfCancellationRequested();
         return await _campaignRepository.Get(campaignId, ct);
     }
+
+    public Task<CampaignDetails?> GetCampaignDetailsAsync(Guid campaignId, CancellationToken ct) =>
+        _campaignRepository.GetDetailsAsync(campaignId, ct);
 
     public async Task<Delivery?> GetDeliveryAsync(Guid deliveryId, CancellationToken ct)
     {

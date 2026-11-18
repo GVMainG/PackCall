@@ -5,6 +5,7 @@ namespace PackCall.Core.Repositorys
     public interface ICampaingRepository
     {
         Task<Campaign?> Get(Guid id, CancellationToken ct);
+        Task<CampaignDetails?> GetDetailsAsync(Guid id, CancellationToken ct);
         Task<IReadOnlyList<string>> GetChannelsAsync(Guid id, CancellationToken ct);
         /// <summary>
         /// Возвращает страницу в порядке Id и общее число кампаний; нумерация с 1.
@@ -18,5 +19,6 @@ namespace PackCall.Core.Repositorys
         /// <summary>Сохраняет только статус и даты, если статус в БД всё ещё равен ожидаемому.</summary>
         Task<bool> TryUpdateStatusAsync(Campaign campaign, CampaignStatus expectedStatus, CancellationToken ct);
         Task<bool> Delete(Guid id, CancellationToken ct);
+        Task DeleteIfFormingAsync(Guid id, CancellationToken ct);
     }
 }

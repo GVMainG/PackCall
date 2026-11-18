@@ -17,12 +17,16 @@ public interface ICampaignService
     /// <remarks>
     /// При формировании доставок кампания имеет статус Forming и недоступна для изменения
     /// или запуска. Доставки сохраняются порциями; после завершения статус становится Draft.
-    /// При ошибке или отмене создания частичная кампания удаляется. Адрес получателя сохраняется как снимок.
+    /// При ошибке или отмене создания предпринимается попытка удалить частичную кампанию.
     /// Каждый вызов создаёт новую кампанию; повторный запрос не дедуплицируется.
     /// Название и сообщение проверяются при запуске, поэтому возможен незаполненный черновик.
     /// </remarks>
-    /// <exception cref="ArgumentException">У получателя отсутствует идентификатор или заполненный email.</exception>
+    /// <exception cref="CampaignFormationException">Не удалось сформировать кампанию.</exception>
     Task<Guid> CreateCampaignAsync(string name, string messageText, CancellationToken ct);
+
+    /// <summary>Создаёт черновик и доставки по снимку выборки. Null в contactIds означает все контакты.</summary>
+    Task<Guid> CreateCampaignAsync(string name, string messageText,
+        IReadOnlyList<Guid>? contactIds, IReadOnlyList<string?> channels, CancellationToken ct);
 
     /// <summary>Сохраняет кампанию в Forming вместе со снимком аудитории. Null в contactIds означает все контакты.</summary>
     /// <exception cref="ArgumentException">Выборка или каналы некорректны либо контакт не найден.</exception>
@@ -66,6 +70,9 @@ public interface ICampaignService
 
     /// <summary>Возвращает кампанию или null, если она не найдена.</summary>
     Task<Campaign?> GetCampaignAsync(Guid campaignId, CancellationToken ct);
+
+    /// <summary>Возвращает кампанию и статистику в одном снимке данных или null.</summary>
+    Task<CampaignDetails?> GetCampaignDetailsAsync(Guid campaignId, CancellationToken ct);
 
     /// <summary>Возвращает доставку или null, если она не найдена.</summary>
     Task<Delivery?> GetDeliveryAsync(Guid deliveryId, CancellationToken ct);
