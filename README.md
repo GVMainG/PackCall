@@ -67,34 +67,62 @@ Worker захватывает доставки активных кампаний
 
 ## Быстрый старт (Compose)
 
+Выполните из корня репозитория в Bash с `curl` 7.76 или новее и Python 3.11+.
+Для проверки создаётся отдельный Compose-проект
+с чистым томом PostgreSQL. Настройки берутся из `docker-compose.env` (режим
+`test/inprocess`, имитация отказов выключена).
+
 ```bash
-# 1. тестовые значения окружения (не используйте рабочий .env)
-cat > .env <<'EOF'
-DOCKER_REGISTRY=
-PACKCALL_ENVIRONMENT=test
-TEST_SENDER_MODE=inprocess
-TEST_SIMULATE_ERRORS=false
-TEST_OPERATOR_URL=
-TEST_OPERATOR_TIMEOUT_SECONDS=5
-POSTGRES_DB=packcall
-POSTGRES_USER=packcall
-POSTGRES_PASSWORD=packcall
-EOF
+unset api
+project=$(python -c 'import uuid; print("packcall-smoke-" + uuid.uuid4().hex[:12])') || project=
 
-# 2. поднять и собрать (migrator применяет EF-миграции и завершается; api/worker ждут его)
-docker compose up -d --build
+smoke_compose() (
+  unset PACKCALL_ENVIRONMENT TEST_SENDER_MODE TEST_SIMULATE_ERRORS TEST_OPERATOR_URL
+  unset TEST_OPERATOR_TIMEOUT_SECONDS POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD
+  DOCKER_REGISTRY=packcall-quickstart/ docker compose --env-file docker-compose.env \
+    -p "${project:?Имя тестового Compose-проекта не создано}" -f docker-compose.yml -f - "$@" <<'YAML'
+services:
+  packcall.api:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+    ports:
+      - "127.0.0.1::8080"
+YAML
+)
 
-# 3. проверка работоспособности
-docker compose ps
-docker compose logs packcall.api
-curl -s "http://localhost:8080/api/recipients?pageNumber=1&pageSize=1"
+smoke_compose up -d --build &&
+  smoke_compose ps --all &&
+  address=$(smoke_compose port packcall.api 8080) &&
+  curl --fail-with-body -sS --retry 30 --retry-delay 1 --retry-all-errors --max-time 3 \
+    "http://${address:?Порт API не опубликован}/api/contacts?pageSize=1" &&
+  api="http://$address"
 ```
 
-Сервисы Compose: `packcall.api`, `packcall.worker`, `packcall.migrator`, `packcall.db`
-(имена заданы явно, без коротких алиасов). API публикуется на `8080` из
-`docker-compose.override.yml` (применяется Compose v2 автоматически); БД — `5432`, поэтому
-локальный PostgreSQL 18 на том же порту конфликтует. Проверка `curl` выполняется с хоста (в
-образе `aspnet:10.0` curl не гарантирован). Более полный перечень проверок —
+В `ps --all` ожидается `Exited (0)` у `packcall.migrator`. Он применяет миграции
+после готовности БД. API и Worker ждут его успешного завершения. После ответа
+списка контактов создайте контакт и прочитайте его по возвращённому `Location`.
+
+```bash
+created=$(curl --fail-with-body -sS -i -H 'Content-Type: application/json' \
+  --data '{"displayName":"Compose smoke","channels":[{"channel":"email","address":"compose-smoke@example.test"}]}' \
+  "${api:?Сначала дождитесь готовности API}/api/contacts") &&
+  printf '%s\n' "$created" &&
+  location=$(printf '%s\n' "$created" | awk 'tolower($1) == "location:" { sub(/\r$/, "", $2); print $2 }') &&
+  curl --fail-with-body -sS -i "${location:?В ответе создания отсутствует Location}"
+```
+
+Ожидаются `201 Created` и `200 OK` с одинаковыми `id` и `compose-smoke@example.test`.
+При ошибке проверьте `smoke_compose logs packcall.migrator packcall.api`. После проверки
+удалите стенд вместе с его временным томом командой `smoke_compose down --volumes`.
+
+Явные `-f` и `--env-file` позволяют выполнить сценарий при существующем рабочем
+`.env`. API доступен с хоста на автоматически выделенном порту `127.0.0.1`, БД
+доступна сервисам проекта на `packcall.db:5432`. Обычный локальный запуск с
+`docker-compose.override.yml` публикует API на `8080` и БД на `5432`.
+Для проверок внешнего тестового email-оператора есть отдельные
+`docker-compose.test-http.yml` и `docker-compose.test-http.env`.
+Более полный перечень проверок —
 [`tests/README.md`](tests/README.md); зависимости Python (`jsonschema`, `pytest`) —
 [`scripts/performance/requirements.txt`](scripts/performance/requirements.txt).
 

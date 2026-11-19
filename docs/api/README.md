@@ -21,7 +21,26 @@ Wire-спеллинг (AD-7) использует PascalCase для статус
 Контакт включает хотя бы один адрес канала `email` или `telegram`. Telegram chat ID передаётся строкой.
 Ошибки возвращаются как ProblemDetails. Некорректные данные дают `400`, отсутствующий контакт — `404`,
 занятый адрес — `409`, откат записи из-за дедлока — `503` с возможностью повторить запрос.
-`/api/recipients` по-прежнему обслуживает email-получателей.
+
+## Совместимость с beta.2
+
+- `POST /api/recipients` принимает `{"email":"legacy@example.test"}` и создаёт контакт с
+  одним адресом email. `GET /api/recipients` и `GET /api/recipients/{id}` читают только
+  контакты с email, в ответе сохраняется поле `email`. Эти операции работают с новой
+  моделью контактов.
+- `GET /api/deliveries/{id}` и `GET /api/campaigns/{id}/deliveries` возвращают поля
+  `recipientId` и `recipientEmail`. В них передаются UUID контакта и сохранённый
+  адрес доставки, в том числе chat ID для Telegram. Для исторического `NULL`
+  возвращается пустая строка. Полей `contactId`, `channel` и `addressSnapshot`
+  в DTO доставки пока нет.
+- Отдельный протокол тестового email-оператора сохраняет `recipient_id` (UUID контакта) и
+  `recipient_email` (снимок email) в запросе `POST /v1/email/send`. Остальные поля —
+  `delivery_id`, `campaign_id`, `message_text` и `simulate_errors`.
+  [Контракт оператора](../../tests/acceptance/operators/README.md).
+
+Прежняя таблица `recipients` и колонки `deliveries.recipient_id` и
+`deliveries.recipient_email` относятся к схеме до переноса контактов.
+[Миграция beta.2 → beta.3](../adr/0002-legacy-migration-api-evolution.md).
 
 ## Каналы кампании
 
@@ -59,35 +78,37 @@ Wire-спеллинг (AD-7) использует PascalCase для статус
   Ответ `204` подтверждает удаление кампании, её снимка и доставок. Журнал
   остаётся в БД. Для отсутствующей кампании API возвращает `404`.
 
-## Регенерация
+## Сверка с текущим OpenAPI
 
-Baseline снимается с запущенного API (требуется образ `packcall-api` и доступный PostgreSQL,
-схема создана):
+Схему beta.3 можно получить с запущенного стенда, до его очистки. В той же Bash-сессии
+используйте переменную `$api` из [быстрого старта](../../README.md#быстрый-старт-compose).
 
 ```bash
-docker run -d --name openapi-gen --network <net> \
-  -e ASPNETCORE_ENVIRONMENT=Development \
-  -e PACKCALL_ENVIRONMENT=test -e TEST_SENDER_MODE=inprocess \
-  -e "ConnectionStrings__Postgres=Host=<db>;Database=<db>;Username=<user>;Password=<pass>" \
-  -p 18080:8080 packcall-api
-curl -s --retry 10 --retry-connrefused --retry-delay 2 \
-  http://localhost:18080/openapi/v1.json -o docs/api/openapi.v1.json
-docker stop openapi-gen && docker rm openapi-gen
+openapi_current=$(mktemp) &&
+  curl --fail-with-body -sS "${api:?Сначала дождитесь готовности API}/openapi/v1.json" -o "$openapi_current" &&
+  git diff --no-index -- docs/api/openapi.v1.json "$openapi_current"
 ```
 
-`MapOpenApi()` доступен только в Development-окружении (см. `src/PackCall.Api/Program.cs`).
-JSON генерируется, а не правится вручную.
+`servers[0].url` различается из-за динамического порта стенда. Код выхода `git diff`
+`1` означает, что найдены различия.
+
+`MapOpenApi()` доступен в Development. По сравнению с baseline beta.2 добавились
+`/api/channels`, `/api/contacts` и `/api/contacts/{id}`. У создания кампании в схеме
+теперь обязательны `selection` и `channels` вместе с `name` и `messageText`.
+Детали кампании включают `formation`, а схема `DeliveryResponse` сохраняет прежние поля.
+Генератор по-прежнему описывает статусы числами, в ответах API используются строки PascalCase.
+Итоговый дифф и release notes относятся к Story 2.19.
 
 ## Известные ограничения baseline beta.2
 
 - `CampaignStatus`/`DeliveryStatus` в схеме — `"type": "integer"` без enum: `Microsoft.AspNetCore.OpenApi`
   не применяет `JsonStringEnumConverter` к схеме. Фактический wire-формат — PascalCase-строки
-  (AD-7; `JsonStringEnumConverter` в `Program.cs`). Выравнивание схемы (string-enum) — в `beta.3`.
+  (AD-7, `JsonStringEnumConverter` в `Program.cs`).
 - `pageNumber/pageSize/totalCount/totalPages` рендерятся как union `integer|string` с pattern,
   допускающим `0`/отрицательные — артефакт генератора; реальная валидация — `pageNumber ≥ 1`,
   `pageSize` 20/100 (AD-7).
 - Нет `operationId`, `security`/`securitySchemes`, описаний/примеров и единого набора кодов ошибок
-  — это «как есть» на HEAD; аутентификация отсутствует по NFR-8 (демо/локальный стенд).
+  в зафиксированной схеме beta.2. Аутентификация отсутствует по NFR-8 (демо/локальный стенд).
 - `info.version` = `1.0.0` (дефолт генератора); версия контракта — имя файла `v1`; `beta.N` —
   вехи релиза. `servers[0].url` — хост генерации (`localhost:18080`).
 
@@ -95,5 +116,5 @@ JSON генерируется, а не правится вручную.
 
 - Любое изменение API сравнивается с `openapi.v1.json`; намеренность и breaking-статус
   указываются в PR и release notes; молчаливые breaking changes запрещены.
-- Baseline, устаревший относительно кода, — красный флаг ревью, а не «допустимое расхождение».
-- Автоматическая проверка дрейфа (перегенерация + diff в CI) — отдельная задача `beta.3`.
+- Baseline beta.2 фиксирует контракт той ревизии. Схема работающего API генерируется из кода и
+  сравнивается с ним при подготовке выпуска.
