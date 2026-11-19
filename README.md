@@ -126,12 +126,53 @@ created=$(curl --fail-with-body -sS -i -H 'Content-Type: application/json' \
 [`tests/README.md`](tests/README.md); зависимости Python (`jsonschema`, `pytest`) —
 [`scripts/performance/requirements.txt`](scripts/performance/requirements.txt).
 
-При обновлении существующей БД с beta.2 на beta.3 используйте
-[порядок проверки, миграции и отката](docs/adr/0002-legacy-migration-api-evolution.md)
-перед запуском новых Api и Worker.
-Миграция `DeliveryCaptureIndex` добавляет индекс `(delivery_status, id)` для захвата
-доставок. Планируйте её в том же окне обслуживания: создание индекса блокирует
-запись в `deliveries` до завершения миграции. Откат этой миграции удаляет только индекс.
+## Обновление с beta.2 до beta.3
+
+Остановите API и Worker beta.2, используя имя и файлы Compose старого проекта.
+Из корня исходников beta.3 выполните в Bash. При первом запуске выберите
+свободное имя проекта, например `packcall-beta3`. Убедитесь, что этого имени
+нет в `docker compose ls --all` и тома `packcall-beta3_packcall-postgres-data`
+нет в `docker volume ls`. Выберите свободный порт, например `18083`, и
+используйте выбранное имя и порт для последующих запусков.
+
+```bash
+project=packcall-beta3
+port=18083
+
+beta3_compose() (
+  unset PACKCALL_ENVIRONMENT TEST_SENDER_MODE TEST_SIMULATE_ERRORS TEST_OPERATOR_URL
+  unset TEST_OPERATOR_TIMEOUT_SECONDS POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD
+  DOCKER_REGISTRY="$project/" docker compose --env-file docker-compose.env \
+    -p "$project" -f docker-compose.yml -f - "$@" <<YAML
+services:
+  packcall.api:
+    environment:
+      ASPNETCORE_HTTP_PORTS: 8080
+    ports:
+      - "127.0.0.1:$port:8080"
+YAML
+)
+
+beta3_compose up -d --build &&
+  beta3_compose ps --all &&
+  curl --fail-with-body -sS --retry 30 --retry-delay 1 --retry-all-errors --max-time 3 \
+    "http://127.0.0.1:$port/api/contacts?pageSize=1"
+```
+
+Первый запуск создаёт пустой том. Migrator применяет миграции и завершается
+с кодом 0, после чего запускаются API и Worker. API доступен на
+`http://127.0.0.1:18083`, PostgreSQL доступен сервисам проекта внутри Docker.
+Проверка списка контактов выполняет только чтение. Для повторного запуска
+выполните тот же блок, а для остановки с сохранением данных используйте
+`beta3_compose stop`. Быстрый старт выше предназначен для временного стенда.
+[Проверка отправки тестовой кампании](docs/evidence/beta3/release-readiness.md#чистый-compose).
+
+Данные beta.2 в новую базу не переносятся. Старый том остаётся у владельца.
+Сохраните его отдельно и используйте исходные
+настройки beta.2, если потребуется снова открыть прежнюю установку. Гарантия
+переноса распространяется на данные, созданные в 1.0 и позднее, при последующих
+поддерживаемых обновлениях.
+Политика обновления и история репетиции переноса описаны в [ADR 0002](docs/adr/0002-legacy-migration-api-evolution.md).
 
 ## Структура и ссылки
 

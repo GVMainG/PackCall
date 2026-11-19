@@ -14,3 +14,6 @@ commit SHA, версию окружения и команду воспроизв
 [восстановление кампаний и повтор SM-6](beta3/sm6-recovery.md).
 
 [Матрица выборки, попытки и снимок кампании SM-2](beta3/sm2-audience.md).
+
+[Финальная локальная регрессия и допуск beta.3](beta3/release-readiness.md).
+[Сравнение OpenAPI работающего API с beta.2](beta3/openapi-diff.md).

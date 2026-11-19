@@ -97,7 +97,7 @@ openapi_current=$(mktemp) &&
 теперь обязательны `selection` и `channels` вместе с `name` и `messageText`.
 Детали кампании включают `formation`, а схема `DeliveryResponse` сохраняет прежние поля.
 Генератор по-прежнему описывает статусы числами, в ответах API используются строки PascalCase.
-Итоговый дифф и release notes относятся к Story 2.19.
+Полный список существенных различий зафиксирован в [сверке OpenAPI beta.3](../evidence/beta3/openapi-diff.md).
 
 ## Известные ограничения baseline beta.2
 
