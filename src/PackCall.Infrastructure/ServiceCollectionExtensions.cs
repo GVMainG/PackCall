@@ -33,21 +33,18 @@ namespace PackCall.Infrastructure
         public static IServiceCollection AddCampaignManagement(this IServiceCollection services) => services
             .AddRepositories().AddScoped<ICampaignService, CampaignService>();
 
-        public static IServiceCollection AddDeliveryProcessing(this IServiceCollection services, Hosting.TestOperatorSettings settings)
-        {
-            services.AddRepositories()
-                .AddChannelOperators(settings)
-                .AddScoped<DeliveryProcessingService>(provider => new DeliveryProcessingService(
-                    provider.GetRequiredService<IDeliveryRepository>(),
-                    provider.GetRequiredService<ICampaingRepository>(),
-                    channel => provider.GetKeyedService<IMessageSender>(channel),
-                    provider.GetRequiredService<IDeliveryStatusJournal>(),
-                    provider.GetService<TimeProvider>()))
-                .AddScoped<IDeliveryProcessingService>(provider => provider.GetRequiredService<DeliveryProcessingService>())
-                .AddSingleton<PackCall.Core.ILeaseClock, PostgresLeaseClock>()
-                .AddSingleton<IDeliveryStatusJournal, DeliveryStatusJournal>();
-            return services;
-        }
+        public static IServiceCollection AddDeliveryProcessing(this IServiceCollection services, Hosting.TestOperatorSettings settings) => services
+            .AddRepositories()
+            .AddChannelOperators(settings)
+            .AddScoped<DeliveryProcessingService>(provider => new DeliveryProcessingService(
+                provider.GetRequiredService<IDeliveryRepository>(),
+                provider.GetRequiredService<ICampaingRepository>(),
+                channel => provider.GetKeyedService<IMessageSender>(channel),
+                provider.GetRequiredService<IDeliveryStatusJournal>(),
+                provider.GetService<TimeProvider>()))
+            .AddScoped<IDeliveryProcessingService>(provider => provider.GetRequiredService<DeliveryProcessingService>())
+            .AddSingleton<PackCall.Core.ILeaseClock, PostgresLeaseClock>()
+            .AddSingleton<IDeliveryStatusJournal, DeliveryStatusJournal>();
 
         public static IServiceCollection AddChannelOperators(this IServiceCollection services, Hosting.TestOperatorSettings settings)
         {

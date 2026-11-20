@@ -49,6 +49,11 @@ public sealed class ContactsApiPostgresTests : PostgresTestBase
         Assert.Equal((2, 2), (secondPage.TotalCount, secondPage.TotalPages));
         Assert.Equal(new[] { created.Id, other.Id }.Order(),
             new[] { Assert.Single(firstPage.Items).Id, Assert.Single(secondPage.Items).Id });
+
+        var emailPage = (await client.GetFromJsonAsync<PageResponse<RecipientResponse>>("/api/recipients?pageSize=1"))!;
+        Assert.Equal(1, emailPage.TotalCount);
+        var emailRecipient = Assert.Single(emailPage.Items);
+        Assert.Equal((other.Id, "user@example.com"), (emailRecipient.Id, emailRecipient.Email));
     }
 
     [PostgresFact]

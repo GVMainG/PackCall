@@ -39,6 +39,7 @@ public class OperatorRegistrationTests : OperatorTestBase
             .AddSingleton<IDeliveryStatusJournal>(new FakeJournal()).AddSingleton<IOperatorRandom>(new SequenceRandom(0));
         await using var provider=services.BuildServiceProvider();using var scope=provider.CreateScope();
         var processing=scope.ServiceProvider.GetRequiredService<IDeliveryProcessingService>();
+        Assert.Same(processing, scope.ServiceProvider.GetRequiredService<DeliveryProcessingService>());
         var captured=Assert.Single(await processing.CaptureBatchAsync(1,"policy",TimeSpan.FromSeconds(90),default));
         await processing.ProcessAsync(captured,default);
         Assert.Equal(simulate?DeliveryStatus.Failed:DeliveryStatus.Sent,delivery.DeliveryStatus);
