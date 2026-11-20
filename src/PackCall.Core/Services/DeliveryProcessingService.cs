@@ -102,24 +102,25 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
             // Сохраняем владельца и срок захвата: терминальный переход очистит оба поля.
             var workerId = delivery.WorkerId;
             var lockExpiresAt = delivery.LockExpiresAt;
-            var campaign = await GetCampaignAsync(delivery.CampaignId, ct);
+            var campaignId = delivery.CampaignId;
+            var campaign = await _campaignRepository.Get(campaignId, ct)
+                ?? throw new KeyNotFoundException($"Кампания {campaignId} не найдена.");
             if (campaign.Status == CampaignStatus.Paused)
             {
                 // На паузе возвращаем доставку в очередь, если владелец и срок захвата ещё совпадают.
                 outcome = Outcome.PausedNoRelease;
-                if (workerId is not null && lockExpiresAt is { } expiresAt)
-                {
-                    var releasedAt = DateTime.UtcNow;
-                    var released = await _deliveryRepository.ReleaseCapturedAsync(
-                        delivery.Id, workerId, expiresAt, releasedAt, ct);
-                    if (released is not null)
-                    {
-                        outcome = Outcome.PausedRelease;
-                        await AppendMeasuredAsync(new StatusChangeEntry(
-                            delivery.CampaignId, delivery.Id, DeliveryStatus.InProgress, DeliveryStatus.Waiting,
-                            workerId, releasedAt, OperatorResult: null), ct, Purpose.Pause);
-                    }
-                }
+                if (workerId is null || lockExpiresAt is not { } expiresAt)
+                    return;
+
+                var releasedAt = DateTime.UtcNow;
+                if (await _deliveryRepository.ReleaseCapturedAsync(
+                        delivery.Id, workerId, expiresAt, releasedAt, ct) is null)
+                    return;
+
+                outcome = Outcome.PausedRelease;
+                await AppendMeasuredAsync(new StatusChangeEntry(
+                    delivery.CampaignId, delivery.Id, DeliveryStatus.InProgress, DeliveryStatus.Waiting,
+                    workerId, releasedAt, OperatorResult: null), ct, Purpose.Pause);
                 return;
             }
             if (campaign.Status != CampaignStatus.InProgress)
@@ -264,10 +265,4 @@ public sealed class DeliveryProcessingService : IDeliveryProcessingService
     private Task AppendMeasuredAsync(StatusChangeEntry entry, CancellationToken ct, Purpose purpose) =>
         MeasuredOperation.Run(Operation.JournalAppend, () => _journal.AppendAsync(entry, ct),
             Event.JournalFinished, purpose, _time);
-
-    private async Task<Campaign> GetCampaignAsync(Guid campaignId, CancellationToken ct)
-    {
-        return await _campaignRepository.Get(campaignId, ct)
-            ?? throw new KeyNotFoundException($"Кампания {campaignId} не найдена.");
-    }
 }

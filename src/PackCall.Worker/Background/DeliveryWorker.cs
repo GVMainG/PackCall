@@ -92,7 +92,14 @@ public sealed class DeliveryWorker : BackgroundService
                 else
                     _logger.Error(exception, "Ошибка прохода recovery: возврат просроченных доставок и сверка кампаний");
 
-                await DelayAfterErrorAsync(ct);
+                try
+                {
+                    await Task.Delay(_options.ErrorDelay, ct);
+                }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                {
+                    break;
+                }
             }
         }
     }
@@ -160,17 +167,6 @@ public sealed class DeliveryWorker : BackgroundService
         {
             if (!enteredService) PerformanceMetrics.Count(Event.ProcessingFinished, outcome);
             PerformanceMetrics.Duration(Operation.ProcessingTotal, outcome, _timeProvider.GetElapsedTime(start).TotalMilliseconds);
-        }
-    }
-
-    private async Task DelayAfterErrorAsync(CancellationToken ct)
-    {
-        try
-        {
-            await Task.Delay(_options.ErrorDelay, ct);
-        }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
         }
     }
 }
